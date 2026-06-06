@@ -65,7 +65,6 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
             <TableRow>
               <TableHead className='w-[100px]'>Mã hàng</TableHead>
               <TableHead>Tên mặt hàng</TableHead>
-              <TableHead className='w-[80px] text-right'>Tồn kho</TableHead>
               <TableHead className='w-[130px] text-right'>Giá gốc</TableHead>
               <TableHead className='w-[160px] text-right'>Giá tùy chỉnh</TableHead>
             </TableRow>
@@ -77,11 +76,6 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
                 <TableCell>
                   {item.product.name}
                   <span className='ml-2 text-xs text-muted-foreground'>({item.product.unit})</span>
-                </TableCell>
-                <TableCell
-                  className={`text-right ${item.product.stock < 0 ? 'text-red-500 font-medium' : ''}`}
-                >
-                  {item.product.stock}
                 </TableCell>
                 <TableCell className='text-right text-muted-foreground'>
                   {formatCurrency(item.product.defaultSalePrice)}
@@ -99,7 +93,7 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
             ))}
             {filteredItems.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className='h-24 text-center'>
+                <TableCell colSpan={4} className='h-24 text-center'>
                   Không tìm thấy mặt hàng.
                 </TableCell>
               </TableRow>

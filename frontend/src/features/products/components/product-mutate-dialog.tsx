@@ -27,8 +27,8 @@ export function ProductMutateDialog() {
   const form = useForm<ProductSchema>({
     resolver: zodResolver(productSchema),
     defaultValues: isEdit
-      ? { code: selectedProduct?.code ?? '', name: selectedProduct?.name ?? '', category: selectedProduct?.category ?? '', unit: selectedProduct?.unit ?? '', description: selectedProduct?.description ?? '', purchasePrice: selectedProduct?.purchasePrice ?? 0, defaultSalePrice: selectedProduct?.defaultSalePrice ?? 0, stock: selectedProduct?.stock ?? 0 }
-      : { code: '', name: '', category: '', unit: '', description: '', purchasePrice: 0, defaultSalePrice: 0, stock: 0 },
+      ? { code: selectedProduct?.code ?? '', name: selectedProduct?.name ?? '', category: selectedProduct?.category ?? '', unit: selectedProduct?.unit ?? '', description: selectedProduct?.description ?? '', purchasePrice: selectedProduct?.purchasePrice ?? 0, defaultSalePrice: selectedProduct?.defaultSalePrice ?? 0 }
+      : { code: '', name: '', category: '', unit: '', description: '', purchasePrice: 0, defaultSalePrice: 0 },
   })
 
   const mutation = useMutation({
@@ -102,7 +102,7 @@ export function ProductMutateDialog() {
             <Label htmlFor='description'>Mô tả</Label>
             <textarea id='description' {...form.register('description')} className='flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm' placeholder='Mô tả sản phẩm...' />
           </div>
-          <div className='grid grid-cols-3 gap-4'>
+          <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label htmlFor='purchasePrice'>Giá nhập</Label>
               <Input id='purchasePrice' type='number' {...form.register('purchasePrice', { valueAsNumber: true })} />
@@ -110,10 +110,6 @@ export function ProductMutateDialog() {
             <div className='space-y-2'>
               <Label htmlFor='defaultSalePrice'>Giá bán</Label>
               <Input id='defaultSalePrice' type='number' {...form.register('defaultSalePrice', { valueAsNumber: true })} />
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='stock'>Tồn kho</Label>
-              <Input id='stock' type='number' {...form.register('stock', { valueAsNumber: true })} />
             </div>
           </div>
           <DialogFooter>

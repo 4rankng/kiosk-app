@@ -8,7 +8,6 @@ export const productSchema = z.object({
   description: z.string(),
   purchasePrice: z.number().min(0, 'Giá nhập phải lớn hơn hoặc bằng 0'),
   defaultSalePrice: z.number().min(0, 'Giá bán phải lớn hơn hoặc bằng 0'),
-  stock: z.number(),
 })
 
 export type ProductSchema = z.infer<typeof productSchema>

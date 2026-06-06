@@ -25,14 +25,6 @@ export function getProductsColumns(
       cell: ({ row }) => formatCurrency(row.getValue('defaultSalePrice')),
     },
     {
-      accessorKey: 'stock',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Tồn kho' />,
-      cell: ({ row }) => {
-        const stock = row.getValue('stock') as number
-        return <span className={stock < 0 ? 'text-red-500 font-medium' : ''}>{stock}</span>
-      },
-    },
-    {
       id: 'actions',
       header: 'Thao tác',
       cell: ({ row }) => (

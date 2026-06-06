@@ -44,7 +44,7 @@ function ProductsContent() {
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>Danh mục sản phẩm</h2>
-            <p className='text-muted-foreground'>Quản lý sản phẩm và tồn kho.</p>
+            <p className='text-muted-foreground'>Quản lý sản phẩm.</p>
           </div>
           <AddProductButton />
         </div>

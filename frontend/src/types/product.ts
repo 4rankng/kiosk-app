@@ -7,5 +7,4 @@ export interface Product {
   description: string
   purchasePrice: number
   defaultSalePrice: number
-  stock: number
 }
