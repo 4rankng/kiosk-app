@@ -18,9 +18,7 @@ import { getInvoices } from '@/services/invoices'
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table'
-import { DataTablePagination } from '@/components/data-table/data-table-pagination'
-import { DataTableFacetedFilter } from '@/components/data-table/data-table-faceted-filter'
-import { DataTableViewOptions } from '@/components/data-table/data-table-view-options'
+import { DataTablePagination, DataTableFacetedFilter, DataTableViewOptions } from '@/components/data-table'
 import { Input } from '@/components/ui/input'
 import { getInvoicesColumns } from './invoices-columns'
 import { statusOptions } from '../data/data'
