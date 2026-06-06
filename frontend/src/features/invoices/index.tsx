@@ -2,7 +2,7 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
+import { NotificationBell } from '@/components/notification-bell'
 import { InvoicesDialogs } from './components/invoices-dialogs'
 import { InvoicesProvider } from './components/invoices-provider'
 import { InvoicesTable } from './components/invoices-table'
@@ -12,7 +12,7 @@ export function Invoices() {
     <InvoicesProvider>
       <Header fixed>
         <Search className='me-auto' />
-        <ThemeSwitch />
+        <NotificationBell />
         <ProfileDropdown />
       </Header>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>

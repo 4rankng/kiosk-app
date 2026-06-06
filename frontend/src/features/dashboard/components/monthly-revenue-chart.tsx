@@ -19,8 +19,8 @@ export function MonthlyRevenueChart() {
     <Card>
       <CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Doanh thu theo tháng</CardTitle></CardHeader>
       <CardContent>
-        <div className='h-[300px]' style={{ minWidth: 0, minHeight: 0 }}>
-          <ResponsiveContainer width='100%' height='100%'>
+        <div className='h-[300px] w-full'>
+          <ResponsiveContainer width='100%' height={300}>
             <BarChart data={data?.monthlyRevenue ?? []}>
               <CartesianGrid strokeDasharray='3 3' />
               <XAxis dataKey='week' />

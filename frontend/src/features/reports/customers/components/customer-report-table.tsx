@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, Fragment } from 'react'
 import { formatCurrency } from '@/lib/format'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import type { CustomerReportRow } from '@/services/reports'
@@ -29,7 +29,7 @@ export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
           {Object.entries(grouped).map(([companyId, rows]) => {
             const totals = rows.reduce((acc, r) => ({ revenue: acc.revenue + r.totalRevenue, unpaid: acc.unpaid + r.unpaidAmount }), { revenue: 0, unpaid: 0 })
             return (
-              <>
+              <Fragment key={companyId}>
                 {rows.map((row) => (
                   <TableRow key={row.customerId}>
                     <TableCell className='font-mono text-sm'>{row.customerCode}</TableCell>
@@ -43,7 +43,7 @@ export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
                   <TableCell className='text-right font-bold'>{formatCurrency(totals.revenue)}</TableCell>
                   <TableCell className='text-right font-bold'>{formatCurrency(totals.unpaid)}</TableCell>
                 </TableRow>
-              </>
+              </Fragment>
             )
           })}
           {data.length === 0 && (

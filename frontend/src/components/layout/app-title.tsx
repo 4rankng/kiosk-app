@@ -23,10 +23,10 @@ export function AppTitle() {
             <Link
               to='/'
               onClick={() => setOpenMobile(false)}
-              className='grid flex-1 text-start text-sm leading-tight'
+              className='flex flex-1 items-center gap-2'
             >
-              <span className='truncate font-bold'>Quản Lý Bán Buôn</span>
-              <span className='truncate text-xs'>Hệ thống quản lý bán buôn</span>
+              <img src='/favicon.png' alt='TingTing Kiosk' className='size-8 rounded-md' />
+              <span className='font-bold'>TingTing Kiosk</span>
             </Link>
             <ToggleSidebar />
           </div>

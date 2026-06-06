@@ -7,7 +7,7 @@ import { CustomerActionsCell } from './customer-actions-cell'
 export function getCustomersColumns(): ColumnDef<Customer>[] {
   return [
     { accessorKey: 'code', header: ({ column }) => <DataTableColumnHeader column={column} title='Mã KH' /> },
-    { accessorKey: 'name', header: ({ column }) => <DataTableColumnHeader column={column} title='Tên Nhà Hàng' /> },
+    { accessorKey: 'name', header: ({ column }) => <DataTableColumnHeader column={column} title='Khách hàng' /> },
     {
       accessorKey: 'companyId', header: 'Trực thuộc Công ty',
       cell: ({ row }) => <CompanyCell companyId={row.getValue('companyId') as string} />,

@@ -21,7 +21,7 @@ export const sidebarData: SidebarData = {
   teams: [],
   navGroups: [
     {
-      title: 'Chính',
+      title: '',
       items: [
         {
           title: 'Tổng quan',
