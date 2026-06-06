@@ -20,42 +20,39 @@ PHẦN II: ĐẶC TẢ CHI TIẾT CÁC TÍNH NĂNG THÀNH PHẦN
 
 1.1. Quản lý danh mục sản phẩm
 - Trường thông tin sản phẩm: Mã hàng, Tên mặt hàng, Nhóm hàng, Đơn vị tính (Thùng, Cân, Gói, Hộp, Chai...), Mô tả sản phẩm, Giá nhập vào, Giá bán mặc định.
+- Nhóm hàng: Hiển thị dưới dạng dropdown, nếu danh sách trống người dùng có thể thêm mới trực tiếp inline.
+- Đơn vị tính: Hiển thị dưới dạng dropdown, nếu danh sách trống người dùng có thể thêm mới trực tiếp inline.
+- Giá bán mặc định: Sử dụng giá từ Bảng giá chung nếu đã tồn tại. Nếu chưa có, cho phép nhập giá trị thủ công — hệ thống sẽ tự động tạo một bản ghi Bảng giá chung mới khi sản phẩm được lưu.
 - Phân nhóm hàng hóa: Cho phép tạo danh mục phân loại nhiều cấp. Hiện tại tập trung vào nhóm Gia vị, hệ thống phải sẵn sàng hạ tầng kỹ thuật để mở rộng sang các nhóm khác trong tương lai.
-- Cơ chế tồn kho: Hệ thống ghi nhận trạng thái hàng hóa và cho phép Xuất hàng số lượng âm. Không khóa tính năng tạo đơn khi số lượng tồn kho trên máy hiển thị số âm.
 
 1.2. Cơ chế đa bảng giá cho khách hàng
-- Bảng giá chung: Là bảng giá chuẩn áp dụng khi bán lẻ hoặc dùng làm cơ sở tham chiếu ban đầu.
-- Bảng giá tùy chỉnh theo đối tác:
-  + Cho phép tạo không giới hạn các bảng giá riêng biệt cho từng đơn vị.
-  + Mỗi bảng giá cho phép tùy chỉnh giá bán của từng mã sản phẩm độc lập nhau.
-  + Cho phép người dùng Ghi đè giá trực tiếp bằng tay ngay tại màn hình tạo đơn hàng giao dịch.
+- Bảng giá chung: Là bảng giá chuẩn áp dụng cho bán lẻ hoặc dùng làm cơ sở tham chiếu ban đầu cho toàn bộ sản phẩm.
+- Bảng giá theo đối tác: Cho phép tạo không giới hạn các bảng giá riêng biệt cho từng nhóm khách hàng. Mỗi bảng giá cho phép tùy chỉnh giá bán của từng mã sản phẩm độc lập.
+- Ghi đè giá trực tiếp: Cho phép người dùng sửa giá bằng tay ngay tại màn hình tạo đơn hàng nếu chưa có giá tùy chỉnh nào được thiết lập trước.
 
-2. Phân hệ quản lý Khách hàng và Chuỗi Nhà hàng
+2. Phân hệ quản lý Khách hàng
 
-2.1. Cấu trúc dữ liệu Khách hàng
-Hệ thống quản lý đối tác theo cấu trúc hai tầng: Công ty/Chuỗi hệ thống quản lý -> Các chi nhánh nhà hàng trực thuộc.
-- Tầng Công ty: Đại diện cho pháp nhân hoặc chuỗi văn phòng trung tâm. Tầng này sẽ được gán cố định với một Bảng giá tùy chỉnh cụ thể.
-- Tầng Chi nhánh/Nhà hàng: Là điểm nhận hàng thực tế từng cơ sở đơn lẻ. Mỗi nhà hàng thành viên bắt buộc phải cấu hình thuộc nhóm Công ty nào để tự động thừa hưởng bảng giá từ công ty mẹ đó.
+2.1. Nhóm khách hàng và Khách hàng
+Hệ thống quản lý đối tác theo cấu trúc hai tầng:
+- Nhóm khách hàng (Công ty/Chuỗi): Đại diện cho pháp nhân hoặc chuỗi hệ thống. Được gán cố định với một Bảng giá tùy chỉnh cụ thể.
+- Khách hàng (Chi nhánh/Nhà hàng): Là điểm nhận hàng thực tế. Mỗi khách hàng bắt buộc phải thuộc một Nhóm khách hàng để tự động thừa hưởng bảng giá từ nhóm đó.
 
-2.2. Thông tin hồ sơ Khách hàng tinh gọn
-Một hồ sơ đối tác chuẩn chỉ bao gồm:
-- Mã khách hàng / Tên nhà hàng cụ thể.
-- Tên Công ty/Chuỗi quản lý trực thuộc.
+2.2. Thông tin hồ sơ Khách hàng
+Một hồ sơ khách hàng chuẩn bao gồm:
+- Mã khách hàng.
+- Tên khách hàng / Tên nhà hàng.
 - Số điện thoại liên hệ.
-- Địa chỉ thư điện tử (Bắt buộc).
+- Địa chỉ thư điện tử (Email).
+- Mã số thuế (MST) phục vụ mục đích tổng hợp.
 - Địa chỉ giao hàng.
-- Mã số thuế phục vụ mục đích tổng hợp.
 
 3. Phân hệ Bán hàng và Quản lý Hóa đơn
 
-3.1. Quy trình Lên đơn hàng bán ra
-- Giao diện tương thích thiết bị di động: Tối ưu hóa sơ đồ hiển thị để chạy mượt mà trên màn hình điện thoại di động.
-- Cơ chế điền thông tin tự động: Chọn Tên nhà hàng -> Hệ thống tự động tải Bảng giá tùy chỉnh tương ứng -> Nhập sản phẩm -> Hệ thống tự động hiển thị đơn giá riêng -> Sửa số lượng/giá nếu cần -> Lưu đơn.
+3.1. Quy trình tạo đơn hàng
+- Giao diện thao tác được tối ưu cho màn hình điện thoại di động. Các bước thực hiện: Chọn tên khách hàng -> Hệ thống tự động áp dụng bảng giá riêng của khách đó -> Thêm hàng hóa vào đơn -> Chốt đơn.
 
-3.2. Cơ chế in Hóa đơn và Tùy biến Hộ kinh doanh
-- Khi tiến hành in hoặc xuất tập tin hóa đơn, hệ thống bắt buộc phải hiển thị một Cửa sổ bật lên lựa chọn mẫu in:
-  + Chọn Hộ kinh doanh Phương Linh: Hóa đơn xuất ra sẽ tự động chèn thông tin phần đầu của cơ sở Phương Linh.
-  + Chọn Hộ kinh doanh Hồng Hạnh: Hóa đơn xuất ra sẽ tự động đổi sang thông tin cấu hình của cơ sở Hồng Hạnh.
+3.2. Cơ chế in Hóa đơn
+- Khi xuất hóa đơn, hiển thị cửa sổ lựa chọn mẫu in (Hộ kinh doanh Phương Linh hoặc Hồng Hạnh) để hệ thống tự động điền thông tin pháp nhân tương ứng lên phần đầu của phiếu in.
 - Bố cục bản in hóa đơn phải hiển thị đầy đủ: Số thứ tự, Tên hàng, Đơn vị tính, Số lượng, Đơn giá, Thành tiền, Tổng cộng số tiền, Phần ký tên chỉn chu, không bị lệch dòng.
 
 4. Hệ thống Báo cáo và Đối chiếu Công nợ
@@ -74,18 +71,27 @@ Một hồ sơ đối tác chuẩn chỉ bao gồm:
 
 PHẦN III: QUY ĐỊNH PHẠM VI VÀ YÊU CẦU KỸ THUẬT
 
-1. Tính năng nằm ngoài phạm vi phát triển
-- Không quản lý nhân sự, chấm công, tính lương.
-- Không có sổ quỹ thu chi nội bộ ngoài hóa đơn bán hàng.
-- Không làm cổng đặt hàng trực tuyến cho khách.
-- Không kết nối kỹ thuật với hệ thống của cơ quan thuế hay các bên cung cấp dịch vụ hóa đơn điện tử chính thức.
-- Không ép buộc quy trình nhập kho đầu vào mới được xuất kho đầu ra.
+1. Phạm vi hệ thống
++------------+----------------------------------------------------------------------+
+| Hạng mục   | Trong phạm vi (In-Scope)                                             |
++------------+----------------------------------------------------------------------+
+| Dữ liệu    | Sản phẩm, Khách hàng, Đơn hàng, Bảng giá                            |
+| Tính năng  | Hệ thống báo cáo, Xuất tập tin (Excel/PDF), Cơ chế đa bảng giá      |
+| Vận hành   | Giao diện Web tương thích cho Máy tính bàn và Điện thoại di động    |
++------------+----------------------------------------------------------------------+
 
-2. Phương thức đăng nhập và Bảo mật
-- Loại bỏ hoàn toàn cơ chế đăng nhập bằng Tên người dùng và Mật khẩu truyền thống.
-- Tích hợp giải pháp Đăng nhập đồng bộ bằng tài khoản thư điện tử của Google. Hệ thống phân quyền truy cập dựa trên danh sách các địa chỉ thư điện tử được chỉ định trước.
+2. Tính năng nằm ngoài phạm vi phát triển
+Tuyệt đối không đưa vào các tính năng phức tạp sau:
+- Quản lý luồng kho tự động (nhập xuất tuần tự).
+- Quản lý nhân sự, Bảng lương, Sổ quỹ thu chi.
+- Cổng đặt hàng trực tuyến (Online), Tự động hóa tính thuế/kết nối cơ quan thuế.
 
-3. Kiến trúc vận hành
+3. Phương thức đăng nhập và Bảo mật
+- Hỗ trợ đăng nhập bằng tài khoản Google thông qua OAuth 2.0.
+- Đồng thời hỗ trợ đăng nhập bằng Tên đăng nhập và Mật khẩu truyền thống.
+- Hệ thống phân quyền truy cập dựa trên danh sách các địa chỉ thư điện tử hoặc tài khoản được chỉ định trước.
+
+4. Kiến trúc vận hành
 - Hệ thống vận hành theo mô hình ứng dụng chạy trên nền tảng đám mây, đồng bộ thời gian thực.
 - Giao diện trang mạng ứng dụng chạy tối ưu đồng thời trên màn hình máy tính bàn văn phòng và các trình duyệt di động trên điện thoại.
 
