@@ -11,3 +11,12 @@ export async function getInvoiceById(id: string): Promise<Invoice | undefined> {
   await sleep(200)
   return invoices.find((inv) => inv.id === id)
 }
+
+export async function markInvoiceAsPaid(id: string): Promise<Invoice> {
+  await sleep(300)
+  const inv = invoices.find((i) => i.id === id)
+  if (!inv) throw new Error('Không tìm thấy hóa đơn.')
+  inv.isPaid = true
+  inv.paidAmount = inv.total
+  return { ...inv }
+}

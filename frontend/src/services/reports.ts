@@ -1,5 +1,10 @@
 import type { Invoice } from '@/types/invoice'
+import { products } from '@/mock/products'
+import { customers } from '@/mock/customers'
 import { getInvoices } from './invoices'
+
+const productCodeMap = new Map(products.map((p) => [p.id, p.code]))
+const customerCodeMap = new Map(customers.map((c) => [c.id, c.code]))
 
 export interface ProductReportRow {
   productId: string
@@ -32,6 +37,8 @@ export interface DashboardStats {
   todayRevenue: number
   todayOrders: number
   todayPending: number
+  todayPaid: number
+  todayUnpaid: number
   monthlyRevenue: { week: string; revenue: number }[]
   topCustomers: { rank: number; name: string; revenue: number }[]
 }
@@ -51,7 +58,7 @@ export async function getProductReport(
       if (!map.has(item.productId)) {
         map.set(item.productId, {
           productId: item.productId,
-          productCode: '',
+          productCode: productCodeMap.get(item.productId) ?? '',
           productName: item.productName,
           unit: item.unit,
           totalQuantity: 0,
@@ -96,7 +103,7 @@ export async function getCustomerReport(
     if (!map.has(inv.customerId)) {
       map.set(inv.customerId, {
         customerId: inv.customerId,
-        customerCode: '',
+        customerCode: customerCodeMap.get(inv.customerId) ?? '',
         customerName: inv.customerName,
         companyId: inv.companyId,
         companyName: companyMap.get(inv.companyId) || 'Không xác định',
@@ -120,6 +127,12 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   )
   const todayRevenue = todayInvoices.reduce((s, inv) => s + inv.total, 0)
   const todayOrders = todayInvoices.length
+  const todayPaid = todayInvoices
+    .filter((inv) => inv.isPaid)
+    .reduce((s, inv) => s + inv.total, 0)
+  const todayUnpaid = todayInvoices
+    .filter((inv) => !inv.isPaid)
+    .reduce((s, inv) => s + (inv.total - inv.paidAmount), 0)
   const todayPending = invoices.filter(
     (inv) => inv.date.slice(0, 10) === today && inv.status === 'pending'
   ).length
@@ -155,6 +168,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     todayRevenue,
     todayOrders,
     todayPending,
+    todayPaid,
+    todayUnpaid,
     monthlyRevenue: weekRevenue.map((revenue, i) => ({
       week: `Tuần ${i + 1}`,
       revenue,

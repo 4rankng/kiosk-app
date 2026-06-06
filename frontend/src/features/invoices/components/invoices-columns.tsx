@@ -4,7 +4,7 @@ import { formatCurrency, formatDateTime } from '@/lib/format'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Printer } from 'lucide-react'
+import { Printer, DollarSign } from 'lucide-react'
 import { statusColorMap } from '../data/data'
 import { useInvoicesContext } from './invoices-provider'
 
@@ -43,22 +43,49 @@ export function getInvoicesColumns(): ColumnDef<Invoice>[] {
       },
     },
     {
+      id: 'paymentStatus',
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Thanh toán' />,
+      cell: ({ row }) => {
+        const invoice = row.original
+        if (invoice.isPaid) {
+          return <Badge className='bg-green-600 hover:bg-green-700'>Đã thanh toán</Badge>
+        }
+        return <Badge variant='outline' className='border-orange-300 text-orange-600'>Chưa thanh toán</Badge>
+      },
+    },
+    {
       id: 'actions',
       header: 'Thao tác',
       cell: function InvoiceRowActions({ row }) {
         const { setOpen, setSelectedInvoice } = useInvoicesContext()
+        const invoice = row.original
         return (
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={() => {
-              setSelectedInvoice(row.original)
-              setOpen('print')
-            }}
-          >
-            <Printer className='mr-1 h-4 w-4' />
-            In ấn
-          </Button>
+          <div className='flex items-center gap-1'>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => {
+                setSelectedInvoice(row.original)
+                setOpen('print')
+              }}
+            >
+              <Printer className='mr-1 h-4 w-4' />
+              In ấn
+            </Button>
+            {!invoice.isPaid && (
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => {
+                  setSelectedInvoice(row.original)
+                  setOpen('payment')
+                }}
+              >
+                <DollarSign className='mr-1 h-4 w-4' />
+                Thu tiền
+              </Button>
+            )}
+          </div>
         )
       },
     },

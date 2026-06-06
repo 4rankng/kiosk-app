@@ -25,7 +25,7 @@ export function MonthlyRevenueChart() {
               <CartesianGrid strokeDasharray='3 3' />
               <XAxis dataKey='week' />
               <YAxis tickFormatter={formatCompact} width={60} />
-              <Tooltip formatter={(value: number) => [formatCurrency(value), 'Doanh thu']} />
+              <Tooltip formatter={(value: unknown) => [formatCurrency(value as number), 'Doanh thu']} />
               <Bar dataKey='revenue' fill='hsl(var(--primary))' radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

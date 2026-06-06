@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { deleteProduct } from '@/services/products'
 import { useProductsContext } from './products-provider'
 import { ConfirmDialog } from '@/components/confirm-dialog'

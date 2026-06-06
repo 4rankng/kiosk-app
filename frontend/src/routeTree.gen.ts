@@ -21,6 +21,7 @@ import { Route as AuthenticatedProductsIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedPriceListsIndexRouteImport } from './routes/_authenticated/price-lists/index'
 import { Route as AuthenticatedInvoicesIndexRouteImport } from './routes/_authenticated/invoices/index'
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers/index'
+import { Route as AuthenticatedCompaniesIndexRouteImport } from './routes/_authenticated/companies/index'
 import { Route as AuthenticatedOrdersNewRouteImport } from './routes/_authenticated/orders/new'
 import { Route as AuthenticatedReportsProductsIndexRouteImport } from './routes/_authenticated/reports/products/index'
 import { Route as AuthenticatedReportsCustomersIndexRouteImport } from './routes/_authenticated/reports/customers/index'
@@ -88,6 +89,12 @@ const AuthenticatedCustomersIndexRoute =
     path: '/customers/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCompaniesIndexRoute =
+  AuthenticatedCompaniesIndexRouteImport.update({
+    id: '/companies/',
+    path: '/companies/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOrdersNewRoute = AuthenticatedOrdersNewRouteImport.update({
   id: '/orders/new',
   path: '/orders/new',
@@ -115,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/orders/new': typeof AuthenticatedOrdersNewRoute
+  '/companies/': typeof AuthenticatedCompaniesIndexRoute
   '/customers/': typeof AuthenticatedCustomersIndexRoute
   '/invoices/': typeof AuthenticatedInvoicesIndexRoute
   '/price-lists/': typeof AuthenticatedPriceListsIndexRoute
@@ -131,6 +139,7 @@ export interface FileRoutesByTo {
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
   '/orders/new': typeof AuthenticatedOrdersNewRoute
+  '/companies': typeof AuthenticatedCompaniesIndexRoute
   '/customers': typeof AuthenticatedCustomersIndexRoute
   '/invoices': typeof AuthenticatedInvoicesIndexRoute
   '/price-lists': typeof AuthenticatedPriceListsIndexRoute
@@ -149,6 +158,7 @@ export interface FileRoutesById {
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/orders/new': typeof AuthenticatedOrdersNewRoute
+  '/_authenticated/companies/': typeof AuthenticatedCompaniesIndexRoute
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
   '/_authenticated/invoices/': typeof AuthenticatedInvoicesIndexRoute
   '/_authenticated/price-lists/': typeof AuthenticatedPriceListsIndexRoute
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/orders/new'
+    | '/companies/'
     | '/customers/'
     | '/invoices/'
     | '/price-lists/'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/orders/new'
+    | '/companies'
     | '/customers'
     | '/invoices'
     | '/price-lists'
@@ -200,6 +212,7 @@ export interface FileRouteTypes {
     | '/(errors)/503'
     | '/_authenticated/'
     | '/_authenticated/orders/new'
+    | '/_authenticated/companies/'
     | '/_authenticated/customers/'
     | '/_authenticated/invoices/'
     | '/_authenticated/price-lists/'
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCustomersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/companies/': {
+      id: '/_authenticated/companies/'
+      path: '/companies'
+      fullPath: '/companies/'
+      preLoaderRoute: typeof AuthenticatedCompaniesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/new': {
       id: '/_authenticated/orders/new'
       path: '/orders/new'
@@ -331,6 +351,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedOrdersNewRoute: typeof AuthenticatedOrdersNewRoute
+  AuthenticatedCompaniesIndexRoute: typeof AuthenticatedCompaniesIndexRoute
   AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
   AuthenticatedInvoicesIndexRoute: typeof AuthenticatedInvoicesIndexRoute
   AuthenticatedPriceListsIndexRoute: typeof AuthenticatedPriceListsIndexRoute
@@ -342,6 +363,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedOrdersNewRoute: AuthenticatedOrdersNewRoute,
+  AuthenticatedCompaniesIndexRoute: AuthenticatedCompaniesIndexRoute,
   AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
   AuthenticatedInvoicesIndexRoute: AuthenticatedInvoicesIndexRoute,
   AuthenticatedPriceListsIndexRoute: AuthenticatedPriceListsIndexRoute,

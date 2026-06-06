@@ -2,8 +2,9 @@ import { create } from 'zustand'
 import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
 
 const ACCESS_TOKEN = 'kiosk_access_token'
+const USER_DATA = 'kiosk_user_data'
 
-interface AuthUser {
+export interface AuthUser {
   name: string
   email: string
   avatar: string
@@ -21,14 +22,36 @@ interface AuthState {
   }
 }
 
+function loadUser(): AuthUser | null {
+  try {
+    const raw = localStorage.getItem(USER_DATA)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+function saveUser(user: AuthUser | null) {
+  if (user) {
+    localStorage.setItem(USER_DATA, JSON.stringify(user))
+  } else {
+    localStorage.removeItem(USER_DATA)
+  }
+}
+
 export const useAuthStore = create<AuthState>()((set) => {
   const cookieState = getCookie(ACCESS_TOKEN)
   const initToken = cookieState ? JSON.parse(cookieState) : ''
+  const initUser = initToken ? loadUser() : null
+
   return {
     auth: {
-      user: null,
+      user: initUser,
       setUser: (user) =>
-        set((state) => ({ ...state, auth: { ...state.auth, user } })),
+        set((state) => {
+          saveUser(user)
+          return { ...state, auth: { ...state.auth, user } }
+        }),
       accessToken: initToken,
       setAccessToken: (accessToken) =>
         set((state) => {
@@ -43,6 +66,7 @@ export const useAuthStore = create<AuthState>()((set) => {
       reset: () =>
         set((state) => {
           removeCookie(ACCESS_TOKEN)
+          saveUser(null)
           return {
             ...state,
             auth: { ...state.auth, user: null, accessToken: '' },

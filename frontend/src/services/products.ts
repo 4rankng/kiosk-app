@@ -1,5 +1,6 @@
 import type { Product } from '@/types/product'
 import { products } from '@/mock/products'
+import { priceLists } from '@/mock/price-lists'
 import { sleep } from '@/lib/utils'
 
 export async function getProducts(): Promise<Product[]> {
@@ -30,6 +31,13 @@ export async function createProduct(data: Omit<Product, 'id'>): Promise<Product>
     id: `p${Date.now()}`,
   }
   products.push(newProduct)
+
+  // Auto-add to general price list
+  const general = priceLists.find((pl) => pl.companyId === '')
+  if (general) {
+    general.items.push({ productId: newProduct.id, product: newProduct, customPrice: data.defaultSalePrice })
+  }
+
   return newProduct
 }
 

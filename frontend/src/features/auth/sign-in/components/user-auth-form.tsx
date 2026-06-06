@@ -1,60 +1,84 @@
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { useNavigate } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
-import { sleep, cn } from '@/lib/utils'
+import { signInWithEmail, signInWithGoogle } from '@/services/auth'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
+const loginSchema = z.object({
+  email: z.string().email('Email không hợp lệ.'),
+  password: z.string().min(1, 'Vui lòng nhập mật khẩu.'),
+})
+
+type LoginForm = z.infer<typeof loginSchema>
+
+interface UserAuthFormProps {
+  className?: string
   redirectTo?: string
 }
 
 export function UserAuthForm({
   className,
   redirectTo,
-  ...props
 }: UserAuthFormProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
+  const [googleLoading, setGoogleLoading] = useState(false)
   const { auth } = useAuthStore()
+  const navigate = useNavigate()
+
+  const form = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  })
 
   function handleGoogleSignIn() {
-    setIsLoading(true)
-
-    toast.promise(sleep(1500), {
+    setGoogleLoading(true)
+    toast.promise(signInWithGoogle(), {
       loading: 'Đang đăng nhập...',
-      success: () => {
-        setIsLoading(false)
-
-        const mockUser = {
-          name: 'Quản trị viên',
-          email: 'admin@phuonglinh.vn',
-          avatar: '',
-          exp: Date.now() + 24 * 60 * 60 * 1000,
-        }
-
-        auth.setUser(mockUser)
+      success: (user) => {
+        setGoogleLoading(false)
+        auth.setUser(user)
         auth.setAccessToken('mock-access-token')
-
-        const targetPath = redirectTo || '/'
-        navigate({ to: targetPath, replace: true })
-
+        navigate({ to: redirectTo || '/', replace: true })
         return 'Đăng nhập thành công!'
       },
-      error: 'Có lỗi xảy ra, vui lòng thử lại.',
+      error: (err: Error) => {
+        setGoogleLoading(false)
+        return err.message || 'Có lỗi xảy ra, vui lòng thử lại.'
+      },
+    })
+  }
+
+  function handleEmailSignIn(values: LoginForm) {
+    toast.promise(signInWithEmail(values.email, values.password), {
+      loading: 'Đang đăng nhập...',
+      success: (user) => {
+        auth.setUser(user)
+        auth.setAccessToken('mock-access-token')
+        navigate({ to: redirectTo || '/', replace: true })
+        return 'Đăng nhập thành công!'
+      },
+      error: (err: Error) => {
+        return err.message || 'Có lỗi xảy ra, vui lòng thử lại.'
+      },
     })
   }
 
   return (
-    <div className={cn('grid gap-3', className)} {...props}>
+    <div className={cn('grid gap-4', className)}>
       <Button
-        className='mt-2'
-        disabled={isLoading}
+        disabled={googleLoading}
         onClick={handleGoogleSignIn}
         type='button'
       >
-        {isLoading ? (
+        {googleLoading ? (
           <Loader2 className='animate-spin' />
         ) : (
           <svg className='mr-2 h-4 w-4' viewBox='0 0 24 24'>
@@ -78,6 +102,52 @@ export function UserAuthForm({
         )}
         Đăng nhập bằng Google
       </Button>
+
+      <div className='relative'>
+        <Separator />
+        <span className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-muted-foreground'>
+          hoặc
+        </span>
+      </div>
+
+      <form onSubmit={form.handleSubmit(handleEmailSignIn)} className='space-y-3'>
+        <div className='space-y-2'>
+          <Label htmlFor='email'>Email</Label>
+          <Input
+            id='email'
+            type='email'
+            placeholder='admin@phuonglinh.vn'
+            {...form.register('email')}
+          />
+          {form.formState.errors.email && (
+            <p className='text-sm text-destructive'>
+              {form.formState.errors.email.message}
+            </p>
+          )}
+        </div>
+        <div className='space-y-2'>
+          <Label htmlFor='password'>Mật khẩu</Label>
+          <Input
+            id='password'
+            type='password'
+            placeholder='••••••••'
+            {...form.register('password')}
+          />
+          {form.formState.errors.password && (
+            <p className='text-sm text-destructive'>
+              {form.formState.errors.password.message}
+            </p>
+          )}
+        </div>
+        <Button type='submit' className='w-full' disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? (
+            <Loader2 className='animate-spin' />
+          ) : (
+            'Đăng nhập'
+          )}
+        </Button>
+      </form>
+
       <p className='text-center text-xs text-muted-foreground'>
         Chỉ tài khoản được phê duyệt mới có thể truy cập hệ thống.
       </p>

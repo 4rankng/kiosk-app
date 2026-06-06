@@ -1,3 +1,4 @@
+import React from 'react'
 import { useState } from 'react'
 import {
   type SortingState, flexRender, getCoreRowModel, getExpandedRowModel,
@@ -42,7 +43,7 @@ export function ProductReportTable({ data }: { data: ProductReportRow[] }) {
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.map((row) => (
-            <>
+            <React.Fragment key={row.id}>
               <TableRow key={row.id} className='cursor-pointer' onClick={() => row.toggleExpanded()}>
                 <TableCell>
                   <Button variant='ghost' size='icon' className='h-6 w-6'>
@@ -60,7 +61,7 @@ export function ProductReportTable({ data }: { data: ProductReportRow[] }) {
                   </TableCell>
                 </TableRow>
               )}
-            </>
+            </React.Fragment>
           ))}
           {table.getRowModel().rows.length === 0 && (
             <TableRow><TableCell colSpan={5} className='h-24 text-center'>Không có dữ liệu.</TableCell></TableRow>

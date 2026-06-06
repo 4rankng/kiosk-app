@@ -7,7 +7,7 @@ export const customerSchema = z.object({
   phone: z.string().min(1, 'Vui lòng nhập số điện thoại'),
   email: z.string().email('Email không hợp lệ'),
   address: z.string().min(1, 'Vui lòng nhập địa chỉ'),
-  taxId: z.string().optional().default(''),
+  taxId: z.string(),
 })
 
 export type CustomerSchema = z.infer<typeof customerSchema>

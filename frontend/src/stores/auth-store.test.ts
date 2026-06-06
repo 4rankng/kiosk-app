@@ -11,6 +11,8 @@ const sampleUser = {
   email: 'user@example.com',
   role: ['user'],
   exp: 1_700_000_000,
+  name: 'Test User',
+  avatar: 'https://example.com/avatar.png',
 }
 
 describe('useAuthStore', () => {

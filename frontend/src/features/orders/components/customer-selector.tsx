@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { searchCustomers, getCustomerById } from '@/services/customers'
+import { searchCustomers } from '@/services/customers'
 import { getCompanyById } from '@/services/companies'
 import { getPriceListByCompany } from '@/services/price-lists'
 import type { Customer } from '@/types'

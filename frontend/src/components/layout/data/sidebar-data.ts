@@ -9,6 +9,7 @@ import {
   BarChart3,
   PackageSearch,
   UserCheck,
+  Building2,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -46,8 +47,19 @@ export const sidebarData: SidebarData = {
         },
         {
           title: 'Khách hàng',
-          url: '/customers',
           icon: Users,
+          items: [
+            {
+              title: 'Danh sách',
+              url: '/customers',
+              icon: List,
+            },
+            {
+              title: 'Nhóm khách hàng',
+              url: '/companies',
+              icon: Building2,
+            },
+          ],
         },
         {
           title: 'Bán hàng',
