@@ -42,7 +42,7 @@ export function CompanyMutateDialog() {
           <DialogTitle>{isEdit ? 'Chỉnh sửa công ty' : 'Thêm công ty/chuỗi mới'}</DialogTitle>
           <DialogDescription>{isEdit ? 'Cập nhật thông tin công ty.' : 'Nhập thông tin để tạo công ty mới.'}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className='space-y-4'>
+        <form onSubmit={form.handleSubmit((v) => mutation.mutate(v as CompanySchema))} className='space-y-4'>
           <div className='space-y-2'>
             <Label>Tên công ty/chuỗi</Label>
             <Input {...form.register('name')} />
