@@ -23,30 +23,28 @@ export function MobileCard({
   actions,
   className,
 }: MobileCardProps) {
-  const hasExpandableContent = !!children || !!actions
+  const hasDetail = !!children
 
   return (
     <div className={cn('rounded-md border bg-card', className)}>
-      {/* Card header — always visible, acts as touch target */}
-      <button
-        type='button'
-        className={cn(
-          'flex w-full items-start gap-3 p-3 text-left',
-          hasExpandableContent && 'cursor-pointer'
-        )}
-        onClick={hasExpandableContent ? onToggle : undefined}
-        aria-expanded={hasExpandableContent ? expanded : undefined}
-      >
-        <div className='min-w-0 flex-1 space-y-1'>
-          <div className='flex items-center gap-2'>
-            <span className='truncate text-sm font-medium'>{title}</span>
-            {status}
+      {/* Card header — always visible */}
+      {hasDetail ? (
+        /* Expandable: whole row is a button */
+        <button
+          type='button'
+          className='flex w-full items-start gap-3 p-3 text-left cursor-pointer'
+          onClick={onToggle}
+          aria-expanded={expanded}
+        >
+          <div className='min-w-0 flex-1 space-y-1'>
+            <div className='flex items-center gap-2'>
+              <span className='truncate text-sm font-medium'>{title}</span>
+              {status}
+            </div>
+            {metric && (
+              <p className='text-xs text-muted-foreground'>{metric}</p>
+            )}
           </div>
-          {metric && (
-            <p className='text-xs text-muted-foreground'>{metric}</p>
-          )}
-        </div>
-        {hasExpandableContent && (
           <span className='mt-0.5 shrink-0 text-muted-foreground'>
             {expanded ? (
               <ChevronDown className='h-4 w-4' />
@@ -54,11 +52,27 @@ export function MobileCard({
               <ChevronRight className='h-4 w-4' />
             )}
           </span>
-        )}
-      </button>
+        </button>
+      ) : (
+        /* Flat: title + inline actions, no expand */
+        <div className='flex w-full items-center gap-3 p-3'>
+          <div className='min-w-0 flex-1 space-y-1'>
+            <div className='flex items-center gap-2'>
+              <span className='truncate text-sm font-medium'>{title}</span>
+              {status}
+            </div>
+            {metric && (
+              <p className='text-xs text-muted-foreground'>{metric}</p>
+            )}
+          </div>
+          {actions && (
+            <div className='flex items-center gap-1 shrink-0'>{actions}</div>
+          )}
+        </div>
+      )}
 
-      {/* Expanded content — accordion */}
-      {expanded && hasExpandableContent && (
+      {/* Expanded detail — accordion */}
+      {expanded && hasDetail && (
         <div className='border-t px-3 pb-3 pt-2 space-y-3'>
           {children}
           {actions && (
