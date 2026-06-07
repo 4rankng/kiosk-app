@@ -80,7 +80,7 @@ export function MobileCard({
         <div className='border-t px-3 pb-3 pt-2 space-y-2'>
           {children}
           {actions && (
-            <div className='flex items-center gap-2 pt-1'>{actions}</div>
+            <div className='flex items-center justify-end gap-3 pt-1'>{actions}</div>
           )}
         </div>
       )}
