@@ -42,8 +42,9 @@ export function CustomerMutateDialog() {
           <DialogTitle>{isEdit ? 'Chỉnh sửa khách hàng' : 'Thêm mới khách hàng'}</DialogTitle>
           <DialogDescription>{isEdit ? 'Cập nhật thông tin khách hàng.' : 'Nhập thông tin để tạo khách hàng mới.'}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className='space-y-4'>
-          <div className='grid grid-cols-2 gap-4'>
+        <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className='flex flex-1 flex-col gap-4'>
+          <div className='flex-1 space-y-4 overflow-y-auto'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label>Mã khách hàng</Label>
               <Input {...form.register('code')} />
@@ -65,7 +66,7 @@ export function CustomerMutateDialog() {
             </Select>
             {form.formState.errors.companyId && <p className='text-sm text-destructive'>{form.formState.errors.companyId.message}</p>}
           </div>
-          <div className='grid grid-cols-2 gap-4'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label>Số điện thoại</Label>
               <Input {...form.register('phone')} />
@@ -84,7 +85,8 @@ export function CustomerMutateDialog() {
             <Label>Mã số thuế</Label>
             <Input {...form.register('taxId')} />
           </div>
-          <DialogFooter>
+          </div>
+          <DialogFooter className='border-t pt-4'>
             <Button type='button' variant='outline' onClick={() => setOpen(null)}>Hủy bỏ</Button>
             <Button type='submit' disabled={mutation.isPending}>{mutation.isPending ? 'Đang lưu...' : isEdit ? 'Cập nhật' : 'Tạo mới'}</Button>
           </DialogFooter>

@@ -38,6 +38,7 @@ export function PaymentDialog() {
             Hóa đơn {invoice.code} — {invoice.customerName}
           </DialogDescription>
         </DialogHeader>
+        <div className='flex-1 flex flex-col justify-center'>
         <div className='bg-muted/50 rounded-lg p-4 space-y-3'>
           <div className='flex justify-between text-sm'>
             <span className='text-muted-foreground'>Tổng tiền</span>
@@ -51,6 +52,7 @@ export function PaymentDialog() {
             <span className='text-muted-foreground'>Còn lại</span>
             <span className='text-lg font-bold'>{formatCurrency(remaining)}</span>
           </div>
+        </div>
         </div>
         <div className='border-t pt-4'>
           <DialogFooter>

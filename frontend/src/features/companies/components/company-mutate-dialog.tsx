@@ -42,26 +42,28 @@ export function CompanyMutateDialog() {
           <DialogTitle>{isEdit ? 'Chỉnh sửa công ty' : 'Thêm công ty/chuỗi mới'}</DialogTitle>
           <DialogDescription>{isEdit ? 'Cập nhật thông tin công ty.' : 'Nhập thông tin để tạo công ty mới.'}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit((v) => mutation.mutate(v as CompanySchema))} className='space-y-4'>
-          <div className='space-y-2'>
-            <Label>Tên công ty/chuỗi</Label>
-            <Input {...form.register('name')} />
-            {form.formState.errors.name && <p className='text-sm text-destructive'>{form.formState.errors.name.message}</p>}
+        <form onSubmit={form.handleSubmit((v) => mutation.mutate(v as CompanySchema))} className='flex flex-1 flex-col gap-4'>
+          <div className='flex-1 space-y-4 overflow-y-auto'>
+            <div className='space-y-2'>
+              <Label>Tên công ty/chuỗi</Label>
+              <Input {...form.register('name')} />
+              {form.formState.errors.name && <p className='text-sm text-destructive'>{form.formState.errors.name.message}</p>}
+            </div>
+            <div className='space-y-2'>
+              <Label>Mã số thuế</Label>
+              <Input {...form.register('taxId')} />
+            </div>
+            <div className='space-y-2'>
+              <Label>Bảng giá áp dụng</Label>
+              <Select onValueChange={(v) => form.setValue('priceListId', v)} defaultValue={form.getValues('priceListId')}>
+                <SelectTrigger><SelectValue placeholder='Chọn bảng giá...' /></SelectTrigger>
+                <SelectContent>
+                  {priceLists.map((pl) => <SelectItem key={pl.id} value={pl.id}>{pl.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className='space-y-2'>
-            <Label>Mã số thuế</Label>
-            <Input {...form.register('taxId')} />
-          </div>
-          <div className='space-y-2'>
-            <Label>Bảng giá áp dụng</Label>
-            <Select onValueChange={(v) => form.setValue('priceListId', v)} defaultValue={form.getValues('priceListId')}>
-              <SelectTrigger><SelectValue placeholder='Chọn bảng giá...' /></SelectTrigger>
-              <SelectContent>
-                {priceLists.map((pl) => <SelectItem key={pl.id} value={pl.id}>{pl.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <DialogFooter>
+          <DialogFooter className='border-t pt-4'>
             <Button type='button' variant='outline' onClick={() => setOpen(null)}>Hủy bỏ</Button>
             <Button type='submit' disabled={mutation.isPending}>{mutation.isPending ? 'Đang lưu...' : isEdit ? 'Cập nhật' : 'Tạo mới'}</Button>
           </DialogFooter>

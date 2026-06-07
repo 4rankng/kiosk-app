@@ -41,7 +41,7 @@ export function OrderReviewSheet({
 }: OrderReviewSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side='bottom' className='h-[70vh] overflow-y-auto'>
+      <SheetContent side='bottom' className='overflow-y-auto'>
         <SheetHeader>
           <SheetTitle>Chi tiết đơn hàng ({items.length} mặt hàng)</SheetTitle>
         </SheetHeader>
