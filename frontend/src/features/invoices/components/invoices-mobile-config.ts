@@ -6,6 +6,5 @@ export const invoicesCardConfig: MobileCardConfig = {
   date: { role: 'detail', label: 'Ngày' },
   total: { role: 'metric' },
   status: { role: 'status' },
-  paymentStatus: { role: 'detail', label: 'Thanh toán' },
   actions: { role: 'detail', hidden: true },
 }

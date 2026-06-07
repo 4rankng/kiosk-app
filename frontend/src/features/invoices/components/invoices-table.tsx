@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/table'
 import { DataTablePagination, DataTableFacetedFilter, DataTableViewOptions } from '@/components/data-table'
 import { Input } from '@/components/ui/input'
+import { CheckCircle2, Clock, XCircle, DollarSign } from 'lucide-react'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileCardView } from '@/components/data-table/mobile-card-view'
 import { getInvoicesColumns } from './invoices-columns'
@@ -74,6 +75,13 @@ export function InvoicesTable() {
           />
         )}
         {!isMobile && <DataTableViewOptions table={table} />}
+      </div>
+
+      <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground'>
+        <span className='flex items-center gap-1'><CheckCircle2 className='h-3 w-3 text-emerald-600' />Đã TT</span>
+        <span className='flex items-center gap-1'><DollarSign className='h-3 w-3 text-red-600' />Chưa TT</span>
+        <span className='flex items-center gap-1'><Clock className='h-3 w-3 text-amber-600' />Đang xử lý</span>
+        <span className='flex items-center gap-1'><XCircle className='h-3 w-3 text-red-600' />Đã hủy</span>
       </div>
 
       {isMobile ? (

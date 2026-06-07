@@ -2,7 +2,6 @@ import { type ColumnDef } from '@tanstack/react-table'
 import type { Invoice } from '@/types'
 import { formatCurrency, formatDateTime } from '@/lib/format'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Tooltip,
@@ -10,9 +9,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { Printer, DollarSign } from 'lucide-react'
-import { statusColorMap } from '../data/data'
+import { Printer, DollarSign, CheckCircle2, Clock, XCircle } from 'lucide-react'
 import { useInvoicesContext } from './invoices-provider'
+
+const statusIconMap: Record<string, { icon: typeof CheckCircle2; bg: string; color: string; tip: string }> = {
+  pending: { icon: Clock, bg: 'bg-amber-50', color: 'text-amber-600', tip: 'Đang xử lý' },
+  cancelled: { icon: XCircle, bg: 'bg-red-50', color: 'text-red-600', tip: 'Đã hủy' },
+}
 
 export function getInvoicesColumns(): ColumnDef<Invoice>[] {
   return [
@@ -43,32 +46,55 @@ export function getInvoicesColumns(): ColumnDef<Invoice>[] {
       accessorKey: 'status',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
       cell: ({ row }) => {
-        const status = row.getValue('status') as string
-        const label = status === 'completed' ? 'Hoàn thành' : status === 'pending' ? 'Đang xử lý' : 'Đã hủy'
-        return <Badge variant='outline' className={statusColorMap[status] ?? ''}>{label}</Badge>
+        const invoice = row.original
+        // Completed: show payment status instead
+        if (invoice.status === 'completed') {
+          if (invoice.isPaid) {
+            return (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className='inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50'>
+                      <CheckCircle2 className='h-3 w-3 text-emerald-600' />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>Đã thanh toán</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )
+          }
+          return (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className='inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-50'>
+                    <DollarSign className='h-3 w-3 text-red-600' />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Chưa thanh toán</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )
+        }
+        const cfg = statusIconMap[invoice.status]
+        if (!cfg) return null
+        const Icon = cfg.icon
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${cfg.bg}`}>
+                  <Icon className={`h-3 w-3 ${cfg.color}`} />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{cfg.tip}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )
       },
       filterFn: (row, _columnId, filterValue) => {
         if (Array.isArray(filterValue)) return filterValue.includes(row.getValue('status'))
         return row.getValue('status') === filterValue
-      },
-    },
-    {
-      id: 'paymentStatus',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Thanh toán' />,
-      cell: ({ row }) => {
-        const invoice = row.original
-        if (invoice.isPaid) {
-          return (
-            <Badge variant='outline'>
-              Đã thanh toán
-            </Badge>
-          )
-        }
-        return (
-          <Badge variant='outline' className='text-muted-foreground'>
-            Chưa thanh toán
-          </Badge>
-        )
       },
     },
     {
