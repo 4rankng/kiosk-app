@@ -1,4 +1,4 @@
-import type { Invoice } from '@/types/invoice'
+import type { Invoice, InvoiceStatus } from '@/types/invoice'
 import { products } from '@/mock/products'
 import { customers } from '@/mock/customers'
 import { getInvoices } from './invoices'
@@ -41,6 +41,28 @@ export interface DashboardStats {
   todayUnpaid: number
   monthlyRevenue: { week: string; revenue: number }[]
   topCustomers: { rank: number; name: string; revenue: number }[]
+  // Trend comparison
+  yesterdayRevenue: number
+  yesterdayOrders: number
+  // Product performance
+  topProducts: {
+    rank: number
+    name: string
+    unit: string
+    quantity: number
+    revenue: number
+  }[]
+  // Outstanding debts
+  outstandingDebts: { customerName: string; amount: number }[]
+  // Recent activity
+  recentInvoices: {
+    code: string
+    customerName: string
+    total: number
+    status: InvoiceStatus
+    isPaid: boolean
+    date: string
+  }[]
 }
 
 export async function getProductReport(
@@ -174,6 +196,69 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     .slice(0, 10)
     .map((c, i) => ({ rank: i + 1, ...c }))
 
+  // Yesterday comparison
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+  const yesterdayInvoices = invoices.filter(
+    (inv) => inv.date.slice(0, 10) === yesterday && inv.status === 'completed'
+  )
+  const yesterdayRevenue = yesterdayInvoices.reduce((s, inv) => s + inv.total, 0)
+  const yesterdayOrders = yesterdayInvoices.length
+
+  // Top 5 products this month
+  const productNameMap = new Map(products.map((p) => [p.id, { name: p.name, unit: p.unit }]))
+  const productQty = new Map<string, { name: string; unit: string; quantity: number; revenue: number }>()
+  for (const inv of monthInvoices) {
+    for (const item of inv.items) {
+      const existing = productQty.get(item.productId)
+      if (existing) {
+        existing.quantity += item.quantity
+        existing.revenue += item.total
+      } else {
+        const info = productNameMap.get(item.productId)
+        productQty.set(item.productId, {
+          name: info?.name ?? item.productName,
+          unit: info?.unit ?? item.unit,
+          quantity: item.quantity,
+          revenue: item.total,
+        })
+      }
+    }
+  }
+  const topProducts = Array.from(productQty.values())
+    .sort((a, b) => b.quantity - a.quantity)
+    .slice(0, 5)
+    .map((p, i) => ({ rank: i + 1, ...p }))
+
+  // Outstanding debts (all completed + unpaid)
+  const debtMap = new Map<string, { customerName: string; amount: number }>()
+  for (const inv of invoices) {
+    if (inv.status === 'completed' && !inv.isPaid) {
+      const debt = inv.total - inv.paidAmount
+      const existing = debtMap.get(inv.customerId)
+      if (existing) {
+        existing.amount += debt
+      } else {
+        debtMap.set(inv.customerId, { customerName: inv.customerName, amount: debt })
+      }
+    }
+  }
+  const outstandingDebts = Array.from(debtMap.values())
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5)
+
+  // Recent invoices (latest 5)
+  const recentInvoices = [...invoices]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 5)
+    .map((inv) => ({
+      code: inv.code,
+      customerName: inv.customerName,
+      total: inv.total,
+      status: inv.status,
+      isPaid: inv.isPaid,
+      date: inv.date,
+    }))
+
   return {
     todayRevenue,
     todayOrders,
@@ -185,5 +270,10 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       revenue,
     })),
     topCustomers,
+    yesterdayRevenue,
+    yesterdayOrders,
+    topProducts,
+    outstandingDebts,
+    recentInvoices,
   }
 }

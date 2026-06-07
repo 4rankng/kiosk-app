@@ -67,7 +67,7 @@ export function InlineAddCombobox({
 
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className='h-9'>
+      <SelectTrigger className='h-9 w-full'>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
