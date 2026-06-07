@@ -32,7 +32,7 @@ export function MobileCard({
         /* Expandable: whole row is a button */
         <button
           type='button'
-          className='flex w-full items-start gap-2 py-2.5 px-3 text-left cursor-pointer'
+          className='flex w-full items-start gap-3 p-3 text-left cursor-pointer'
           onClick={onToggle}
           aria-expanded={expanded}
         >
@@ -55,7 +55,7 @@ export function MobileCard({
         </button>
       ) : (
         /* Flat: title + inline actions, no expand */
-        <div className='flex w-full items-center gap-2 py-2.5 px-3'>
+        <div className='flex w-full items-center gap-3 p-3'>
           <div className='min-w-0 flex-1 space-y-1'>
             <div className='flex items-center gap-2'>
               <span className='truncate text-sm font-medium'>{title}</span>
@@ -73,7 +73,7 @@ export function MobileCard({
 
       {/* Expanded detail — accordion */}
       {expanded && hasDetail && (
-        <div className='border-t px-3 pb-2.5 pt-1.5 space-y-1'>
+        <div className='border-t px-3 pb-3 pt-2 space-y-2'>
           {children}
           {actions && (
             <div className='flex items-center gap-2 pt-1'>{actions}</div>

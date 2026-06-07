@@ -91,7 +91,7 @@ export function MobileCardView<TData>({
                 return e.key
               })()
             return (
-              <div key={e.key} className='flex items-start gap-1.5 text-xs'>
+              <div key={e.key} className='flex items-start gap-2 text-sm'>
                 <span className='shrink-0 text-muted-foreground'>
                   {label}:
                 </span>
