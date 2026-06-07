@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Wallet, Package, CheckCircle, AlertCircle } from 'lucide-react'
 import { getDashboardStats } from '@/services/reports'
 import { formatCurrency, formatNumber } from '@/lib/format'
+import { cn } from '@/lib/utils'
 import {
   Card,
   CardContent,
@@ -16,6 +17,23 @@ const statsConfig = [
   { key: 'paid', icon: CheckCircle, label: 'Đã thanh toán' },
   { key: 'unpaid', icon: AlertCircle, label: 'Còn nợ' },
 ] as const
+
+function TrendText({ value, suffix, className }: { value: number | string; suffix: string; className?: string }) {
+  const num = typeof value === 'string' ? parseFloat(value) : value
+  const isUp = num > 0
+  const isDown = num < 0
+  return (
+    <p className={cn(
+      'mt-1 text-xs',
+      isUp && 'text-emerald-600',
+      isDown && 'text-red-600',
+      !isUp && !isDown && 'text-muted-foreground',
+      className,
+    )}>
+      {isUp ? '↑' : isDown ? '↓' : '—'} {isUp ? '+' : ''}{value}{suffix}
+    </p>
+  )
+}
 
 function StatCardSkeleton() {
   return (
@@ -78,26 +96,15 @@ export function TodayStats() {
 
         if (config.key === 'revenue') {
           if (revenueTrend !== null) {
-            const num = parseFloat(revenueTrend)
-            const isUp = num > 0
-            subtitle = (
-              <p className={`mt-1 text-xs ${isUp ? 'text-emerald-600' : num < 0 ? 'text-red-600' : 'text-muted-foreground'}`}>
-                {isUp ? '+' : ''}{revenueTrend}% vs hôm qua
-              </p>
-            )
+            subtitle = <TrendText value={revenueTrend} suffix='% vs hôm qua' />
           } else {
-            subtitle = <p className='mt-1 text-xs text-muted-foreground'>— vs hôm qua</p>
+            subtitle = <TrendText value={0} suffix=' vs hôm qua' />
           }
         } else if (config.key === 'orders') {
           if (orderTrend !== null) {
-            const isUp = orderTrend > 0
-            subtitle = (
-              <p className={`mt-1 text-xs ${isUp ? 'text-emerald-600' : orderTrend < 0 ? 'text-red-600' : 'text-muted-foreground'}`}>
-                {isUp ? '+' : ''}{orderTrend} vs hôm qua
-              </p>
-            )
+            subtitle = <TrendText value={orderTrend} suffix=' vs hôm qua' />
           } else {
-            subtitle = <p className='mt-1 text-xs text-muted-foreground'>— vs hôm qua</p>
+            subtitle = <TrendText value={0} suffix=' vs hôm qua' />
           }
         } else if (config.key === 'paid') {
           if (collectionRate !== null) {

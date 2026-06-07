@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { getDashboardStats } from '@/services/reports'
 import { formatCurrency } from '@/lib/format'
 import {
-  Card,
   CardContent,
   CardHeader,
   CardTitle,
@@ -24,8 +23,7 @@ function RecentInvoicesSkeleton() {
               <Skeleton className='h-4 w-16' />
               <Skeleton className='h-4 flex-1' />
               <Skeleton className='h-4 w-20' />
-              <Skeleton className='h-4 w-14' />
-              <Skeleton className='h-4 w-10' />
+              <Skeleton className='h-4 w-16' />
             </div>
           ))}
         </div>
@@ -34,32 +32,27 @@ function RecentInvoicesSkeleton() {
   )
 }
 
+const statusConfig = {
+  cancelled: { icon: XCircle, label: 'Đã hủy', className: 'text-muted-foreground' },
+  pending: { icon: Clock, label: 'Chờ TT', className: 'text-amber-600' },
+  paid: { icon: CheckCircle, label: 'Đã TT', className: 'text-emerald-600' },
+  unpaid: { icon: AlertCircle, label: 'Chưa TT', className: 'text-red-600' },
+} as const
+
 function StatusBadge({ status, isPaid }: { status: string; isPaid: boolean }) {
-  if (status === 'cancelled') {
-    return (
-      <span className='flex items-center gap-1 text-xs text-muted-foreground'>
-        <XCircle className='h-3.5 w-3.5' /> Đã hủy
-      </span>
-    )
-  }
-  if (status === 'pending') {
-    return (
-      <span className='flex items-center gap-1 text-xs text-amber-600'>
-        <Clock className='h-3.5 w-3.5' /> Chờ TT
-      </span>
-    )
-  }
-  // status === 'completed'
-  if (isPaid) {
-    return (
-      <span className='flex items-center gap-1 text-xs text-emerald-600'>
-        <CheckCircle className='h-3.5 w-3.5' /> Đã TT
-      </span>
-    )
-  }
+  const key = status === 'cancelled'
+    ? 'cancelled'
+    : status === 'pending'
+      ? 'pending'
+      : isPaid
+        ? 'paid'
+        : 'unpaid'
+  const config = statusConfig[key]
+  const Icon = config.icon
   return (
-    <span className='flex items-center gap-1 text-xs text-red-600'>
-      <AlertCircle className='h-3.5 w-3.5' /> Chưa TT
+    <span className={cn('flex items-center gap-1 whitespace-nowrap text-xs', config.className)}>
+      <Icon className='h-3.5 w-3.5' />
+      {config.label}
     </span>
   )
 }
@@ -108,13 +101,13 @@ export function RecentInvoices() {
                   inv.status === 'cancelled' && 'opacity-50'
                 )}
               >
-                <span className='shrink-0 font-mono text-xs text-muted-foreground'>
+                <span className='shrink-0 font-mono text-xs text-muted-foreground tabular-nums'>
                   {inv.code}
                 </span>
                 <span className='min-w-0 flex-1 truncate text-sm'>
                   {inv.customerName}
                 </span>
-                <span className='shrink-0 font-medium tabular-nums text-sm'>
+                <span className='shrink-0 text-sm font-medium tabular-nums'>
                   {formatCurrency(inv.total)}
                 </span>
                 <StatusBadge status={inv.status} isPaid={inv.isPaid} />

@@ -86,9 +86,9 @@ export function OutstandingDebts() {
           ))}
         </div>
         <Separator className='my-3' />
-        <div className='flex items-center justify-between'>
-          <span className='text-sm text-muted-foreground'>Tổng công nợ</span>
-          <span className='font-bold tabular-nums'>{formatCurrency(totalDebt)}</span>
+        <div className='flex items-center justify-between rounded-md bg-muted/50 px-3 py-2'>
+          <span className='text-sm font-medium'>Tổng công nợ</span>
+          <span className='text-sm font-bold tabular-nums text-red-600'>{formatCurrency(totalDebt)}</span>
         </div>
       </CardContent>
     </>

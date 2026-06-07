@@ -26,7 +26,7 @@ export function MonthlyRevenueChart() {
 
   return (
     <ChartContainer config={chartConfig} className='h-[250px] w-full'>
-      <BarChart data={chartData}>
+      <BarChart data={chartData} accessibilityLayer>
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey='name'
