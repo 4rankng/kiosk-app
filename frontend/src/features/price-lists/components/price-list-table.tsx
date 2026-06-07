@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { savePriceList } from '@/services/price-lists'
 import type { PriceList, PriceListItem } from '@/types'
@@ -24,7 +24,7 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
   const isMobile = useIsMobile()
 
   // Sync items when priceList changes
-  useMemo(() => {
+  useEffect(() => {
     setItems(priceList.items)
   }, [priceList.id])
 

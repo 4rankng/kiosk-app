@@ -52,7 +52,7 @@
     "runtime": null
   },
   "build": {
-    "buildCommand": "pnpm build 2>&1 | tail -5",
+    "buildCommand": "rtk tsc --noEmit --pretty 2>&1 | head -20",
     "testCommand": "pnpm test",
     "lintCommand": "pnpm lint",
     "devCommand": "pnpm dev",
@@ -190,14 +190,20 @@
   "hotPaths": [
     {
       "path": "src/features/dashboard/components/today-stats.tsx",
-      "accessCount": 11,
-      "lastAccessed": 1780823265132,
+      "accessCount": 19,
+      "lastAccessed": 1780859084750,
       "type": "file"
     },
     {
       "path": "src/features/dashboard/components/monthly-revenue-chart.tsx",
-      "accessCount": 9,
-      "lastAccessed": 1780823281761,
+      "accessCount": 10,
+      "lastAccessed": 1780858581642,
+      "type": "file"
+    },
+    {
+      "path": "src/features/dashboard/index.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1780858840565,
       "type": "file"
     },
     {
@@ -222,6 +228,18 @@
       "path": "src/features/orders/components/order-success-dialog.tsx",
       "accessCount": 5,
       "lastAccessed": 1780823641874,
+      "type": "file"
+    },
+    {
+      "path": "src/features/dashboard/components/top-customers.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780858636085,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/header.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780858729913,
       "type": "file"
     },
     {
@@ -258,18 +276,6 @@
       "path": "src/features/orders/components/order-create.tsx",
       "accessCount": 4,
       "lastAccessed": 1780822762365,
-      "type": "file"
-    },
-    {
-      "path": "src/features/dashboard/index.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1780823293427,
-      "type": "file"
-    },
-    {
-      "path": "src/features/dashboard/components/top-customers.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1780823304583,
       "type": "file"
     },
     {
@@ -312,12 +318,6 @@
       "path": "src/components/ui/input.tsx",
       "accessCount": 3,
       "lastAccessed": 1780821182952,
-      "type": "file"
-    },
-    {
-      "path": "src/components/layout/header.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1780823623839,
       "type": "file"
     },
     {

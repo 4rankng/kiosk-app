@@ -47,7 +47,7 @@ export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
                   </TableRow>
                 ))}
                 <TableRow key={`summary-${companyId}`} className='bg-muted/50 font-bold'>
-                  <TableCell colSpan={2}>TỔNG CỘNG CÔNG NỢ CỦA {rows[0].companyName}:</TableCell>
+                  <TableCell colSpan={2}>Tổng cộng công nợ của {rows[0].companyName}:</TableCell>
                   <TableCell className='text-right font-bold'>{formatCurrency(totals.revenue)}</TableCell>
                   <TableCell className='text-right font-bold'>{formatCurrency(totals.unpaid)}</TableCell>
                 </TableRow>

@@ -34,12 +34,12 @@ export const sidebarData: SidebarData = {
           icon: Package,
           items: [
             {
-              title: 'Danh mục',
+              title: 'Sản phẩm',
               url: '/products',
               icon: List,
             },
             {
-              title: 'Thiết lập giá',
+              title: 'Bảng giá',
               url: '/price-lists',
               icon: DollarSign,
             },
@@ -50,12 +50,12 @@ export const sidebarData: SidebarData = {
           icon: Users,
           items: [
             {
-              title: 'Danh sách',
+              title: 'Danh sách KH',
               url: '/customers',
               icon: List,
             },
             {
-              title: 'Nhóm khách hàng',
+              title: 'Nhóm KH',
               url: '/companies',
               icon: Building2,
             },
@@ -76,12 +76,12 @@ export const sidebarData: SidebarData = {
           icon: BarChart3,
           items: [
             {
-              title: 'Báo cáo Hàng hóa',
+              title: 'Hàng hóa',
               url: '/reports/products',
               icon: PackageSearch,
             },
             {
-              title: 'Báo cáo Khách hàng',
+              title: 'Khách hàng',
               url: '/reports/customers',
               icon: UserCheck,
             },

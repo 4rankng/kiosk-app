@@ -9,6 +9,7 @@ import { productSchema, type ProductSchema } from '../data/schema'
 import { useProductsContext } from './products-provider'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { InlineAddCombobox } from '@/components/inline-add-combobox'
@@ -120,7 +121,7 @@ export function ProductMutateDialog() {
           </div>
           <div className='space-y-2'>
             <Label htmlFor='description'>Mô tả</Label>
-            <textarea id='description' {...form.register('description')} className='flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm' placeholder='Mô tả sản phẩm...' />
+            <Textarea id='description' {...form.register('description')} placeholder='Mô tả sản phẩm...' />
           </div>
           <div className='grid grid-cols-2 gap-3'>
             <div className='space-y-2'>

@@ -2,44 +2,31 @@ import { useQuery } from '@tanstack/react-query'
 import { Wallet, Package, CheckCircle, AlertCircle } from 'lucide-react'
 import { getDashboardStats } from '@/services/reports'
 import { formatCurrency, formatNumber } from '@/lib/format'
-import { Card } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
 const statsConfig = [
-  {
-    key: 'revenue',
-    icon: Wallet,
-    label: 'Doanh thu',
-    color: 'bg-blue-50 text-blue-600',
-  },
-  {
-    key: 'orders',
-    icon: Package,
-    label: 'Đơn hàng',
-    color: 'bg-amber-50 text-amber-600',
-  },
-  {
-    key: 'paid',
-    icon: CheckCircle,
-    label: 'Đã TT',
-    color: 'bg-emerald-50 text-emerald-600',
-  },
-  {
-    key: 'unpaid',
-    icon: AlertCircle,
-    label: 'Còn nợ',
-    color: 'bg-rose-50 text-rose-600',
-  },
+  { key: 'revenue', icon: Wallet, label: 'Doanh thu' },
+  { key: 'orders', icon: Package, label: 'Đơn hàng' },
+  { key: 'paid', icon: CheckCircle, label: 'Đã thanh toán' },
+  { key: 'unpaid', icon: AlertCircle, label: 'Còn nợ' },
 ] as const
 
 function StatCardSkeleton() {
   return (
-    <Card className='flex items-center gap-3 p-3'>
-      <Skeleton className='h-9 w-9 shrink-0 rounded-lg' />
-      <div className='min-w-0 flex-1'>
-        <Skeleton className='h-3 w-16' />
-        <Skeleton className='mt-1 h-5 w-20' />
-      </div>
+    <Card>
+      <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+        <Skeleton className='h-4 w-20' />
+        <Skeleton className='h-4 w-4' />
+      </CardHeader>
+      <CardContent>
+        <Skeleton className='h-7 w-24' />
+      </CardContent>
     </Card>
   )
 }
@@ -49,7 +36,7 @@ export function TodayStats() {
 
   if (isLoading) {
     return (
-      <div className='grid grid-cols-2 gap-3 lg:grid-cols-4'>
+      <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
         {statsConfig.map((config) => (
           <StatCardSkeleton key={config.key} />
         ))}
@@ -65,22 +52,20 @@ export function TodayStats() {
   }
 
   return (
-    <div className='grid grid-cols-2 gap-3 lg:grid-cols-4'>
+    <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
       {statsConfig.map((config) => {
         const Icon = config.icon
         return (
-          <Card key={config.key} className='flex items-center gap-3 p-3'>
-            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${config.color}`}>
-              <Icon className='h-4 w-4' />
-            </div>
-            <div className='min-w-0 flex-1'>
-              <p className='truncate text-[11px] font-medium text-muted-foreground'>
+          <Card key={config.key}>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium'>
                 {config.label}
-              </p>
-              <p className='truncate text-base font-bold leading-tight tracking-tight'>
-                {values[config.key]}
-              </p>
-            </div>
+              </CardTitle>
+              <Icon className='h-4 w-4 text-muted-foreground' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold'>{values[config.key]}</div>
+            </CardContent>
           </Card>
         )
       })}

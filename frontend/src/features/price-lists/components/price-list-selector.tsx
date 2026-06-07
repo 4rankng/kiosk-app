@@ -92,40 +92,41 @@ export function PriceListSelector({ selectedPriceList, onSelect }: PriceListSele
             <DialogTitle>Tạo bảng giá mới</DialogTitle>
             <DialogDescription>Nhập thông tin bảng giá mới.</DialogDescription>
           </DialogHeader>
-          <div className='grid gap-3 py-4'>
+          <form id='price-list-create' onSubmit={(e) => { e.preventDefault(); createMutation.mutate() }} className='grid gap-3 py-4'>
             <div className='grid grid-cols-2 gap-3'>
-            <div className='grid gap-2'>
-              <Label htmlFor='name'>Tên bảng giá</Label>
-              <Input
-                id='name'
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder='VD: BẢNG GIÁ CHUỖI ABC'
-              />
+              <div className='grid gap-2'>
+                <Label htmlFor='name'>Tên bảng giá</Label>
+                <Input
+                  id='name'
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder='VD: BẢNG GIÁ CHUỖI ABC'
+                />
+              </div>
+              <div className='grid gap-2'>
+                <Label htmlFor='company'>Công ty</Label>
+                <Select value={newCompanyId} onValueChange={setNewCompanyId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Chọn công ty...' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companies.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className='grid gap-2'>
-              <Label htmlFor='company'>Công ty</Label>
-              <Select value={newCompanyId} onValueChange={setNewCompanyId}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Chọn công ty...' />
-                </SelectTrigger>
-                <SelectContent>
-                  {companies.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          </div>
+          </form>
           <DialogFooter>
             <Button variant='outline' onClick={() => setShowCreate(false)}>
               Hủy bỏ
             </Button>
             <Button
-              onClick={() => createMutation.mutate()}
+              type='submit'
+              form='price-list-create'
               disabled={!newName.trim() || !newCompanyId || createMutation.isPending}
             >
               {createMutation.isPending ? 'Đang tạo...' : 'Tạo bảng giá'}

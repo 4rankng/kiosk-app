@@ -226,12 +226,13 @@ export function OrderCreate() {
 
       {/* Sticky bottom bar */}
       {isMobile ? (
-        <button
+        <Button
           type='button'
+          variant='ghost'
           onClick={() => setReviewOpen(true)}
-          className='fixed bottom-0 left-0 right-0 z-40 border-t bg-background/80 backdrop-blur-lg p-4'
+          className='fixed bottom-0 left-0 right-0 z-40 h-auto border-t bg-background/80 backdrop-blur-lg p-4 rounded-none'
         >
-          <div className='flex items-center justify-between'>
+          <div className='flex w-full items-center justify-between'>
             <div>
               <span className='text-sm text-muted-foreground'>
                 {items.length} mặt hàng · Khách cần trả:
@@ -240,9 +241,9 @@ export function OrderCreate() {
             </div>
             <ChevronUp className='h-5 w-5 text-muted-foreground' />
           </div>
-        </button>
+        </Button>
       ) : (
-        <div className='fixed bottom-0 left-0 right-0 z-40 border-t bg-background/80 backdrop-blur-lg shadow-[0_-4px_20px_rgba(0,0,0,0.08)] p-4 sm:left-[calc(var(--sidebar-width,0px)+0px)]'>
+        <div className='fixed bottom-0 left-0 right-0 z-40 border-t bg-background/80 backdrop-blur-lg shadow-lg p-4 sm:left-[calc(var(--sidebar-width,0px)+0px)]'>
           <div className='mx-auto flex max-w-2xl items-center justify-between gap-4'>
             <div>
               <span className='text-sm text-muted-foreground'>Khách cần trả:</span>

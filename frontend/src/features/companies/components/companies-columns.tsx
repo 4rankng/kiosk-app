@@ -2,6 +2,7 @@ import { type ColumnDef } from '@tanstack/react-table'
 import type { Company } from '@/types/company'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useCompaniesContext } from './companies-provider'
 
@@ -21,7 +22,9 @@ export function getCompaniesColumns(): ColumnDef<Company>[] {
       header: ({ column }) => <DataTableColumnHeader column={column} title='Bảng giá' />,
       cell: ({ row }) => {
         const plId = row.getValue('priceListId') as string
-        return plId ? <span className='text-muted-foreground'>Đã gán</span> : <span className='text-muted-foreground'>Chưa gán</span>
+        return plId
+          ? <Badge variant='default' className='text-xs'>Đã gán</Badge>
+          : <Badge variant='outline' className='text-xs text-muted-foreground'>Chưa gán</Badge>
       },
     },
     {

@@ -17,9 +17,11 @@ export function Dashboard() {
         <ProfileDropdown />
       </Header>
       <Main>
-        <div className='mb-2'>
-          <h1 className='text-2xl font-bold tracking-tight'>Tổng quan</h1>
-          <p className='text-muted-foreground'>Tình hình kinh doanh hôm nay.</p>
+        <div className='mb-2 flex items-center justify-between space-y-2'>
+          <div>
+            <h1 className='text-2xl font-bold tracking-tight'>Tổng quan</h1>
+            <p className='text-muted-foreground'>Tình hình kinh doanh hôm nay.</p>
+          </div>
         </div>
         <div className='space-y-4'>
           <TodayStats />

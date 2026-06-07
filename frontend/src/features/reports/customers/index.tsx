@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getCustomerReport } from '@/services/reports'
 import { getCompanies } from '@/services/companies'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
 import { CustomerReportTable } from './components/customer-report-table'
 import { ExportActions } from './components/export-actions'
 
@@ -45,15 +46,15 @@ export function CustomerReport() {
         </div>
         <div className='flex flex-wrap items-end gap-3'>
           <div className='space-y-1'>
-            <label className='text-sm font-medium'>Từ ngày</label>
+            <Label className='text-sm font-medium'>Từ ngày</Label>
             <Input type='date' value={startDate} onChange={(e) => setStartDate(e.target.value)} className='h-9' />
           </div>
           <div className='space-y-1'>
-            <label className='text-sm font-medium'>Đến ngày</label>
+            <Label className='text-sm font-medium'>Đến ngày</Label>
             <Input type='date' value={endDate} onChange={(e) => setEndDate(e.target.value)} className='h-9' />
           </div>
           <div className='space-y-1'>
-            <label className='text-sm font-medium'>Công ty/Chuỗi</label>
+            <Label className='text-sm font-medium'>Công ty/Chuỗi</Label>
             <Select value={companyId} onValueChange={setCompanyId}>
               <SelectTrigger className='h-9 w-full sm:w-[200px]'><SelectValue placeholder='Tất cả công ty' /></SelectTrigger>
               <SelectContent>

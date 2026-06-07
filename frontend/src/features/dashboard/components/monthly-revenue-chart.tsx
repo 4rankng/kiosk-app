@@ -1,6 +1,20 @@
 import { useQuery } from '@tanstack/react-query'
 import { getDashboardStats } from '@/services/reports'
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
+import { formatCurrency } from '@/lib/format'
+
+const chartConfig = {
+  total: {
+    label: 'Doanh thu',
+    color: 'hsl(var(--chart-1))',
+  },
+} satisfies ChartConfig
 
 export function MonthlyRevenueChart() {
   const { data } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
@@ -11,33 +25,40 @@ export function MonthlyRevenueChart() {
   }))
 
   return (
-    <ResponsiveContainer width='100%' height={350}>
+    <ChartContainer config={chartConfig} className='h-[350px] w-full'>
       <BarChart data={chartData}>
+        <CartesianGrid vertical={false} />
         <XAxis
           dataKey='name'
-          stroke='#888888'
-          fontSize={12}
           tickLine={false}
           axisLine={false}
+          tickMargin={8}
+          fontSize={12}
         />
         <YAxis
-          stroke='#888888'
-          fontSize={12}
           tickLine={false}
           axisLine={false}
+          fontSize={12}
+          tickMargin={8}
           tickFormatter={(value: number) => {
             if (value >= 1000000) return `${(value / 1000000).toFixed(1)}tr`
             if (value >= 1000) return `${(value / 1000).toFixed(0)}k`
             return value.toString()
           }}
         />
+        <ChartTooltip
+          content={
+            <ChartTooltipContent
+              formatter={(value) => formatCurrency(Number(value))}
+            />
+          }
+        />
         <Bar
           dataKey='total'
-          fill='currentColor'
+          fill='var(--color-total)'
           radius={[4, 4, 0, 0]}
-          className='fill-primary'
         />
       </BarChart>
-    </ResponsiveContainer>
+    </ChartContainer>
   )
 }

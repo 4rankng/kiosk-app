@@ -58,7 +58,6 @@ export function PaymentDialog() {
           <DialogFooter>
             <Button variant='outline' onClick={() => setOpen(null)}>Hủy bỏ</Button>
             <Button
-              className='bg-primary hover:bg-primary/90'
               onClick={() => mutation.mutate(invoice.id)}
               disabled={mutation.isPending}
             >

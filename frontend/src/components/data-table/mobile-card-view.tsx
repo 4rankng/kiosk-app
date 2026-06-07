@@ -126,8 +126,8 @@ export function MobileCardView<TData>({
         // Render action buttons (hidden columns are action columns)
         const actionCells = configEntries
           .filter((e) => e.cardConfig.hidden)
-          .map((e) => getCellContent(e.key))
-          .filter(Boolean)
+          .map((e, i) => <span key={e.key ?? i}>{getCellContent(e.key)}</span>)
+          .filter((el) => el.props.children !== null && el.props.children !== undefined)
 
         return (
           <MobileCard

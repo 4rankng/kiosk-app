@@ -6,6 +6,7 @@ import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { useQuery } from '@tanstack/react-query'
 import { getProductReport } from '@/services/reports'
 import { ProductReportTable } from './components/product-report-table'
@@ -37,11 +38,11 @@ export function ProductReport() {
         </div>
         <div className='flex flex-wrap items-end gap-3'>
           <div className='space-y-1'>
-            <label className='text-sm font-medium'>Từ ngày</label>
+            <Label className='text-sm font-medium'>Từ ngày</Label>
             <Input type='date' value={startDate} onChange={(e) => setStartDate(e.target.value)} className='h-9' />
           </div>
           <div className='space-y-1'>
-            <label className='text-sm font-medium'>Đến ngày</label>
+            <Label className='text-sm font-medium'>Đến ngày</Label>
             <Input type='date' value={endDate} onChange={(e) => setEndDate(e.target.value)} className='h-9' />
           </div>
           <Button onClick={() => setFetchKey((k) => k + 1)} disabled={isLoading}>
