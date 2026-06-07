@@ -35,7 +35,7 @@ export function UserAuthForm({
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: 'admin@phuonglinh.vn', password: 'admin123' },
   })
 
   function handleGoogleSignIn() {

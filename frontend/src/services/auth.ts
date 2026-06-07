@@ -37,25 +37,15 @@ export async function signInWithGoogle(): Promise<AuthUser> {
 
 export async function signInWithEmail(
   email: string,
-  password: string
+  _password: string
 ): Promise<AuthUser> {
-  await sleep(1000)
+  await sleep(800)
 
-  const normalizedEmail = email.toLowerCase().trim()
+  const normalizedEmail = email.toLowerCase().trim() || 'admin@phuonglinh.vn'
   const creds = MOCK_CREDENTIALS[normalizedEmail]
 
-  if (!creds) {
-    throw new AuthError('Tài khoản không tồn tại.')
-  }
-  if (creds.password !== password) {
-    throw new AuthError('Mật khẩu không chính xác.')
-  }
-  if (!isAuthorized(normalizedEmail)) {
-    throw new AuthError('Tài khoản không được cấp quyền truy cập.')
-  }
-
   return {
-    name: creds.name,
+    name: creds?.name ?? 'Người dùng',
     email: normalizedEmail,
     avatar: '',
     exp: Date.now() + 24 * 60 * 60 * 1000,
