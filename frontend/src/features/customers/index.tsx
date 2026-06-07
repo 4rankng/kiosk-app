@@ -14,7 +14,7 @@ function AddCustomerButton() {
   return (
     <Button onClick={() => setOpen('add')}>
       <Plus className='mr-2 h-4 w-4' />
-      Thêm mới khách hàng
+      Thêm
     </Button>
   )
 }

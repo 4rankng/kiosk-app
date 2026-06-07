@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { formatCurrency, formatDateTime } from '@/lib/format'
+import { formatCurrency, formatDateTime, formatNumber } from '@/lib/format'
 import { MobileCard } from '@/components/data-table/mobile-card'
 import type { ProductReportRow } from '@/services/reports'
 
@@ -30,7 +30,7 @@ export function ProductReportMobile({ data }: { data: ProductReportRow[] }) {
             }
             metric={
               <span className='flex gap-3'>
-                <span>SL: {product.totalQuantity}</span>
+                <span>SL: {formatNumber(product.totalQuantity)}</span>
                 <span>{formatCurrency(product.totalRevenue)}</span>
               </span>
             }

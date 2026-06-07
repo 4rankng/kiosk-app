@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
@@ -25,6 +26,19 @@ export function CompanyMutateDialog() {
       : { name: '', taxId: '', priceListId: '' },
   })
 
+  // Reset form when dialog opens with new company data
+  useEffect(() => {
+    if (open === 'edit' && selectedCompany) {
+      form.reset({
+        name: selectedCompany.name ?? '',
+        taxId: selectedCompany.taxId ?? '',
+        priceListId: selectedCompany.priceListId ?? '',
+      })
+    } else if (open === 'add') {
+      form.reset({ name: '', taxId: '', priceListId: '' })
+    }
+  }, [open, selectedCompany])
+
   const mutation = useMutation({
     mutationFn: (values: CompanySchema) =>
       isEdit && selectedCompany ? updateCompany(selectedCompany.id, values) : createCompany(values),
@@ -44,18 +58,20 @@ export function CompanyMutateDialog() {
         </DialogHeader>
         <form onSubmit={form.handleSubmit((v) => mutation.mutate(v as CompanySchema))} className='flex flex-1 flex-col gap-4'>
           <div className='flex-1 space-y-4 overflow-y-auto'>
+            <div className='grid grid-cols-2 gap-3'>
             <div className='space-y-2'>
-              <Label>Tên công ty/chuỗi</Label>
+              <Label>Tên công ty</Label>
               <Input {...form.register('name')} />
               {form.formState.errors.name && <p className='text-sm text-destructive'>{form.formState.errors.name.message}</p>}
             </div>
             <div className='space-y-2'>
-              <Label>Mã số thuế</Label>
+              <Label>MST</Label>
               <Input {...form.register('taxId')} />
             </div>
+          </div>
             <div className='space-y-2'>
-              <Label>Bảng giá áp dụng</Label>
-              <Select onValueChange={(v) => form.setValue('priceListId', v)} defaultValue={form.getValues('priceListId')}>
+              <Label>Bảng giá</Label>
+              <Select onValueChange={(v) => form.setValue('priceListId', v)} value={form.watch('priceListId') ?? ''}>
                 <SelectTrigger><SelectValue placeholder='Chọn bảng giá...' /></SelectTrigger>
                 <SelectContent>
                   {priceLists.map((pl) => <SelectItem key={pl.id} value={pl.id}>{pl.name}</SelectItem>)}

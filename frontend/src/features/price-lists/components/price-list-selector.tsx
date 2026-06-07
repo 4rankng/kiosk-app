@@ -92,7 +92,8 @@ export function PriceListSelector({ selectedPriceList, onSelect }: PriceListSele
             <DialogTitle>Tạo bảng giá mới</DialogTitle>
             <DialogDescription>Nhập thông tin bảng giá mới.</DialogDescription>
           </DialogHeader>
-          <div className='grid gap-4 py-4'>
+          <div className='grid gap-3 py-4'>
+            <div className='grid grid-cols-2 gap-3'>
             <div className='grid gap-2'>
               <Label htmlFor='name'>Tên bảng giá</Label>
               <Input
@@ -103,7 +104,7 @@ export function PriceListSelector({ selectedPriceList, onSelect }: PriceListSele
               />
             </div>
             <div className='grid gap-2'>
-              <Label htmlFor='company'>Công ty/Chuỗi</Label>
+              <Label htmlFor='company'>Công ty</Label>
               <Select value={newCompanyId} onValueChange={setNewCompanyId}>
                 <SelectTrigger>
                   <SelectValue placeholder='Chọn công ty...' />
@@ -117,6 +118,7 @@ export function PriceListSelector({ selectedPriceList, onSelect }: PriceListSele
                 </SelectContent>
               </Select>
             </div>
+          </div>
           </div>
           <DialogFooter>
             <Button variant='outline' onClick={() => setShowCreate(false)}>

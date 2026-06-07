@@ -62,9 +62,9 @@ export function CustomerMutateDialog() {
         </DialogHeader>
         <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className='flex flex-1 flex-col gap-4'>
           <div className='flex-1 space-y-4 overflow-y-auto'>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+            <div className='grid grid-cols-2 gap-3'>
             <div className='space-y-2'>
-              <Label>Mã khách hàng</Label>
+              <Label>Mã KH</Label>
               <Input {...form.register('code')} />
               {form.formState.errors.code && <p className='text-sm text-destructive'>{form.formState.errors.code.message}</p>}
             </div>
@@ -75,8 +75,8 @@ export function CustomerMutateDialog() {
             </div>
           </div>
           <div className='space-y-2'>
-            <Label>Công ty/Chuỗi</Label>
-            <Select onValueChange={(v) => form.setValue('companyId', v)} defaultValue={form.getValues('companyId')}>
+            <Label>Công ty</Label>
+            <Select onValueChange={(v) => form.setValue('companyId', v)} value={form.watch('companyId') ?? ''}>
               <SelectTrigger><SelectValue placeholder='Chọn công ty...' /></SelectTrigger>
               <SelectContent>
                 {companies.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
@@ -84,9 +84,9 @@ export function CustomerMutateDialog() {
             </Select>
             {form.formState.errors.companyId && <p className='text-sm text-destructive'>{form.formState.errors.companyId.message}</p>}
           </div>
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+          <div className='grid grid-cols-2 gap-3'>
             <div className='space-y-2'>
-              <Label>Số điện thoại</Label>
+              <Label>Điện thoại</Label>
               <Input {...form.register('phone')} />
             </div>
             <div className='space-y-2'>
@@ -96,11 +96,11 @@ export function CustomerMutateDialog() {
             </div>
           </div>
           <div className='space-y-2'>
-            <Label>Địa chỉ giao hàng</Label>
+            <Label>Địa chỉ</Label>
             <Input {...form.register('address')} />
           </div>
           <div className='space-y-2'>
-            <Label>Mã số thuế</Label>
+            <Label>MST</Label>
             <Input {...form.register('taxId')} />
           </div>
           </div>

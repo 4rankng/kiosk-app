@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { savePriceList } from '@/services/price-lists'
 import type { PriceList, PriceListItem } from '@/types'
@@ -127,6 +127,30 @@ function MobilePriceList({
   items: PriceListItem[]
   onUpdatePrice: (productId: string, price: number) => void
 }) {
+  const batchSize = 20
+  const [visibleCount, setVisibleCount] = useState(batchSize)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  // Reset when items change
+  useMemo(() => { setVisibleCount(batchSize) }, [items.length])
+
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!sentinelRef.current) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + batchSize, items.length))
+        }
+      },
+      { rootMargin: '200px' }
+    )
+    observer.observe(sentinelRef.current)
+    return () => observer.disconnect()
+  }, [items.length])
+
+  const visibleItems = items.slice(0, visibleCount)
+
   if (items.length === 0) {
     return (
       <div className='flex h-24 items-center justify-center text-sm text-muted-foreground'>
@@ -137,7 +161,7 @@ function MobilePriceList({
 
   return (
     <div className='space-y-2'>
-      {items.map((item) => (
+      {visibleItems.map((item) => (
         <div
           key={item.productId}
           className='rounded-md border bg-card p-3 space-y-2'
@@ -163,6 +187,11 @@ function MobilePriceList({
           </div>
         </div>
       ))}
+      {visibleCount < items.length && (
+        <div ref={sentinelRef} className='flex justify-center py-4'>
+          <span className='text-sm text-muted-foreground'>Đang tải...</span>
+        </div>
+      )}
     </div>
   )
 }
