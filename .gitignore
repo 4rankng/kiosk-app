@@ -144,3 +144,6 @@ vite.config.ts.timestamp-*
 
 # Graphify
 graphify-out/
+
+# OMC orchestration state
+.omc/
