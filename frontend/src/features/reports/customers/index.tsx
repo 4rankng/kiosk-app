@@ -55,7 +55,7 @@ export function CustomerReport() {
           <div className='space-y-1'>
             <label className='text-sm font-medium'>Công ty/Chuỗi</label>
             <Select value={companyId} onValueChange={setCompanyId}>
-              <SelectTrigger className='h-9 w-[200px]'><SelectValue placeholder='Tất cả công ty' /></SelectTrigger>
+              <SelectTrigger className='h-9 w-full sm:w-[200px]'><SelectValue placeholder='Tất cả công ty' /></SelectTrigger>
               <SelectContent>
                 <SelectItem value='all'>Tất cả công ty</SelectItem>
                 {companies.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}

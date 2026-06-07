@@ -25,7 +25,7 @@ export function OrderSummary({ subtotal, discount, total, onDiscountChange }: Or
             const val = parseInt(e.target.value.replace(/\D/g, ''), 10) || 0
             onDiscountChange(val)
           }}
-          className='h-9 w-[150px] text-right'
+          className='h-9 w-full max-w-[150px] text-right'
         />
       </div>
       <div className='flex items-center justify-between border-t pt-2'>

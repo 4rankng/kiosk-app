@@ -1,9 +1,13 @@
 import { useMemo, Fragment } from 'react'
 import { formatCurrency } from '@/lib/format'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { CustomerReportMobile } from './customer-report-mobile'
 import type { CustomerReportRow } from '@/services/reports'
 
 export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
+  const isMobile = useIsMobile()
+
   const grouped = useMemo(() => {
     const sorted = [...data].sort((a, b) => a.companyName.localeCompare(b.companyName, 'vi'))
     const groups: Record<string, CustomerReportRow[]> = {}
@@ -13,6 +17,10 @@ export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
     }
     return groups
   }, [data])
+
+  if (isMobile) {
+    return <CustomerReportMobile data={data} />
+  }
 
   return (
     <div className='rounded-md border'>

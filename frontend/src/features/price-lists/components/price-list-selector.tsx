@@ -68,7 +68,7 @@ export function PriceListSelector({ selectedPriceList, onSelect }: PriceListSele
             if (pl) onSelect(pl)
           }}
         >
-          <SelectTrigger className='w-[300px]'>
+          <SelectTrigger className='w-full sm:w-[300px]'>
             <SelectValue placeholder='Chọn bảng giá...' />
           </SelectTrigger>
           <SelectContent>

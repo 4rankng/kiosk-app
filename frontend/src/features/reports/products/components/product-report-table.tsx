@@ -8,6 +8,8 @@ import { formatCurrency, formatDateTime } from '@/lib/format'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { ChevronRight, ChevronDown, Search } from 'lucide-react'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { ProductReportMobile } from './product-report-mobile'
 import type { ProductReportRow } from '@/services/reports'
 
 const columns: ColumnDef<ProductReportRow>[] = [
@@ -18,6 +20,7 @@ const columns: ColumnDef<ProductReportRow>[] = [
 ]
 
 export function ProductReportTable({ data }: { data: ProductReportRow[] }) {
+  const isMobile = useIsMobile()
   const [sorting, setSorting] = useState<SortingState>([])
 
   const table = useReactTable({
@@ -25,6 +28,10 @@ export function ProductReportTable({ data }: { data: ProductReportRow[] }) {
     getCoreRowModel: getCoreRowModel(), getSortedRowModel: getSortedRowModel(),
     getExpandedRowModel: getExpandedRowModel(), getRowCanExpand: () => true,
   })
+
+  if (isMobile) {
+    return <ProductReportMobile data={data} />
+  }
 
   return (
     <div className='rounded-md border'>
