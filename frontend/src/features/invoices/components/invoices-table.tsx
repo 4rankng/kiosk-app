@@ -123,7 +123,7 @@ export function InvoicesTable() {
         </div>
       )}
 
-      <DataTablePagination table={table} />
+      {!isMobile && <DataTablePagination table={table} />}
     </div>
   )
 }

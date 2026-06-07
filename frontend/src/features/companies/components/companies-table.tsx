@@ -68,7 +68,7 @@ export function CompaniesTable() {
           </Table>
         </div>
       )}
-      <DataTablePagination table={table} />
+      {!isMobile && <DataTablePagination table={table} />}
     </div>
   )
 }
