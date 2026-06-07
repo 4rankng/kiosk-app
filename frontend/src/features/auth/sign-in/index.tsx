@@ -14,12 +14,11 @@ export function SignIn() {
 
   return (
     <AuthLayout>
-      <Card className='max-w-sm gap-4'>
-        <CardHeader>
-          <CardTitle className='text-lg tracking-tight'>Đăng nhập</CardTitle>
+      <Card className='w-full max-w-sm'>
+        <CardHeader className='text-center'>
+          <CardTitle className='text-2xl tracking-tight'>Đăng nhập</CardTitle>
           <CardDescription>
-            Đăng nhập bằng tài khoản Google đã được phê duyệt để truy cập hệ
-            thống quản lý bán buôn.
+            Đăng nhập bằng tài khoản đã được phê duyệt để truy cập hệ thống.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -16,7 +16,7 @@ export function OrderLineItem({ item, onUpdateQuantity, onUpdatePrice, onRemove 
       <div className='flex-1 space-y-2'>
         <div className='flex items-center justify-between'>
           <div>
-            <span className='text-sm font-medium'>[+] {item.productName}</span>
+            <span className='text-sm font-medium'>{item.productName}</span>
             <span className='ml-1 text-xs text-muted-foreground'>({item.unit})</span>
           </div>
           <Button
@@ -49,7 +49,7 @@ export function OrderLineItem({ item, onUpdateQuantity, onUpdatePrice, onRemove 
             <Plus className='h-4 w-4' />
           </Button>
 
-          <span className='mx-1 text-sm text-muted-foreground'>|</span>
+          <span className='mx-2 text-muted-foreground'>·</span>
           <span className='text-sm text-muted-foreground'>Giá:</span>
           <Input
             type='text'

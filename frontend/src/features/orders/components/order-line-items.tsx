@@ -1,3 +1,4 @@
+import { ShoppingCart } from 'lucide-react'
 import type { OrderItem } from '@/types'
 import { OrderLineItem } from './order-line-item'
 
@@ -16,9 +17,11 @@ export function OrderLineItems({
 }: OrderLineItemsProps) {
   if (items.length === 0) {
     return (
-      <p className='py-4 text-center text-sm text-muted-foreground'>
-        Chưa có sản phẩm nào. Tìm kiếm và thêm hàng hóa ở trên.
-      </p>
+      <div className='flex flex-col items-center justify-center py-8 text-center'>
+        <ShoppingCart className='h-10 w-10 text-muted-foreground/40 mb-2' />
+        <p className='text-sm text-muted-foreground'>Chưa có sản phẩm nào</p>
+        <p className='text-xs text-muted-foreground/60'>Tìm kiếm và thêm hàng hóa ở trên</p>
+      </div>
     )
   }
 

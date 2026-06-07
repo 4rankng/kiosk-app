@@ -52,7 +52,7 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
     <div className='space-y-4'>
       <div className='flex flex-wrap items-center gap-2'>
         <Input
-          placeholder='🔍 Tìm kiếm mặt hàng...'
+          placeholder='Tìm kiếm mặt hàng...'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className='h-9 w-[300px]'
@@ -105,7 +105,7 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
       <div className='flex justify-end'>
         <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
           <Save className='mr-2 h-4 w-4' />
-          {saveMutation.isPending ? 'Đang lưu...' : '💾 Lưu bảng giá'}
+          {saveMutation.isPending ? 'Đang lưu...' : 'Lưu bảng giá'}
         </Button>
       </div>
     </div>

@@ -74,9 +74,11 @@ export function UserAuthForm({
   return (
     <div className={cn('grid gap-4', className)}>
       <Button
+        variant='outline'
         disabled={googleLoading}
         onClick={handleGoogleSignIn}
         type='button'
+        className='w-full h-11'
       >
         {googleLoading ? (
           <Loader2 className='animate-spin' />
@@ -105,18 +107,19 @@ export function UserAuthForm({
 
       <div className='relative'>
         <Separator />
-        <span className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-muted-foreground'>
+        <span className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground'>
           hoặc
         </span>
       </div>
 
-      <form onSubmit={form.handleSubmit(handleEmailSignIn)} className='space-y-3'>
+      <form onSubmit={form.handleSubmit(handleEmailSignIn)} className='space-y-4'>
         <div className='space-y-2'>
           <Label htmlFor='email'>Email</Label>
           <Input
             id='email'
             type='email'
             placeholder='admin@phuonglinh.vn'
+            className='h-11'
             {...form.register('email')}
           />
           {form.formState.errors.email && (
@@ -131,6 +134,7 @@ export function UserAuthForm({
             id='password'
             type='password'
             placeholder='••••••••'
+            className='h-11'
             {...form.register('password')}
           />
           {form.formState.errors.password && (
@@ -139,7 +143,7 @@ export function UserAuthForm({
             </p>
           )}
         </div>
-        <Button type='submit' className='w-full' disabled={form.formState.isSubmitting}>
+        <Button type='submit' className='w-full h-11' disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? (
             <Loader2 className='animate-spin' />
           ) : (

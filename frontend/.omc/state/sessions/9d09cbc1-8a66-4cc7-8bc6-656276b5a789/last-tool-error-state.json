@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"pnpm build 2>&1\",\"timeout\":120000,\"description\":\"Run production build to verify compilation\"}",
+  "error": "Exit code 2\n\n> shadcn-admin@2.2.1 build /Users/dev/Documents/projects/kiosk-app/frontend\n> tsc -b && vite build\n\nsrc/components/theme-switch.tsx(19,24): error TS2367: This comparison appears to be unintentional because the types '\"light\"' and '\"dark\"' have no overlap.\nsrc/components/theme-switch.tsx(41,51): error TS2345: Argument of type '\"dark\"' is not assignable to parameter of type '\"light\"'.\nsrc/components/theme-switch.tsx(45,38): error TS2367: This comparison appears to be unintentional bec...",
+  "timestamp": "2026-06-07T08:34:00.852Z",
+  "retry_count": 1
+}

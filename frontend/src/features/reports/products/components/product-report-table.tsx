@@ -7,7 +7,7 @@ import {
 import { formatCurrency, formatDateTime } from '@/lib/format'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { ChevronRight, ChevronDown } from 'lucide-react'
+import { ChevronRight, ChevronDown, Search } from 'lucide-react'
 import type { ProductReportRow } from '@/services/reports'
 
 const columns: ColumnDef<ProductReportRow>[] = [
@@ -75,7 +75,9 @@ export function ProductReportTable({ data }: { data: ProductReportRow[] }) {
 function DetailTable({ details }: { details: ProductReportRow['details'] }) {
   return (
     <div className='mx-4 mb-2'>
-      <p className='py-2 text-sm font-semibold'>🔍 Chi tiết lịch sử tiêu thụ</p>
+      <p className='flex items-center gap-1.5 py-2 text-sm font-semibold'>
+        <Search className='h-4 w-4' /> Chi tiết lịch sử tiêu thụ
+      </p>
       <Table>
         <TableHeader>
           <TableRow>

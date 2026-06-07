@@ -1,0 +1,493 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1780820568079,
+  "projectRoot": "/Users/dev/Documents/projects/kiosk-app/frontend",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "react",
+        "version": "19.2.5",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.5",
+        "category": "frontend"
+      },
+      {
+        "name": "playwright",
+        "version": "1.59.1",
+        "category": "testing"
+      },
+      {
+        "name": "vite",
+        "version": "8.0.8",
+        "category": "build"
+      },
+      {
+        "name": "vitest",
+        "version": "4.1.4",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "pnpm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "pnpm build 2>&1 | tail -5",
+    "testCommand": "pnpm test",
+    "lintCommand": "pnpm lint",
+    "devCommand": "pnpm dev",
+    "scripts": {
+      "dev": "vite",
+      "build": "tsc -b && vite build",
+      "lint": "eslint .",
+      "preview": "vite preview",
+      "format:check": "prettier --check .",
+      "format": "prettier --write .",
+      "knip": "knip",
+      "test": "vitest run --browser.headless",
+      "test:watch": "vitest --browser.headless",
+      "test:ui": "vitest --ui --browser.headless",
+      "test:browser": "vitest",
+      "test:coverage": "vitest run --coverage --browser.headless",
+      "test:browser:install": "playwright install chromium --with-deps"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": "feature-based"
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "public",
+      "src"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 4,
+      "lastAccessed": 1780820568058,
+      "keyFiles": [
+        "favicon.png",
+        "index.html",
+        "logo-square.png"
+      ]
+    },
+    "graphify-out": {
+      "path": "graphify-out",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1780820568064,
+      "keyFiles": [
+        "graph.json",
+        "manifest.json"
+      ]
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 3,
+      "lastAccessed": 1780820568065,
+      "keyFiles": [
+        "favicon.png",
+        "logo-square.png"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 4,
+      "lastAccessed": 1780820568065,
+      "keyFiles": [
+        "main.tsx",
+        "routeTree.gen.ts",
+        "tanstack-table.d.ts",
+        "vite-env.d.ts"
+      ]
+    },
+    "dist/assets": {
+      "path": "dist/assets",
+      "purpose": "Static assets",
+      "fileCount": 73,
+      "lastAccessed": 1780820568066,
+      "keyFiles": [
+        "401-DXZBkrO6.js",
+        "403-I-NzMkZA.js",
+        "404-CkfCuYAw.js"
+      ]
+    },
+    "src/assets": {
+      "path": "src/assets",
+      "purpose": "Static assets",
+      "fileCount": 1,
+      "lastAccessed": 1780820568067,
+      "keyFiles": [
+        "logo.tsx"
+      ]
+    },
+    "src/components": {
+      "path": "src/components",
+      "purpose": "UI components",
+      "fileCount": 19,
+      "lastAccessed": 1780820568067,
+      "keyFiles": [
+        "command-menu.tsx",
+        "config-drawer.test.tsx",
+        "config-drawer.tsx"
+      ]
+    },
+    "src/config": {
+      "path": "src/config",
+      "purpose": "Configuration files",
+      "fileCount": 1,
+      "lastAccessed": 1780820568068,
+      "keyFiles": [
+        "fonts.ts"
+      ]
+    },
+    "src/lib": {
+      "path": "src/lib",
+      "purpose": "Library code",
+      "fileCount": 10,
+      "lastAccessed": 1780820568069,
+      "keyFiles": [
+        "auth-whitelist.ts",
+        "cookies.test.ts",
+        "cookies.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src/features/dashboard/components/today-stats.tsx",
+      "accessCount": 11,
+      "lastAccessed": 1780823265132,
+      "type": "file"
+    },
+    {
+      "path": "src/features/dashboard/components/monthly-revenue-chart.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1780823281761,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/button.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780821151434,
+      "type": "file"
+    },
+    {
+      "path": "src/features/auth/sign-in/components/user-auth-form.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780821930809,
+      "type": "file"
+    },
+    {
+      "path": "src/features/invoices/components/invoices-columns.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780823630291,
+      "type": "file"
+    },
+    {
+      "path": "src/features/orders/components/order-success-dialog.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780823641874,
+      "type": "file"
+    },
+    {
+      "path": "src/components/config-drawer.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1780820854119,
+      "type": "file"
+    },
+    {
+      "path": "src/components/theme-switch.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1780821250055,
+      "type": "file"
+    },
+    {
+      "path": "src/features/auth/sign-in/sign-in-2.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1780821796240,
+      "type": "file"
+    },
+    {
+      "path": "src/styles/theme.css",
+      "accessCount": 4,
+      "lastAccessed": 1780821831171,
+      "type": "file"
+    },
+    {
+      "path": "src/styles/index.css",
+      "accessCount": 4,
+      "lastAccessed": 1780821870024,
+      "type": "file"
+    },
+    {
+      "path": "src/features/orders/components/order-create.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1780822762365,
+      "type": "file"
+    },
+    {
+      "path": "src/features/dashboard/index.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1780823293427,
+      "type": "file"
+    },
+    {
+      "path": "src/features/dashboard/components/top-customers.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1780823304583,
+      "type": "file"
+    },
+    {
+      "path": "src/context/theme-provider.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780820788503,
+      "type": "file"
+    },
+    {
+      "path": "src/components/command-menu.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780820840079,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/sonner.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780820840385,
+      "type": "file"
+    },
+    {
+      "path": "src/context/search-provider.test.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780821003852,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/badge.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780821152014,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/switch.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780821152602,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/input.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780821182952,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/header.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780823623839,
+      "type": "file"
+    },
+    {
+      "path": "src/main.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780820738165,
+      "type": "file"
+    },
+    {
+      "path": "src/features/invoices/data/data.ts",
+      "accessCount": 2,
+      "lastAccessed": 1780820905679,
+      "type": "file"
+    },
+    {
+      "path": "src/components/config-drawer.test.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780820967695,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/tabs.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780821183244,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/input-otp.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780821183536,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/calendar.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780821183828,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/radio-group.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780821221048,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/checkbox.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780821221375,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/dropdown-menu.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780821221756,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/select.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780821222062,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/textarea.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780821222365,
+      "type": "file"
+    },
+    {
+      "path": "src/features/auth/sign-in/index.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780821897362,
+      "type": "file"
+    },
+    {
+      "path": "src/features/auth/auth-layout.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780821905852,
+      "type": "file"
+    },
+    {
+      "path": "src/features/companies/index.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780821963541,
+      "type": "file"
+    },
+    {
+      "path": "src/features/price-lists/index.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780822816000,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/app-sidebar.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780824290621,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/data/sidebar-data.ts",
+      "accessCount": 2,
+      "lastAccessed": 1780824290673,
+      "type": "file"
+    },
+    {
+      "path": "index.html",
+      "accessCount": 1,
+      "lastAccessed": 1780820610672,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/cookies.ts",
+      "accessCount": 1,
+      "lastAccessed": 1780820623774,
+      "type": "file"
+    },
+    {
+      "path": "vite.config.ts",
+      "accessCount": 1,
+      "lastAccessed": 1780820634039,
+      "type": "file"
+    },
+    {
+      "path": "src/routes/__root.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780821451174,
+      "type": "file"
+    },
+    {
+      "path": "qa-capture.cjs",
+      "accessCount": 1,
+      "lastAccessed": 1780821697759,
+      "type": "file"
+    },
+    {
+      "path": "src/routes/(auth)/sign-in.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780821831131,
+      "type": "file"
+    },
+    {
+      "path": "src/features/invoices/index.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780821869858,
+      "type": "file"
+    },
+    {
+      "path": "src/features/customers/index.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780821870152,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/main.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780821870165,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/authenticated-layout.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780821870280,
+      "type": "file"
+    },
+    {
+      "path": "src/features/products/index.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780821870337,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
