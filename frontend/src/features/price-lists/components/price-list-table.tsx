@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/table'
 import { toast } from 'sonner'
 import { Save } from 'lucide-react'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 interface PriceListTableProps {
   priceList: PriceList
@@ -19,6 +20,7 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [items, setItems] = useState<PriceListItem[]>(priceList.items)
+  const isMobile = useIsMobile()
 
   // Sync items when priceList changes
   useMemo(() => {
@@ -55,52 +57,59 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
           placeholder='Tìm kiếm mặt hàng...'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className='h-9 w-[300px]'
+          className={isMobile ? 'h-9 w-full' : 'h-9 w-[300px]'}
         />
       </div>
 
-      <div className='rounded-md border'>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className='w-[100px]'>Mã hàng</TableHead>
-              <TableHead>Tên mặt hàng</TableHead>
-              <TableHead className='w-[130px] text-right'>Giá gốc</TableHead>
-              <TableHead className='w-[160px] text-right'>Giá tùy chỉnh</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredItems.map((item) => (
-              <TableRow key={item.productId}>
-                <TableCell className='font-mono text-sm'>{item.product.code}</TableCell>
-                <TableCell>
-                  {item.product.name}
-                  <span className='ml-2 text-xs text-muted-foreground'>({item.product.unit})</span>
-                </TableCell>
-                <TableCell className='text-right text-muted-foreground'>
-                  {formatCurrency(item.product.defaultSalePrice)}
-                </TableCell>
-                <TableCell className='text-right'>
-                  <Input
-                    type='text'
-                    inputMode='numeric'
-                    value={item.customPrice.toLocaleString('vi-VN')}
-                    onChange={(e) => updateCustomPrice(item.productId, e.target.value)}
-                    className='h-8 w-[130px] text-right'
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-            {filteredItems.length === 0 && (
+      {isMobile ? (
+        <MobilePriceList
+          items={filteredItems}
+          onUpdatePrice={updateCustomPrice}
+        />
+      ) : (
+        <div className='rounded-md border'>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={4} className='h-24 text-center'>
-                  Không tìm thấy mặt hàng.
-                </TableCell>
+                <TableHead className='w-[100px]'>Mã hàng</TableHead>
+                <TableHead>Tên mặt hàng</TableHead>
+                <TableHead className='w-[130px] text-right'>Giá gốc</TableHead>
+                <TableHead className='w-[160px] text-right'>Giá tùy chỉnh</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {filteredItems.map((item) => (
+                <TableRow key={item.productId}>
+                  <TableCell className='font-mono text-sm'>{item.product.code}</TableCell>
+                  <TableCell>
+                    {item.product.name}
+                    <span className='ml-2 text-xs text-muted-foreground'>({item.product.unit})</span>
+                  </TableCell>
+                  <TableCell className='text-right text-muted-foreground'>
+                    {formatCurrency(item.product.defaultSalePrice)}
+                  </TableCell>
+                  <TableCell className='text-right'>
+                    <Input
+                      type='text'
+                      inputMode='numeric'
+                      value={item.customPrice.toLocaleString('vi-VN')}
+                      onChange={(e) => updateCustomPrice(item.productId, e.target.value)}
+                      className='h-8 w-[130px] text-right'
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filteredItems.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} className='h-24 text-center'>
+                    Không tìm thấy mặt hàng.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       <div className='flex justify-end'>
         <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
@@ -108,6 +117,56 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
           {saveMutation.isPending ? 'Đang lưu...' : 'Lưu bảng giá'}
         </Button>
       </div>
+    </div>
+  )
+}
+
+/** Mobile card list for price list items — each card shows product info + editable price */
+function MobilePriceList({
+  items,
+  onUpdatePrice,
+}: {
+  items: PriceListItem[]
+  onUpdatePrice: (productId: string, value: string) => void
+}) {
+  if (items.length === 0) {
+    return (
+      <div className='flex h-24 items-center justify-center text-sm text-muted-foreground'>
+        Không tìm thấy mặt hàng.
+      </div>
+    )
+  }
+
+  return (
+    <div className='space-y-2'>
+      {items.map((item) => (
+        <div
+          key={item.productId}
+          className='rounded-md border bg-card p-3 space-y-2'
+        >
+          <div className='flex items-start justify-between gap-2'>
+            <div className='min-w-0 flex-1'>
+              <p className='truncate text-sm font-medium'>{item.product.name}</p>
+              <p className='text-xs text-muted-foreground'>
+                {item.product.code} · {item.product.unit}
+              </p>
+            </div>
+            <span className='shrink-0 text-xs text-muted-foreground'>
+              Giá gốc: {formatCurrency(item.product.defaultSalePrice)}
+            </span>
+          </div>
+          <div className='flex items-center gap-2'>
+            <span className='shrink-0 text-xs text-muted-foreground'>Giá bán:</span>
+            <Input
+              type='text'
+              inputMode='numeric'
+              value={item.customPrice.toLocaleString('vi-VN')}
+              onChange={(e) => onUpdatePrice(item.productId, e.target.value)}
+              className='h-8 flex-1 text-right'
+            />
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
