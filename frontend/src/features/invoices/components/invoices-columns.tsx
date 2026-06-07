@@ -59,13 +59,13 @@ export function getInvoicesColumns(): ColumnDef<Invoice>[] {
         const invoice = row.original
         if (invoice.isPaid) {
           return (
-            <Badge variant='outline' className='border-emerald-200 text-emerald-700'>
+            <Badge variant='outline'>
               Đã thanh toán
             </Badge>
           )
         }
         return (
-          <Badge variant='outline' className='border-amber-200 text-amber-700'>
+          <Badge variant='outline' className='text-muted-foreground'>
             Chưa thanh toán
           </Badge>
         )
