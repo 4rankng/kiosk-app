@@ -56,6 +56,7 @@ export function ProductsTable({ onEdit, onDelete }: ProductsTableProps) {
         <MobileCardView
           table={table}
           config={productsCardConfig}
+          infiniteScroll={isMobile}
           expandedId={expandedId}
           onToggle={(id) => setExpandedId(expandedId === id ? null : id)}
         />

@@ -1,4 +1,5 @@
 import { type Table, flexRender } from '@tanstack/react-table'
+import { useEffect, useRef, useState } from 'react'
 import { MobileCard } from './mobile-card'
 import type { MobileCardConfig } from './mobile-card-types'
 
@@ -7,6 +8,10 @@ interface MobileCardViewProps<TData> {
   config: MobileCardConfig
   expandedId: string | null
   onToggle: (id: string) => void
+  /** Enable infinite scroll (show all rows, load more on scroll) */
+  infiniteScroll?: boolean
+  /** How many rows to show initially / per batch */
+  batchSize?: number
 }
 
 /**
@@ -19,8 +24,33 @@ export function MobileCardView<TData>({
   config,
   expandedId,
   onToggle,
+  infiniteScroll = false,
+  batchSize = 20,
 }: MobileCardViewProps<TData>) {
-  const rows = table.getRowModel().rows
+  // Use all filtered rows for infinite scroll, paginated rows otherwise
+  const allRows = infiniteScroll ? table.getFilteredRowModel().rows : table.getRowModel().rows
+  const [visibleCount, setVisibleCount] = useState(batchSize)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  // Reset visible count when data changes
+  useEffect(() => { setVisibleCount(batchSize) }, [allRows.length, batchSize])
+
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!infiniteScroll || !sentinelRef.current) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + batchSize, allRows.length))
+        }
+      },
+      { rootMargin: '200px' }
+    )
+    observer.observe(sentinelRef.current)
+    return () => observer.disconnect()
+  }, [infiniteScroll, allRows.length, batchSize])
+
+  const rows = infiniteScroll ? allRows.slice(0, visibleCount) : allRows
 
   if (rows.length === 0) {
     return (
@@ -124,6 +154,12 @@ export function MobileCardView<TData>({
           </MobileCard>
         )
       })}
+      {/* Sentinel for infinite scroll */}
+      {infiniteScroll && visibleCount < allRows.length && (
+        <div ref={sentinelRef} className='flex justify-center py-4'>
+          <span className='text-sm text-muted-foreground'>Đang tải...</span>
+        </div>
+      )}
     </div>
   )
 }

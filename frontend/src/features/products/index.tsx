@@ -15,7 +15,7 @@ function AddProductButton() {
   return (
     <Button onClick={() => setOpen('add')}>
       <Plus className='mr-2 h-4 w-4' />
-      Thêm sản phẩm
+      Thêm
     </Button>
   )
 }

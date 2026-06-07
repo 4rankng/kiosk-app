@@ -81,6 +81,7 @@ export function InvoicesTable() {
           table={table}
           config={invoicesCardConfig}
           expandedId={expandedId}
+          infiniteScroll={true}
           onToggle={(id) => setExpandedId(expandedId === id ? null : id)}
         />
       ) : (

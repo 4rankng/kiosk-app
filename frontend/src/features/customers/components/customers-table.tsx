@@ -58,6 +58,7 @@ export function CustomersTable() {
           config={customersCardConfig}
           expandedId={expandedId}
           onToggle={(id) => setExpandedId(expandedId === id ? null : id)}
+          infiniteScroll
         />
       ) : (
         <div className='rounded-md border'>

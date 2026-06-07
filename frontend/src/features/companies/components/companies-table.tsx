@@ -35,6 +35,7 @@ export function CompaniesTable() {
           table={table}
           config={companiesCardConfig}
           expandedId={expandedId}
+          infiniteScroll={true}
           onToggle={(id) => setExpandedId(expandedId === id ? null : id)}
         />
       ) : (
