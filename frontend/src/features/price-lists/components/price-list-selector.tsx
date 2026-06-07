@@ -60,7 +60,7 @@ export function PriceListSelector({ selectedPriceList, onSelect }: PriceListSele
   return (
     <div className='flex flex-wrap items-center gap-3'>
       <div className='flex items-center gap-2'>
-        <span className='text-sm font-medium'>📋 Chọn bảng giá:</span>
+        <span className='text-sm font-medium'>Chọn bảng giá:</span>
         <Select
           value={selectedPriceList?.id ?? ''}
           onValueChange={(val) => {

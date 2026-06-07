@@ -149,6 +149,16 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     weekRevenue[week] += inv.total
   }
 
+  // Generate DD/MM labels for each week of the current month
+  const year = parseInt(today.slice(0, 4))
+  const month = parseInt(today.slice(5, 7))
+  const daysInMonth = new Date(year, month, 0).getDate()
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  const weekLabels = [1, 8, 15, 22].map((startDay) => {
+    const endDay = Math.min(startDay + 6, daysInMonth)
+    return `${pad(startDay)}/${pad(month)}-${pad(endDay)}/${pad(month)}`
+  })
+
   // Top 10 customers
   const customerRevenue = new Map<string, { name: string; revenue: number }>()
   for (const inv of monthInvoices) {
@@ -171,7 +181,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     todayPaid,
     todayUnpaid,
     monthlyRevenue: weekRevenue.map((revenue, i) => ({
-      week: `Tuần ${i + 1}`,
+      week: weekLabels[i],
       revenue,
     })),
     topCustomers,

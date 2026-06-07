@@ -2,9 +2,10 @@ import { useState, useCallback } from 'react'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { Button } from '@/components/ui/button'
-import { RotateCcw } from 'lucide-react'
+import { RotateCcw, ShoppingCart } from 'lucide-react'
 import { toast } from 'sonner'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { formatCurrency } from '@/lib/format'
 import { createOrder } from '@/services/orders'
 import type { OrderItem, Customer } from '@/types'
 import { CustomerSelector } from './customer-selector'
@@ -125,8 +126,9 @@ export function OrderCreate() {
   return (
     <>
       <Header fixed>
-        <div className='me-auto'>
-          <h2 className='text-lg font-bold'>🛒 Tạo đơn hàng mới</h2>
+        <div className='me-auto flex items-center gap-2'>
+          <ShoppingCart className='h-5 w-5' />
+          <h2 className='text-2xl font-bold tracking-tight'>Tạo đơn hàng mới</h2>
         </div>
         <Button variant='outline' size='sm' onClick={handleReset}>
           <RotateCcw className='mr-1 h-4 w-4' />
@@ -137,9 +139,14 @@ export function OrderCreate() {
       <Main className='flex flex-1 flex-col gap-4 pb-24'>
         {/* Section 1: Customer */}
         <section className='space-y-2'>
-          <h3 className='text-sm font-semibold uppercase text-muted-foreground'>
-            1. Thông tin người mua
-          </h3>
+          <div className='flex items-center gap-2'>
+            <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+              1
+            </span>
+            <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+              Thông tin người mua
+            </h3>
+          </div>
           <div className='rounded-lg border bg-card p-4'>
             <CustomerSelector
               selectedCustomer={selectedCustomer}
@@ -153,9 +160,14 @@ export function OrderCreate() {
 
         {/* Section 2: Cart */}
         <section className='space-y-2'>
-          <h3 className='text-sm font-semibold uppercase text-muted-foreground'>
-            2. Giỏ hàng
-          </h3>
+          <div className='flex items-center gap-2'>
+            <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+              2
+            </span>
+            <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+              Giỏ hàng
+            </h3>
+          </div>
           <div className='rounded-lg border bg-card p-4 space-y-3'>
             <ProductSearch
               priceListId={priceListId}
@@ -172,9 +184,14 @@ export function OrderCreate() {
 
         {/* Section 3: Summary */}
         <section className='space-y-2'>
-          <h3 className='text-sm font-semibold uppercase text-muted-foreground'>
-            3. Tổng kết và thanh toán
-          </h3>
+          <div className='flex items-center gap-2'>
+            <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+              3
+            </span>
+            <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+              Tổng kết và thanh toán
+            </h3>
+          </div>
           <div className='rounded-lg border bg-card p-4 space-y-3'>
             <OrderSummary
               subtotal={subtotal}
@@ -191,11 +208,11 @@ export function OrderCreate() {
       </Main>
 
       {/* Sticky bottom bar */}
-      <div className='fixed bottom-0 left-0 right-0 border-t bg-background p-4 sm:left-[calc(var(--sidebar-width,0px)+0px)]'>
+      <div className='fixed bottom-0 left-0 right-0 z-40 border-t bg-background/80 backdrop-blur-lg shadow-[0_-4px_20px_rgba(0,0,0,0.08)] p-4 sm:left-[calc(var(--sidebar-width,0px)+0px)]'>
         <div className='mx-auto flex max-w-2xl items-center justify-between gap-4'>
           <div>
             <span className='text-sm text-muted-foreground'>Khách cần trả:</span>
-            <span className='ml-2 text-xl font-bold'>{formatCurrency(total)}</span>
+            <span className='ml-2 text-2xl font-bold'>{formatCurrency(total)}</span>
           </div>
           <Button
             size='lg'
@@ -203,7 +220,7 @@ export function OrderCreate() {
             disabled={createMutation.isPending}
             className='min-w-[200px]'
           >
-            {createMutation.isPending ? 'Đang lưu...' : '💾 Lưu và tạo hóa đơn'}
+            {createMutation.isPending ? 'Đang lưu...' : 'Lưu và tạo hóa đơn'}
           </Button>
         </div>
       </div>
@@ -217,8 +234,4 @@ export function OrderCreate() {
       />
     </>
   )
-}
-
-function formatCurrency(n: number): string {
-  return `${n.toLocaleString('vi-VN')} đ`
 }
