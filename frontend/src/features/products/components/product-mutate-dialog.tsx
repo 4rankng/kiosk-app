@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { InlineAddCombobox } from '@/components/inline-add-combobox'
+import { NumberInput } from '@/components/number-input'
 import { toast } from 'sonner'
 
 export function ProductMutateDialog() {
@@ -63,7 +64,7 @@ export function ProductMutateDialog() {
         </DialogHeader>
         <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className='flex flex-1 flex-col gap-4'>
           <div className='flex-1 space-y-4 overflow-y-auto'>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+            <div className='grid grid-cols-2 gap-3'>
             <div className='space-y-2'>
               <Label htmlFor='code'>Mã hàng</Label>
               <Input id='code' {...form.register('code')} />
@@ -75,7 +76,7 @@ export function ProductMutateDialog() {
               {form.formState.errors.name && <p className='text-sm text-destructive'>{form.formState.errors.name.message}</p>}
             </div>
           </div>
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+          <div className='grid grid-cols-2 gap-3'>
             <div className='space-y-2'>
               <Label>Nhóm hàng</Label>
               <InlineAddCombobox
@@ -83,18 +84,18 @@ export function ProductMutateDialog() {
                 value={form.watch('category')}
                 onChange={(val) => form.setValue('category', val, { shouldValidate: true })}
                 onCreate={handleCreateCategory}
-                placeholder='Chọn nhóm hàng...'
+                placeholder='Chọn nhóm...'
               />
               {form.formState.errors.category && <p className='text-sm text-destructive'>{form.formState.errors.category.message}</p>}
             </div>
             <div className='space-y-2'>
-              <Label>Đơn vị tính</Label>
+              <Label>Đơn vị</Label>
               <InlineAddCombobox
                 options={unitOptions}
                 value={form.watch('unit')}
                 onChange={(val) => form.setValue('unit', val, { shouldValidate: true })}
                 onCreate={handleCreateUnit}
-                placeholder='Chọn đơn vị...'
+                placeholder='Chọn ĐVT...'
               />
               {form.formState.errors.unit && <p className='text-sm text-destructive'>{form.formState.errors.unit.message}</p>}
             </div>
@@ -103,14 +104,22 @@ export function ProductMutateDialog() {
             <Label htmlFor='description'>Mô tả</Label>
             <textarea id='description' {...form.register('description')} className='flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm' placeholder='Mô tả sản phẩm...' />
           </div>
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+          <div className='grid grid-cols-2 gap-3'>
             <div className='space-y-2'>
               <Label htmlFor='purchasePrice'>Giá nhập</Label>
-              <Input id='purchasePrice' type='number' {...form.register('purchasePrice', { valueAsNumber: true })} />
+              <NumberInput
+                id='purchasePrice'
+                value={form.watch('purchasePrice') ?? 0}
+                onValueChange={(v) => form.setValue('purchasePrice', v, { shouldValidate: true })}
+              />
             </div>
             <div className='space-y-2'>
               <Label htmlFor='defaultSalePrice'>Giá bán</Label>
-              <Input id='defaultSalePrice' type='number' {...form.register('defaultSalePrice', { valueAsNumber: true })} />
+              <NumberInput
+                id='defaultSalePrice'
+                value={form.watch('defaultSalePrice') ?? 0}
+                onValueChange={(v) => form.setValue('defaultSalePrice', v, { shouldValidate: true })}
+              />
             </div>
             </div>
           </div>

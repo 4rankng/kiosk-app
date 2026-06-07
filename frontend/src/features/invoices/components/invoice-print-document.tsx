@@ -1,6 +1,6 @@
 import type { Invoice } from '@/types'
 import type { BusinessEntity } from '@/types'
-import { formatCurrency, formatDate } from '@/lib/format'
+import { formatCurrency, formatNumber, formatDate } from '@/lib/format'
 
 export function generateInvoiceHTML(invoice: Invoice, entity: BusinessEntity): string {
   const itemsRows = invoice.items
@@ -10,7 +10,7 @@ export function generateInvoiceHTML(invoice: Invoice, entity: BusinessEntity): s
         <td style="padding:6px 10px;border:1px solid #333;text-align:center">${i + 1}</td>
         <td style="padding:6px 10px;border:1px solid #333">${item.productName}</td>
         <td style="padding:6px 10px;border:1px solid #333;text-align:center">${item.unit}</td>
-        <td style="padding:6px 10px;border:1px solid #333;text-align:right">${item.quantity.toLocaleString('vi-VN')}</td>
+        <td style="padding:6px 10px;border:1px solid #333;text-align:right">${formatNumber(item.quantity)}</td>
         <td style="padding:6px 10px;border:1px solid #333;text-align:right">${formatCurrency(item.unitPrice)}</td>
         <td style="padding:6px 10px;border:1px solid #333;text-align:right">${formatCurrency(item.total)}</td>
       </tr>`

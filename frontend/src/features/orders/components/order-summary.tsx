@@ -1,5 +1,5 @@
 import { formatCurrency } from '@/lib/format'
-import { Input } from '@/components/ui/input'
+import { NumberInput } from '@/components/number-input'
 
 interface OrderSummaryProps {
   subtotal: number
@@ -17,15 +17,10 @@ export function OrderSummary({ subtotal, discount, total, onDiscountChange }: Or
       </div>
       <div className='flex items-center justify-between gap-4'>
         <span className='text-sm'>Chiết khấu thêm:</span>
-        <Input
-          type='text'
-          inputMode='numeric'
-          value={discount.toLocaleString('vi-VN')}
-          onChange={(e) => {
-            const val = parseInt(e.target.value.replace(/\D/g, ''), 10) || 0
-            onDiscountChange(val)
-          }}
-          className='h-9 w-full max-w-[150px] text-right'
+        <NumberInput
+          value={discount}
+          onValueChange={onDiscountChange}
+          className='h-9 w-full max-w-[150px]'
         />
       </div>
       <div className='flex items-center justify-between border-t pt-2'>

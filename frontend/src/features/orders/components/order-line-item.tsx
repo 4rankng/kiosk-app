@@ -1,6 +1,6 @@
 import type { OrderItem } from '@/types'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { NumberInput } from '@/components/number-input'
 import { Minus, Plus, X } from 'lucide-react'
 
 interface OrderLineItemProps {
@@ -51,15 +51,10 @@ export function OrderLineItem({ item, onUpdateQuantity, onUpdatePrice, onRemove 
 
           <span className='mx-2 text-muted-foreground'>·</span>
           <span className='text-sm text-muted-foreground'>Giá:</span>
-          <Input
-            type='text'
-            inputMode='numeric'
-            value={item.unitPrice.toLocaleString('vi-VN')}
-            onChange={(e) => {
-              const val = parseInt(e.target.value.replace(/\D/g, ''), 10) || 0
-              onUpdatePrice(item.productId, val)
-            }}
-            className='h-9 w-[110px] text-right'
+          <NumberInput
+            value={item.unitPrice}
+            onValueChange={(val) => onUpdatePrice(item.productId, val)}
+            className='h-9 w-[110px]'
           />
         </div>
       </div>

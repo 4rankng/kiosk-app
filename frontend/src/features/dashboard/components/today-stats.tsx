@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Wallet, Package, CheckCircle, AlertCircle } from 'lucide-react'
 import { getDashboardStats } from '@/services/reports'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, formatNumber } from '@/lib/format'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -62,7 +62,7 @@ export function TodayStats() {
 
   const values: Record<string, string> = {
     revenue: formatCurrency(data?.todayRevenue ?? 0),
-    orders: `${data?.todayOrders ?? 0}`,
+    orders: formatNumber(data?.todayOrders ?? 0),
     paid: formatCurrency(data?.todayPaid ?? 0),
     unpaid: formatCurrency(data?.todayUnpaid ?? 0),
   }

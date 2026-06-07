@@ -4,6 +4,7 @@ import { savePriceList } from '@/services/price-lists'
 import type { PriceList, PriceListItem } from '@/types'
 import { formatCurrency } from '@/lib/format'
 import { Input } from '@/components/ui/input'
+import { NumberInput } from '@/components/number-input'
 import { Button } from '@/components/ui/button'
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -41,8 +42,7 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
     },
   })
 
-  function updateCustomPrice(productId: string, value: string) {
-    const price = parseInt(value.replace(/\D/g, ''), 10) || 0
+  function updateCustomPrice(productId: string, price: number) {
     setItems((prev) =>
       prev.map((item) =>
         item.productId === productId ? { ...item, customPrice: price } : item
@@ -89,12 +89,10 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
                     {formatCurrency(item.product.defaultSalePrice)}
                   </TableCell>
                   <TableCell className='text-right'>
-                    <Input
-                      type='text'
-                      inputMode='numeric'
-                      value={item.customPrice.toLocaleString('vi-VN')}
-                      onChange={(e) => updateCustomPrice(item.productId, e.target.value)}
-                      className='h-8 w-[130px] text-right'
+                    <NumberInput
+                      value={item.customPrice}
+                      onValueChange={(val) => updateCustomPrice(item.productId, val)}
+                      className='h-8 w-[130px]'
                     />
                   </TableCell>
                 </TableRow>
@@ -127,7 +125,7 @@ function MobilePriceList({
   onUpdatePrice,
 }: {
   items: PriceListItem[]
-  onUpdatePrice: (productId: string, value: string) => void
+  onUpdatePrice: (productId: string, price: number) => void
 }) {
   if (items.length === 0) {
     return (
@@ -157,12 +155,10 @@ function MobilePriceList({
           </div>
           <div className='flex items-center gap-2'>
             <span className='shrink-0 text-xs text-muted-foreground'>Giá bán:</span>
-            <Input
-              type='text'
-              inputMode='numeric'
-              value={item.customPrice.toLocaleString('vi-VN')}
-              onChange={(e) => onUpdatePrice(item.productId, e.target.value)}
-              className='h-8 flex-1 text-right'
+            <NumberInput
+              value={item.customPrice}
+              onValueChange={(val) => onUpdatePrice(item.productId, val)}
+              className='h-8 flex-1'
             />
           </div>
         </div>
