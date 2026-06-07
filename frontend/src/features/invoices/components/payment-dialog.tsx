@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { markInvoiceAsPaid } from '@/services/invoices'
 import { formatCurrency } from '@/lib/format'
 import { toast } from 'sonner'
+import { DollarSign } from 'lucide-react'
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog'
@@ -29,31 +30,40 @@ export function PaymentDialog() {
     <Dialog open={open === 'payment'} onOpenChange={(v) => { if (!v) setOpen(null) }}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Thu tiền hóa đơn</DialogTitle>
+          <DialogTitle className='flex items-center gap-2'>
+            <DollarSign className='h-5 w-5' />
+            Thu tiền hóa đơn
+          </DialogTitle>
           <DialogDescription>
             Hóa đơn {invoice.code} — {invoice.customerName}
           </DialogDescription>
         </DialogHeader>
-        <div className='space-y-3 py-4'>
+        <div className='bg-muted/50 rounded-lg p-4 space-y-3'>
           <div className='flex justify-between text-sm'>
             <span className='text-muted-foreground'>Tổng tiền</span>
             <span className='font-medium'>{formatCurrency(invoice.total)}</span>
           </div>
-          <div className='flex justify-between text-sm'>
+          <div className='flex justify-between text-sm border-b pb-2'>
             <span className='text-muted-foreground'>Đã thanh toán</span>
             <span className='font-medium'>{formatCurrency(invoice.paidAmount)}</span>
           </div>
-          <div className='flex justify-between text-sm'>
+          <div className='flex justify-between'>
             <span className='text-muted-foreground'>Còn lại</span>
-            <span className='font-medium text-orange-600'>{formatCurrency(remaining)}</span>
+            <span className='text-lg font-bold'>{formatCurrency(remaining)}</span>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant='outline' onClick={() => setOpen(null)}>Hủy bỏ</Button>
-          <Button onClick={() => mutation.mutate(invoice.id)} disabled={mutation.isPending}>
-            {mutation.isPending ? 'Đang xử lý...' : 'Thanh toán toàn bộ'}
-          </Button>
-        </DialogFooter>
+        <div className='border-t pt-4'>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setOpen(null)}>Hủy bỏ</Button>
+            <Button
+              className='bg-primary hover:bg-primary/90'
+              onClick={() => mutation.mutate(invoice.id)}
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? 'Đang xử lý...' : 'Thanh toán toàn bộ'}
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   )

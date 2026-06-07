@@ -21,7 +21,7 @@ export function getCompaniesColumns(): ColumnDef<Company>[] {
       header: ({ column }) => <DataTableColumnHeader column={column} title='Bảng giá' />,
       cell: ({ row }) => {
         const plId = row.getValue('priceListId') as string
-        return plId ? <span className='text-muted-foreground'>Đã gán</span> : <span className='text-orange-500'>Chưa gán</span>
+        return plId ? <span className='text-muted-foreground'>Đã gán</span> : <span className='text-muted-foreground'>Chưa gán</span>
       },
     },
     {

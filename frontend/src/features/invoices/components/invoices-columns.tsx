@@ -4,6 +4,12 @@ import { formatCurrency, formatDateTime } from '@/lib/format'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { Printer, DollarSign } from 'lucide-react'
 import { statusColorMap } from '../data/data'
 import { useInvoicesContext } from './invoices-provider'
@@ -13,7 +19,11 @@ export function getInvoicesColumns(): ColumnDef<Invoice>[] {
     {
       accessorKey: 'code',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Mã Hóa Đơn' />,
-      cell: ({ row }) => <span className='font-mono font-medium'>{row.getValue('code')}</span>,
+      cell: ({ row }) => (
+        <span className='bg-muted px-1.5 py-0.5 rounded font-mono text-sm font-medium'>
+          {row.getValue('code')}
+        </span>
+      ),
     },
     {
       accessorKey: 'date',
@@ -48,9 +58,17 @@ export function getInvoicesColumns(): ColumnDef<Invoice>[] {
       cell: ({ row }) => {
         const invoice = row.original
         if (invoice.isPaid) {
-          return <Badge className='bg-green-600 hover:bg-green-700'>Đã thanh toán</Badge>
+          return (
+            <Badge variant='outline' className='border-emerald-200 text-emerald-700'>
+              Đã thanh toán
+            </Badge>
+          )
         }
-        return <Badge variant='outline' className='border-orange-300 text-orange-600'>Chưa thanh toán</Badge>
+        return (
+          <Badge variant='outline' className='border-amber-200 text-amber-700'>
+            Chưa thanh toán
+          </Badge>
+        )
       },
     },
     {
@@ -60,32 +78,44 @@ export function getInvoicesColumns(): ColumnDef<Invoice>[] {
         const { setOpen, setSelectedInvoice } = useInvoicesContext()
         const invoice = row.original
         return (
-          <div className='flex items-center gap-1'>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => {
-                setSelectedInvoice(row.original)
-                setOpen('print')
-              }}
-            >
-              <Printer className='mr-1 h-4 w-4' />
-              In ấn
-            </Button>
-            {!invoice.isPaid && (
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => {
-                  setSelectedInvoice(row.original)
-                  setOpen('payment')
-                }}
-              >
-                <DollarSign className='mr-1 h-4 w-4' />
-                Thu tiền
-              </Button>
-            )}
-          </div>
+          <TooltipProvider>
+            <div className='flex items-center gap-1'>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='h-8 w-8'
+                    onClick={() => {
+                      setSelectedInvoice(row.original)
+                      setOpen('print')
+                    }}
+                  >
+                    <Printer className='h-4 w-4' />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>In hóa đơn</TooltipContent>
+              </Tooltip>
+              {!invoice.isPaid && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      className='h-8 w-8'
+                      onClick={() => {
+                        setSelectedInvoice(row.original)
+                        setOpen('payment')
+                      }}
+                    >
+                      <DollarSign className='h-4 w-4' />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Thu tiền</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          </TooltipProvider>
         )
       },
     },
