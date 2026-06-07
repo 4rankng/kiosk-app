@@ -1,6 +1,5 @@
 import useDialogState from '@/hooks/use-dialog-state'
 import { useAuthStore } from '@/stores/auth-store'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -11,29 +10,20 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
 import { SignOutDialog } from '@/components/sign-out-dialog'
+import { User } from 'lucide-react'
 
 export function ProfileDropdown() {
   const [open, setOpen] = useDialogState()
   const { auth } = useAuthStore()
   const user = auth.user
 
-  const initials = user?.name
-    ? user.name
-        .split(' ')
-        .map((w) => w[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
-    : '??'
-
   return (
     <>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
-            <Avatar className='h-8 w-8'>
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
+          <Button variant='ghost' size='icon' className='rounded-full'>
+            <User className='size-5' />
+            <span className='sr-only'>Tài khoản</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-56' align='end' forceMount>
