@@ -36,14 +36,16 @@ export function MobileCard({
           onClick={onToggle}
           aria-expanded={expanded}
         >
-          <div className='min-w-0 flex-1 space-y-1'>
-            <div className='flex items-center gap-2'>
-              <span className='truncate text-sm font-medium'>{title}</span>
-              {status}
+          <div className='min-w-0 flex-1'>
+            <div className='flex items-center justify-between gap-2'>
+              <div className='flex items-center gap-2 min-w-0'>
+                <span className='truncate text-sm font-medium'>{title}</span>
+                {status}
+              </div>
+              {metric && (
+                <span className='shrink-0 text-sm tabular-nums'>{metric}</span>
+              )}
             </div>
-            {metric && (
-              <p className='text-xs text-muted-foreground'>{metric}</p>
-            )}
           </div>
           <span className='mt-0.5 shrink-0 text-muted-foreground'>
             {expanded ? (
@@ -56,14 +58,16 @@ export function MobileCard({
       ) : (
         /* Flat: title + inline actions, no expand */
         <div className='flex w-full items-center gap-3 p-3'>
-          <div className='min-w-0 flex-1 space-y-1'>
-            <div className='flex items-center gap-2'>
-              <span className='truncate text-sm font-medium'>{title}</span>
-              {status}
+          <div className='min-w-0 flex-1'>
+            <div className='flex items-center justify-between gap-2'>
+              <div className='flex items-center gap-2 min-w-0'>
+                <span className='truncate text-sm font-medium'>{title}</span>
+                {status}
+              </div>
+              {metric && (
+                <span className='shrink-0 text-sm tabular-nums'>{metric}</span>
+              )}
             </div>
-            {metric && (
-              <p className='text-xs text-muted-foreground'>{metric}</p>
-            )}
           </div>
           {actions && (
             <div className='flex items-center gap-1 shrink-0'>{actions}</div>

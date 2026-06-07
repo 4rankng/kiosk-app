@@ -81,7 +81,6 @@ export function MobileCardView<TData>({
               e.cardConfig.label ??
               (() => {
                 const hdr = e.column?.columnDef?.header
-                // Try to extract title from DataTableColumnHeader({ title: '...' })
                 if (typeof hdr === 'function') {
                   const str = hdr.toString()
                   const m = str.match(/title:\s*['"`]([^'"`]+)['"`]/)
@@ -90,16 +89,9 @@ export function MobileCardView<TData>({
                 if (typeof hdr === 'string') return hdr
                 return e.key
               })()
-            return (
-              <div key={e.key} className='flex items-start gap-2 text-sm'>
-                <span className='shrink-0 text-muted-foreground'>
-                  {label}:
-                </span>
-                <span className='min-w-0'>{content}</span>
-              </div>
-            )
+            return { key: e.key, label, content }
           })
-          .filter(Boolean)
+          .filter((e): e is NonNullable<typeof e> => e !== null && e.content !== null)
 
         // Render action buttons (hidden columns are action columns)
         const actionCells = configEntries
@@ -119,7 +111,16 @@ export function MobileCardView<TData>({
               actionCells.length > 0 ? <>{actionCells}</> : undefined
             }
           >
-            {detailFields.length > 0 && <div className='space-y-1.5'>{detailFields}</div>}
+            {detailFields.length > 0 && (
+              <div className='grid grid-cols-2 gap-x-4 gap-y-1.5'>
+                {detailFields.map((f) => (
+                  <div key={f.key}>
+                    <span className='text-xs text-muted-foreground'>{f.label}</span>
+                    <p className='text-sm'>{f.content}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </MobileCard>
         )
       })}
