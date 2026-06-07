@@ -137,9 +137,7 @@ export function MobileCardView<TData>({
             metric={metricCol ? getCellContent(metricCol.key) : undefined}
             expanded={isExpanded}
             onToggle={() => onToggle(row.id)}
-            actions={
-              actionCells.length > 0 ? <>{actionCells}</> : undefined
-            }
+            actions={actionCells.length > 0 ? actionCells : undefined}
           >
             {detailFields.length > 0 && (
               <div className='grid grid-cols-2 gap-x-4 gap-y-1.5'>

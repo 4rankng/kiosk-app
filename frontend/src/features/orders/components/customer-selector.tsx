@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { searchCustomers } from '@/services/customers'
+import { getCustomers } from '@/services/customers'
 import { getCompanyById } from '@/services/companies'
 import { getPriceListByCompany } from '@/services/price-lists'
-import { Search, Building2, FileText } from 'lucide-react'
+import { Building2, FileText, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { Customer } from '@/types'
 import { Input } from '@/components/ui/input'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import type { Customer } from '@/types'
 
 interface CustomerSelectorProps {
   selectedCustomer: Customer | null
@@ -15,12 +16,13 @@ interface CustomerSelectorProps {
 
 export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelectorProps) {
   const [query, setQuery] = useState('')
-  const [showDropdown, setShowDropdown] = useState(false)
+  const [focused, setFocused] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const blurTimeout = useRef<ReturnType<typeof setTimeout>>(null)
 
-  const { data: results = [] } = useQuery({
-    queryKey: ['search-customers', query],
-    queryFn: () => searchCustomers(query),
-    enabled: query.length >= 2,
+  const { data: customers = [] } = useQuery({
+    queryKey: ['customers'],
+    queryFn: getCustomers,
   })
 
   const { data: company } = useQuery({
@@ -35,18 +37,37 @@ export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelecto
     enabled: !!selectedCustomer?.companyId,
   })
 
-  async function handleSelect(customer: Customer) {
+  const filtered = useMemo(() => {
+    if (!query) return customers
+    const q = query.toLowerCase()
+    return customers.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.code.toLowerCase().includes(q) ||
+        c.phone.includes(q)
+    )
+  }, [customers, query])
+
+  function handleSelect(customer: Customer) {
     setQuery('')
-    setShowDropdown(false)
-    const pl = priceList
-    onSelect(customer, pl?.id ?? '')
+    setFocused(false)
+    setSheetOpen(false)
+    onSelect(customer, priceList?.id ?? '')
+  }
+
+  const handleFocus = () => {
+    if (blurTimeout.current) clearTimeout(blurTimeout.current)
+    setFocused(true)
+  }
+
+  const handleBlur = () => {
+    blurTimeout.current = setTimeout(() => setFocused(false), 200)
   }
 
   if (selectedCustomer) {
     return (
       <div className='space-y-1'>
         <div className='flex items-center gap-2'>
-          <Search className='h-4 w-4 text-muted-foreground' />
           <span className='font-medium'>{selectedCustomer.name}</span>
           <Button
             variant='ghost'
@@ -72,34 +93,88 @@ export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelecto
   }
 
   return (
-    <div className='relative'>
-      <div className='relative'>
-        <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-        <Input
-          placeholder='Tìm khách hàng...'
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value)
-            setShowDropdown(true)
-          }}
-          onFocus={() => setShowDropdown(true)}
-          className='pl-8'
-        />
-      </div>
-      {showDropdown && results.length > 0 && (
-        <div className='absolute top-full z-50 mt-1 max-h-[200px] w-full overflow-auto rounded-md border bg-background shadow-lg'>
-          {results.map((c) => (
-            <button
-              key={c.id}
-              className='w-full px-3 py-2 text-left text-sm hover:bg-accent transition-colors'
-              onClick={() => handleSelect(c)}
-            >
-              <div className='font-medium'>{c.name}</div>
-              <div className='text-xs text-muted-foreground'>{c.code} · {c.phone}</div>
-            </button>
-          ))}
+    <>
+      {/* Desktop: inline search with dropdown */}
+      <div className='hidden sm:block relative'>
+        <div className='relative'>
+          <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+          <Input
+            placeholder='Tìm khách hàng...'
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            className='pl-8'
+          />
         </div>
-      )}
-    </div>
+        {focused && filtered.length > 0 && (
+          <div className='absolute top-full z-50 mt-1 max-h-[250px] w-full overflow-auto rounded-md border bg-background shadow-lg'>
+            {filtered.map((c) => (
+              <button
+                key={c.id}
+                className='flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-accent transition-colors'
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => handleSelect(c)}
+              >
+                <div>
+                  <span className='font-medium'>{c.name}</span>
+                  <span className='ml-2 text-xs text-muted-foreground'>({c.code})</span>
+                </div>
+                <span className='text-xs text-muted-foreground'>{c.phone}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        {focused && query.length >= 1 && filtered.length === 0 && (
+          <div className='absolute top-full z-50 mt-1 w-full rounded-md border bg-background p-3 text-center text-sm text-muted-foreground shadow-lg'>
+            Không tìm thấy khách hàng
+          </div>
+        )}
+      </div>
+
+      {/* Mobile: Sheet slide-up */}
+      <div className='sm:hidden'>
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+          <SheetTrigger asChild>
+            <Button variant='outline' className='w-full'>
+              <Search className='mr-2 h-4 w-4' />
+              Chọn khách hàng
+            </Button>
+          </SheetTrigger>
+          <SheetContent side='bottom' className='h-[70vh]'>
+            <SheetHeader>
+              <SheetTitle>Tìm kiếm khách hàng</SheetTitle>
+            </SheetHeader>
+            <div className='mt-4 space-y-2'>
+              <Input
+                placeholder='Gõ tên, mã hoặc số điện thoại...'
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                autoFocus
+              />
+              <div className='max-h-[50vh] overflow-auto space-y-1'>
+                {filtered.map((c) => (
+                  <button
+                    key={c.id}
+                    className='flex w-full items-center justify-between rounded-md px-3 py-3 text-left hover:bg-accent transition-colors'
+                    onClick={() => handleSelect(c)}
+                  >
+                    <div>
+                      <div className='font-medium'>{c.name}</div>
+                      <div className='text-xs text-muted-foreground'>{c.code} · {c.phone}</div>
+                    </div>
+                  </button>
+                ))}
+                {query.length >= 1 && filtered.length === 0 && (
+                  <p className='py-4 text-center text-sm text-muted-foreground'>
+                    Không tìm thấy khách hàng
+                  </p>
+                )}
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </>
   )
 }

@@ -136,10 +136,6 @@ export function OrderCreate() {
           <ShoppingCart className='h-5 w-5' />
           <h2 className='text-2xl font-bold tracking-tight'>Tạo đơn hàng mới</h2>
         </div>
-        <Button variant='outline' size='sm' onClick={handleReset}>
-          <RotateCcw className='mr-1 h-4 w-4' />
-          Làm lại
-        </Button>
       </Header>
 
       <Main className='flex flex-1 flex-col gap-4 pb-24'>
@@ -176,10 +172,16 @@ export function OrderCreate() {
           </div>
           <div className='rounded-lg border bg-card p-4 space-y-3'>
             {isMobile ? (
-              <POSCategoryGrid
-                priceListId={priceListId}
-                onAddProduct={addItem}
-              />
+              <>
+                <ProductSearch
+                  priceListId={priceListId}
+                  onAddProduct={addItem}
+                />
+                <POSCategoryGrid
+                  priceListId={priceListId}
+                  onAddProduct={addItem}
+                />
+              </>
             ) : (
               <>
                 <ProductSearch

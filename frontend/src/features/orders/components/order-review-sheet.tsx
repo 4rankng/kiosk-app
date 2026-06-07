@@ -1,8 +1,9 @@
 import type { OrderItem } from '@/types'
+import { formatCurrency } from '@/lib/format'
 import { Button } from '@/components/ui/button'
-import { NumberInput } from '@/components/number-input'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { ShoppingCart, Minus, Plus, X } from 'lucide-react'
+import { ShoppingCart } from 'lucide-react'
+import { OrderLineItem } from './order-line-item'
 import { OrderSummary } from './order-summary'
 import { BusinessEntitySelector } from './business-entity-selector'
 
@@ -29,7 +30,6 @@ export function OrderReviewSheet({
   items,
   onUpdateQuantity,
   onUpdatePrice,
-  onRemove,
   onSubmit,
   subtotal,
   discount,
@@ -41,12 +41,19 @@ export function OrderReviewSheet({
 }: OrderReviewSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side='bottom' className='overflow-y-auto'>
-        <SheetHeader>
-          <SheetTitle>Chi tiết đơn hàng ({items.length} mặt hàng)</SheetTitle>
+      <SheetContent side='bottom' className='flex flex-col p-0 [&>button]:hidden'>
+        <SheetHeader className='px-4 pt-4 pb-0'>
+          <SheetTitle className='flex items-center justify-between'>
+            <span className='flex items-center gap-2'>
+              <ShoppingCart className='h-5 w-5' />
+              {items.length} mặt hàng
+            </span>
+            <span>{formatCurrency(total)}</span>
+          </SheetTitle>
         </SheetHeader>
 
-        <div className='mt-4 space-y-4'>
+        {/* Scrollable content */}
+        <div className='flex-1 overflow-y-auto px-4 py-4 space-y-4'>
           {items.length === 0 ? (
             <div className='flex flex-col items-center justify-center py-12 text-center'>
               <ShoppingCart className='h-10 w-10 text-muted-foreground/40 mb-2' />
@@ -55,56 +62,15 @@ export function OrderReviewSheet({
             </div>
           ) : (
             <>
-              {/* Line items */}
+              {/* Line items — no remove button in review */}
               <div className='space-y-2'>
                 {items.map((item) => (
-                  <div key={item.productId} className='flex items-start gap-3 rounded-lg border p-3'>
-                    <div className='flex-1 space-y-2'>
-                      <div className='flex items-center justify-between'>
-                        <div>
-                          <span className='text-sm font-medium'>{item.productName}</span>
-                          <span className='ml-1 text-xs text-muted-foreground'>({item.unit})</span>
-                        </div>
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          className='h-7 w-7'
-                          onClick={() => onRemove(item.productId)}
-                        >
-                          <X className='h-4 w-4' />
-                        </Button>
-                      </div>
-
-                      {/* Quantity stepper */}
-                      <div className='flex items-center gap-2'>
-                        <Button
-                          variant='outline'
-                          size='icon'
-                          className='h-10 w-10 min-w-[44px]'
-                          onClick={() => onUpdateQuantity(item.productId, Math.max(1, item.quantity - 1))}
-                        >
-                          <Minus className='h-4 w-4' />
-                        </Button>
-                        <span className='w-12 text-center text-lg font-semibold'>{item.quantity}</span>
-                        <Button
-                          variant='outline'
-                          size='icon'
-                          className='h-10 w-10 min-w-[44px]'
-                          onClick={() => onUpdateQuantity(item.productId, item.quantity + 1)}
-                        >
-                          <Plus className='h-4 w-4' />
-                        </Button>
-
-                        <span className='mx-2 text-muted-foreground'>·</span>
-                        <span className='text-sm text-muted-foreground'>Giá:</span>
-                        <NumberInput
-                          value={item.unitPrice}
-                          onValueChange={(val) => onUpdatePrice(item.productId, val)}
-                          className='h-9 w-[110px]'
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <OrderLineItem
+                    key={item.productId}
+                    item={item}
+                    onUpdateQuantity={onUpdateQuantity}
+                    onUpdatePrice={onUpdatePrice}
+                  />
                 ))}
               </div>
 
@@ -125,18 +91,27 @@ export function OrderReviewSheet({
                   onSelect={onBusinessEntitySelect}
                 />
               </div>
-
-              {/* Submit button */}
-              <Button
-                size='lg'
-                className='w-full min-h-[48px]'
-                onClick={onSubmit}
-                disabled={isPending}
-              >
-                {isPending ? 'Đang lưu...' : 'Lưu và tạo hóa đơn'}
-              </Button>
             </>
           )}
+        </div>
+
+        {/* Sticky bottom buttons */}
+        <div className='border-t bg-background px-4 py-3 space-y-2'>
+          <Button
+            size='lg'
+            className='w-full min-h-[48px]'
+            onClick={onSubmit}
+            disabled={isPending}
+          >
+            {isPending ? 'Đang lưu...' : 'Tạo hóa đơn'}
+          </Button>
+          <Button
+            variant='outline'
+            className='w-full min-h-[44px]'
+            onClick={() => onOpenChange(false)}
+          >
+            Đóng
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
