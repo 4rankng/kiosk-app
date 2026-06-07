@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
@@ -24,6 +25,23 @@ export function CustomerMutateDialog() {
       ? { code: selectedCustomer?.code ?? '', name: selectedCustomer?.name ?? '', companyId: selectedCustomer?.companyId ?? '', phone: selectedCustomer?.phone ?? '', email: selectedCustomer?.email ?? '', address: selectedCustomer?.address ?? '', taxId: selectedCustomer?.taxId ?? '' }
       : { code: '', name: '', companyId: '', phone: '', email: '', address: '', taxId: '' },
   })
+
+  // Reset form when dialog opens with new customer data
+  useEffect(() => {
+    if (open === 'edit' && selectedCustomer) {
+      form.reset({
+        code: selectedCustomer.code ?? '',
+        name: selectedCustomer.name ?? '',
+        companyId: selectedCustomer.companyId ?? '',
+        phone: selectedCustomer.phone ?? '',
+        email: selectedCustomer.email ?? '',
+        address: selectedCustomer.address ?? '',
+        taxId: selectedCustomer.taxId ?? '',
+      })
+    } else if (open === 'add') {
+      form.reset({ code: '', name: '', companyId: '', phone: '', email: '', address: '', taxId: '' })
+    }
+  }, [open, selectedCustomer])
 
   const mutation = useMutation({
     mutationFn: (values: CustomerSchema) =>

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -31,6 +32,23 @@ export function ProductMutateDialog() {
       ? { code: selectedProduct?.code ?? '', name: selectedProduct?.name ?? '', category: selectedProduct?.category ?? '', unit: selectedProduct?.unit ?? '', description: selectedProduct?.description ?? '', purchasePrice: selectedProduct?.purchasePrice ?? 0, defaultSalePrice: selectedProduct?.defaultSalePrice ?? 0 }
       : { code: '', name: '', category: '', unit: '', description: '', purchasePrice: 0, defaultSalePrice: 0 },
   })
+
+  // Reset form when dialog opens with new product data
+  useEffect(() => {
+    if (open === 'edit' && selectedProduct) {
+      form.reset({
+        code: selectedProduct.code ?? '',
+        name: selectedProduct.name ?? '',
+        category: selectedProduct.category ?? '',
+        unit: selectedProduct.unit ?? '',
+        description: selectedProduct.description ?? '',
+        purchasePrice: selectedProduct.purchasePrice ?? 0,
+        defaultSalePrice: selectedProduct.defaultSalePrice ?? 0,
+      })
+    } else if (open === 'add') {
+      form.reset({ code: '', name: '', category: '', unit: '', description: '', purchasePrice: 0, defaultSalePrice: 0 })
+    }
+  }, [open, selectedProduct])
 
   const mutation = useMutation({
     mutationFn: (values: ProductSchema) =>
