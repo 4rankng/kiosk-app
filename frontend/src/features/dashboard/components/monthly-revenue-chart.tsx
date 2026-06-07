@@ -25,7 +25,7 @@ export function MonthlyRevenueChart() {
   }))
 
   return (
-    <ChartContainer config={chartConfig} className='h-[350px] w-full'>
+    <ChartContainer config={chartConfig} className='h-[250px] w-full'>
       <BarChart data={chartData}>
         <CartesianGrid vertical={false} />
         <XAxis

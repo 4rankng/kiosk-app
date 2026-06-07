@@ -65,10 +65,10 @@ export function TopCustomers() {
         <CardDescription>Top 10 tháng này</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='space-y-4'>
+        <div className='space-y-3'>
           {customers.map((c) => (
-            <div key={c.rank} className='flex items-center gap-4'>
-              <span className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold'>
+            <div key={c.rank} className='flex items-center gap-3'>
+              <span className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold'>
                 {c.rank}
               </span>
               <div className='min-w-0 flex-1'>

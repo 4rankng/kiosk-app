@@ -26,14 +26,14 @@ export function Dashboard() {
             <p className='text-muted-foreground'>Tình hình kinh doanh hôm nay.</p>
           </div>
         </div>
-        <div className='space-y-4'>
+        <div className='space-y-3'>
           <TodayStats />
-          <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
+          <div className='grid grid-cols-1 gap-3 lg:grid-cols-7'>
             <Card className='col-span-1 lg:col-span-4'>
-              <CardHeader>
+              <CardHeader className='pb-1'>
                 <CardTitle>Doanh thu theo tháng</CardTitle>
               </CardHeader>
-              <CardContent className='ps-2'>
+              <CardContent className='ps-2 pt-0'>
                 <MonthlyRevenueChart />
               </CardContent>
             </Card>
@@ -41,7 +41,7 @@ export function Dashboard() {
               <TopCustomers />
             </Card>
           </div>
-          <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
+          <div className='grid grid-cols-1 gap-3 lg:grid-cols-7'>
             <Card className='col-span-1 lg:col-span-4'>
               <TopProducts />
             </Card>

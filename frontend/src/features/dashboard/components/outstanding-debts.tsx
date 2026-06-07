@@ -72,10 +72,10 @@ export function OutstandingDebts() {
         <CardDescription>Khách hàng còn nợ</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='space-y-4'>
+        <div className='space-y-3'>
           {debts.map((d, i) => (
-            <div key={i} className='flex items-center gap-4'>
-              <span className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold'>
+            <div key={i} className='flex items-center gap-3'>
+              <span className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold'>
                 {i + 1}
               </span>
               <div className='min-w-0 flex-1'>
@@ -85,7 +85,7 @@ export function OutstandingDebts() {
             </div>
           ))}
         </div>
-        <Separator className='my-4' />
+        <Separator className='my-3' />
         <div className='flex items-center justify-between'>
           <span className='text-sm text-muted-foreground'>Tổng công nợ</span>
           <span className='font-bold tabular-nums'>{formatCurrency(totalDebt)}</span>
