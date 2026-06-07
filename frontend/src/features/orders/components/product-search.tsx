@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { searchProducts } from '@/services/products'
 import { getPriceListById } from '@/services/price-lists'
@@ -16,11 +16,12 @@ interface ProductSearchProps {
 export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps) {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
+  const [focused, setFocused] = useState(false)
+  const blurTimeout = useRef<ReturnType<typeof setTimeout>>(null)
 
   const { data: results = [] } = useQuery({
     queryKey: ['search-products', query],
     queryFn: () => searchProducts(query),
-    enabled: query.length >= 1,
   })
 
   const { data: priceList } = useQuery({
@@ -38,14 +39,26 @@ export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps)
     return product?.defaultSalePrice ?? 0
   }
 
-  const handleAdd = (product: { id: string; name: string; unit: string }) => {
+  const handleAdd = useCallback((product: { id: string; name: string; unit: string }) => {
     onAddProduct(product, getPrice(product.id))
     setQuery('')
+  }, [onAddProduct, priceList, results])
+
+  const handleFocus = () => {
+    if (blurTimeout.current) clearTimeout(blurTimeout.current)
+    setFocused(true)
   }
+
+  const handleBlur = () => {
+    // Delay blur so click on dropdown item registers first
+    blurTimeout.current = setTimeout(() => setFocused(false), 200)
+  }
+
+  const showDropdown = focused && results.length > 0
 
   return (
     <>
-      {/* Desktop: inline search */}
+      {/* Desktop: inline search with dropdown */}
       <div className='hidden sm:block relative'>
         <div className='relative'>
           <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
@@ -53,15 +66,18 @@ export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps)
             placeholder='Gõ tên hàng để thêm...'
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             className='pl-8'
           />
         </div>
-        {query.length >= 1 && results.length > 0 && (
+        {showDropdown && (
           <div className='absolute top-full z-50 mt-1 max-h-[250px] w-full overflow-auto rounded-md border bg-background shadow-lg'>
             {results.slice(0, 10).map((p) => (
               <button
                 key={p.id}
                 className='flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-accent transition-colors'
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleAdd({ id: p.id, name: p.name, unit: p.unit })}
               >
                 <div>
@@ -76,7 +92,7 @@ export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps)
             ))}
           </div>
         )}
-        {query.length >= 1 && results.length === 0 && (
+        {focused && query.length >= 1 && results.length === 0 && (
           <div className='absolute top-full z-50 mt-1 w-full rounded-md border bg-background p-3 text-center text-sm text-muted-foreground shadow-lg'>
             Không tìm thấy hàng hóa
           </div>
@@ -104,7 +120,7 @@ export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps)
                 autoFocus
               />
               <div className='max-h-[50vh] overflow-auto space-y-1'>
-                {query.length >= 1 && results.slice(0, 15).map((p) => (
+                {results.slice(0, 15).map((p) => (
                   <button
                     key={p.id}
                     className='flex w-full items-center justify-between rounded-md px-3 py-3 text-left hover:bg-accent transition-colors'
