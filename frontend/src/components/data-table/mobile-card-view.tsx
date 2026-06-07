@@ -79,11 +79,19 @@ export function MobileCardView<TData>({
             if (!content) return null
             const label =
               e.cardConfig.label ??
-              (typeof e.column?.columnDef?.header === 'string'
-                ? e.column.columnDef.header
-                : e.key)
+              (() => {
+                const hdr = e.column?.columnDef?.header
+                // Try to extract title from DataTableColumnHeader({ title: '...' })
+                if (typeof hdr === 'function') {
+                  const str = hdr.toString()
+                  const m = str.match(/title:\s*['"`]([^'"`]+)['"`]/)
+                  if (m) return m[1]
+                }
+                if (typeof hdr === 'string') return hdr
+                return e.key
+              })()
             return (
-              <div key={e.key} className='flex items-start gap-2 text-sm'>
+              <div key={e.key} className='flex items-start gap-1.5 text-xs'>
                 <span className='shrink-0 text-muted-foreground'>
                   {label}:
                 </span>
