@@ -132,7 +132,7 @@ function MobilePriceList({
   const sentinelRef = useRef<HTMLDivElement>(null)
 
   // Reset when items change
-  useMemo(() => { setVisibleCount(batchSize) }, [items.length])
+  useEffect(() => { setVisibleCount(batchSize) }, [items.length])
 
   // Infinite scroll observer
   useEffect(() => {

@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { Button } from '@/components/ui/button'
-import { RotateCcw, ShoppingCart, ChevronUp } from 'lucide-react'
+import { ShoppingCart, ChevronUp } from 'lucide-react'
 import { toast } from 'sonner'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatCurrency } from '@/lib/format'
@@ -104,14 +104,6 @@ export function OrderCreate() {
   const removeItem = useCallback((productId: string) => {
     setItems((prev) => prev.filter((i) => i.productId !== productId))
   }, [])
-
-  function handleReset() {
-    setSelectedCustomer(null)
-    setPriceListId('')
-    setItems([])
-    setDiscount(0)
-    setBusinessEntityId('')
-  }
 
   function handleSubmit() {
     if (!selectedCustomer) {

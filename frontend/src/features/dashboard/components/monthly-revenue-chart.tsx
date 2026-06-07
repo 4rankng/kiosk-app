@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getDashboardStats } from '@/services/reports'
-import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid } from 'recharts'
 import {
   type ChartConfig,
   ChartContainer,
