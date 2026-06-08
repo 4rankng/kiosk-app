@@ -21,7 +21,7 @@ function AddProductButton() {
   return (
     <Button onClick={() => setOpen('add')}>
       <Plus className='mr-2 h-4 w-4' />
-      Thêm sản phẩm
+      Thêm
     </Button>
   )
 }
@@ -75,17 +75,16 @@ function ProductsContent() {
           <AddProductButton />
         </div>
 
-        {/* Summary stats — hidden on mobile, shown on sm+ */}
-        {!isMobile && (
-        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+        {/* Summary stats */}
+        <div className='grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4'>
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>Tổng sản phẩm</CardTitle>
+              <CardTitle className='text-sm font-medium'>Sản phẩm</CardTitle>
               <Package className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
               <div className='text-2xl font-bold tabular-nums'>{stats.total}</div>
-              <p className='text-xs text-muted-foreground'>mặt hàng trong kho</p>
+              {!isMobile && <p className='text-xs text-muted-foreground'>mặt hàng trong kho</p>}
             </CardContent>
           </Card>
           <Card>
@@ -95,31 +94,30 @@ function ProductsContent() {
             </CardHeader>
             <CardContent>
               <div className='text-2xl font-bold tabular-nums'>{stats.categories}</div>
-              <p className='text-xs text-muted-foreground'>nhóm đang hoạt động</p>
+              {!isMobile && <p className='text-xs text-muted-foreground'>nhóm đang hoạt động</p>}
             </CardContent>
           </Card>
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>Tổng giá nhập</CardTitle>
+              <CardTitle className='text-sm font-medium'>Giá vốn</CardTitle>
               <TrendingUp className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
               <div className='text-2xl font-bold tabular-nums'>{formatCurrency(stats.inventoryValue)}</div>
-              <p className='text-xs text-muted-foreground'>giá trị vốn hàng</p>
+              {!isMobile && <p className='text-xs text-muted-foreground'>giá trị vốn hàng</p>}
             </CardContent>
           </Card>
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>Giá bán trung bình</CardTitle>
+              <CardTitle className='text-sm font-medium'>Giá TB</CardTitle>
               <TrendingUp className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
               <div className='text-2xl font-bold tabular-nums'>{formatCurrency(stats.avgPrice)}</div>
-              <p className='text-xs text-muted-foreground'>trên mỗi mặt hàng</p>
+              {!isMobile && <p className='text-xs text-muted-foreground'>trên mỗi mặt hàng</p>}
             </CardContent>
           </Card>
         </div>
-        )}
 
         <ProductsTable onEdit={handleEdit} onDelete={handleDelete} />
       </Main>
