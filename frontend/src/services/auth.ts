@@ -1,53 +1,63 @@
-import { sleep } from '@/lib/utils'
-import { isAuthorized } from '@/lib/auth-whitelist'
+/**
+ * Auth service — talks to /api/auth/*.
+ * Replaces the previous MOCK_CREDENTIALS / hardcoded whitelist.
+ */
+import { apiClient, setTokens, setUser, clearTokens, getUser, type AuthUser } from '@/lib/api-client'
 
-export interface AuthUser {
-  name: string
+export interface LoginPayload {
   email: string
-  avatar: string
-  exp: number
+  password: string
 }
 
-const MOCK_CREDENTIALS: Record<string, { password: string; name: string }> = {
-  'admin@phuonglinh.vn': { password: 'admin123', name: 'Quản trị viên' },
-  'admin@honghanh.vn': { password: 'admin123', name: 'Quản trị viên Hồng Hạnh' },
-  'staff@phuonglinh.vn': { password: 'staff123', name: 'Nhân viên' },
+export interface AuthResponse {
+  user: AuthUser
+  accessToken: string
+  refreshToken: string
 }
 
-class AuthError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'AuthError'
-  }
+export async function signInWithEmail(payload: LoginPayload): Promise<AuthResponse> {
+  const { data } = await apiClient.post<{ data: AuthResponse }>('/api/auth/login', payload)
+  setTokens(data.data.accessToken, data.data.refreshToken)
+  setUser(data.data.user)
+  return data.data
 }
 
-export async function signInWithGoogle(): Promise<AuthUser> {
-  await sleep(1500)
-  const mockUser: AuthUser = {
-    name: 'Quản trị viên',
-    email: 'admin@phuonglinh.vn',
-    avatar: '',
-    exp: Date.now() + 24 * 60 * 60 * 1000,
-  }
-  if (!isAuthorized(mockUser.email)) {
-    throw new AuthError('Tài khoản không được cấp quyền truy cập.')
-  }
-  return mockUser
+export async function signInWithGoogle(): Promise<AuthResponse> {
+  // 1. Get OAuth URL from backend
+  const { data: urlData } = await apiClient.get<{ data: { url: string } }>('/api/auth/google/url')
+  // 2. Redirect to Google — when user returns, the callback page will POST
+  //    the auth code to /api/auth/google and then redirect back.
+  window.location.href = urlData.data.url
+  // Will never resolve — the page will navigate away.
+  return new Promise(() => {})
 }
 
-export async function signInWithEmail(
-  email: string,
-  _password: string
-): Promise<AuthUser> {
-  await sleep(800)
+export async function exchangeGoogleCode(code: string): Promise<AuthResponse> {
+  const { data } = await apiClient.post<{ data: AuthResponse }>('/api/auth/google', { code })
+  setTokens(data.data.accessToken, data.data.refreshToken)
+  setUser(data.data.user)
+  return data.data
+}
 
-  const normalizedEmail = email.toLowerCase().trim() || 'admin@phuonglinh.vn'
-  const creds = MOCK_CREDENTIALS[normalizedEmail]
+export async function register(input: {
+  email: string
+  name: string
+  password: string
+  role?: 'admin' | 'staff'
+}): Promise<AuthUser> {
+  const { data } = await apiClient.post<{ data: AuthUser }>('/api/auth/register', input)
+  return data.data
+}
 
-  return {
-    name: creds?.name ?? 'Người dùng',
-    email: normalizedEmail,
-    avatar: '',
-    exp: Date.now() + 24 * 60 * 60 * 1000,
+export async function signOut(): Promise<void> {
+  try {
+    await apiClient.post('/api/auth/logout')
+  } catch {
+    // ignore — clearing local state is enough
   }
+  clearTokens()
+}
+
+export function getCurrentUser(): AuthUser | null {
+  return getUser()
 }

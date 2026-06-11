@@ -38,7 +38,7 @@ export function ProductMutateDialog() {
   const form = useForm<ProductSchema>({
     resolver: zodResolver(productSchema),
     defaultValues: isEdit
-      ? { code: selectedProduct?.code ?? '', name: selectedProduct?.name ?? '', category: selectedProduct?.category ?? '', unit: selectedProduct?.unit ?? '', description: selectedProduct?.description ?? '', purchasePrice: selectedProduct?.purchasePrice ?? 0, defaultSalePrice: selectedProduct?.defaultSalePrice ?? 0 }
+      ? { code: selectedProduct?.code ?? '', name: selectedProduct?.name ?? '', category: selectedProduct?.categoryName ?? '', unit: selectedProduct?.unitName ?? '', description: selectedProduct?.description ?? '', purchasePrice: selectedProduct?.purchasePrice ?? 0, defaultSalePrice: selectedProduct?.defaultSalePrice ?? 0 }
       : { code: '', name: '', category: '', unit: '', description: '', purchasePrice: 0, defaultSalePrice: 0 },
   })
 
@@ -48,8 +48,8 @@ export function ProductMutateDialog() {
       form.reset({
         code: selectedProduct.code ?? '',
         name: selectedProduct.name ?? '',
-        category: selectedProduct.category ?? '',
-        unit: selectedProduct.unit ?? '',
+        category: selectedProduct.categoryName ?? '',
+        unit: selectedProduct.unitName ?? '',
         description: selectedProduct.description ?? '',
         purchasePrice: selectedProduct.purchasePrice ?? 0,
         defaultSalePrice: selectedProduct.defaultSalePrice ?? 0,
@@ -60,8 +60,23 @@ export function ProductMutateDialog() {
   }, [open, selectedProduct])
 
   const mutation = useMutation({
-    mutationFn: (values: ProductSchema) =>
-      isEdit && selectedProduct ? updateProduct(selectedProduct.id, values) : createProduct(values),
+    mutationFn: (values: ProductSchema) => {
+      // Resolve category/unit names to IDs
+      const categoryId = categories.find((c) => c.name === values.category)?.id ?? null
+      const unitId = units.find((u) => u.name === values.unit)?.id ?? null
+      const payload = {
+        code: values.code,
+        name: values.name,
+        description: values.description,
+        categoryId,
+        unitId,
+        purchasePrice: values.purchasePrice,
+        defaultSalePrice: values.defaultSalePrice,
+      }
+      return isEdit && selectedProduct
+        ? updateProduct(selectedProduct.id, payload)
+        : createProduct(payload)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
       queryClient.invalidateQueries({ queryKey: ['price-lists'] })

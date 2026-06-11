@@ -1,14 +1,39 @@
-import { categories, type Category } from '@/mock/categories'
-import { sleep } from '@/lib/utils'
+/**
+ * Categories service — backward-compatible.
+ */
+import { apiClient } from '@/lib/api-client'
 
-export async function getCategories(): Promise<Category[]> {
-  await sleep(200)
-  return [...categories]
+export interface Category {
+  id: string
+  name: string
+  parentId: string | null
+  createdAt: string
 }
 
-export async function createCategory(name: string): Promise<Category> {
-  await sleep(200)
-  const newCat: Category = { id: `cat-${categories.length + 1}`, name }
-  categories.push(newCat)
-  return newCat
+export interface CategoryNode extends Category {
+  children: Category[]
+}
+
+export async function getCategories(): Promise<Category[]> {
+  const { data } = await apiClient.get<{ data: { items: Category[]; tree: CategoryNode[] } }>('/api/categories')
+  return data.data.items
+}
+
+export async function getCategoryTree(): Promise<CategoryNode[]> {
+  const { data } = await apiClient.get<{ data: { items: Category[]; tree: CategoryNode[] } }>('/api/categories')
+  return data.data.tree
+}
+
+export async function createCategory(input: { name: string; parentId?: string | null }): Promise<Category> {
+  const { data } = await apiClient.post<{ data: Category }>('/api/categories', input)
+  return data.data
+}
+
+export async function updateCategory(id: string, input: { name?: string; parentId?: string | null }): Promise<Category> {
+  const { data } = await apiClient.patch<{ data: Category }>(`/api/categories/${id}`, input)
+  return data.data
+}
+
+export async function deleteCategory(id: string): Promise<void> {
+  await apiClient.delete(`/api/categories/${id}`)
 }

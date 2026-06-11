@@ -1,37 +1,43 @@
-import type { Company } from '@/types/company'
-import { companies } from '@/mock/companies'
-import { sleep } from '@/lib/utils'
+/**
+ * Companies (customer groups).
+ */
+import { apiClient } from '@/lib/api-client'
 
-export async function getCompanies(): Promise<Company[]> {
-  await sleep(300)
-  return [...companies]
+export interface Company {
+  id: string
+  name: string
+  taxCode: string | null
+  priceListId: string | null
+  address: string | null
+  phone: string | null
+  email: string | null
 }
 
-export async function getCompanyById(id: string): Promise<Company | undefined> {
-  await sleep(200)
-  return companies.find((c) => c.id === id)
+export interface PaginatedResponse<T> {
+  data: T[]
+  meta: { page: number; pageSize: number; total: number; totalPages: number }
 }
 
-export async function createCompany(data: Omit<Company, 'id'>): Promise<Company> {
-  await sleep(300)
-  const newCompany: Company = {
-    ...data,
-    id: `c${Date.now()}`,
-  }
-  companies.push(newCompany)
-  return newCompany
+export async function getCompanies(params?: { q?: string; page?: number; pageSize?: number }): Promise<PaginatedResponse<Company>> {
+  const { data } = await apiClient.get<{ data: Company[]; meta: PaginatedResponse<Company>['meta'] }>('/api/companies', { params })
+  return { data: data.data, meta: data.meta }
 }
 
-export async function updateCompany(id: string, data: Partial<Company>): Promise<Company> {
-  await sleep(300)
-  const idx = companies.findIndex((c) => c.id === id)
-  if (idx === -1) throw new Error('Không tìm thấy công ty.')
-  companies[idx] = { ...companies[idx], ...data }
-  return companies[idx]
+export async function getCompanyById(id: string): Promise<Company> {
+  const { data } = await apiClient.get<{ data: Company }>(`/api/companies/${id}`)
+  return data.data
+}
+
+export async function createCompany(input: Omit<Company, 'id'>): Promise<Company> {
+  const { data } = await apiClient.post<{ data: Company }>('/api/companies', input)
+  return data.data
+}
+
+export async function updateCompany(id: string, input: Partial<Omit<Company, 'id'>>): Promise<Company> {
+  const { data } = await apiClient.patch<{ data: Company }>(`/api/companies/${id}`, input)
+  return data.data
 }
 
 export async function deleteCompany(id: string): Promise<void> {
-  await sleep(300)
-  const idx = companies.findIndex((c) => c.id === id)
-  if (idx !== -1) companies.splice(idx, 1)
+  await apiClient.delete(`/api/companies/${id}`)
 }

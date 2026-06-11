@@ -142,6 +142,21 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 
+# Backend
+backend/dist/
+backend/node_modules/
+backend/uploads/
+backend/.env
+backend/coverage/
+backend/*.log
+
+# Production
+.env
+.env.production
+.env.local
+deploy/certs/
+
+
 # Graphify
 graphify-out/
 

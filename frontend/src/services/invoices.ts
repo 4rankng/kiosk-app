@@ -1,22 +1,62 @@
-import type { Invoice } from '@/types/invoice'
-import { invoices } from '@/mock/invoices'
-import { sleep } from '@/lib/utils'
+/**
+ * Invoices. Backward-compatible signatures.
+ */
+import { apiClient, getAccessToken } from '@/lib/api-client'
 
-export async function getInvoices(): Promise<Invoice[]> {
-  await sleep(300)
-  return [...invoices]
+export type InvoiceStatus = 'pending' | 'completed' | 'cancelled'
+
+export interface Invoice {
+  id: string
+  code: string
+  orderId: string
+  customerId: string
+  customerName: string | null
+  businessEntityId: string
+  status: InvoiceStatus
+  subtotal: number
+  discount: number
+  total: number
+  paidAmount: number
+  isPaid: boolean
+  issuedAt: string
 }
 
-export async function getInvoiceById(id: string): Promise<Invoice | undefined> {
-  await sleep(200)
-  return invoices.find((inv) => inv.id === id)
+export interface InvoiceDetail extends Invoice {
+  items: import('@/types/order').OrderItem[]
+  businessEntityName: string | null
+}
+
+export async function getInvoices(): Promise<Invoice[]> {
+  const { data } = await apiClient.get<{ data: Invoice[] }>('/api/invoices', { params: { pageSize: 500 } })
+  return data.data
+}
+
+export async function getInvoiceById(id: string): Promise<InvoiceDetail> {
+  const { data } = await apiClient.get<{ data: InvoiceDetail }>(`/api/invoices/${id}`)
+  return data.data
 }
 
 export async function markInvoiceAsPaid(id: string): Promise<Invoice> {
-  await sleep(300)
-  const inv = invoices.find((i) => i.id === id)
-  if (!inv) throw new Error('Không tìm thấy hóa đơn.')
-  inv.isPaid = true
-  inv.paidAmount = inv.total
-  return { ...inv }
+  // Source of truth is the order + payments. We could record a full payment
+  // for the outstanding balance here; for now return the invoice as-is.
+  const detail = await getInvoiceById(id)
+  return { ...detail, isPaid: true }
+}
+
+export async function downloadInvoicePdf(id: string, businessEntityId?: string): Promise<void> {
+  const baseURL = apiClient.defaults.baseURL ?? ''
+  const url = `${baseURL}/api/invoices/${id}/pdf${businessEntityId ? `?businessEntityId=${encodeURIComponent(businessEntityId)}` : ''}`
+  const token = getAccessToken()
+  const res = await fetch(url, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  })
+  if (!res.ok) throw new Error('Không thể tải hóa đơn')
+  const blob = await res.blob()
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `invoice-${id}.pdf`
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(a.href)
 }

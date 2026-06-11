@@ -3,8 +3,11 @@ export interface Customer {
   code: string
   name: string
   companyId: string
-  phone: string
-  email: string
-  address: string
-  taxId: string
+  companyName: string | null
+  priceListId: string | null
+  phone: string | null
+  email: string | null
+  address: string | null
+  taxId: string | null
+  isActive: string
 }

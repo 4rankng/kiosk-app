@@ -1,56 +1,49 @@
-import type { Product } from '@/types/product'
-import { products } from '@/mock/products'
-import { priceLists } from '@/mock/price-lists'
-import { sleep } from '@/lib/utils'
+/**
+ * Products. Backward-compatible signatures.
+ */
+import { apiClient } from '@/lib/api-client'
+
+export interface Product {
+  id: string
+  code: string
+  name: string
+  description: string
+  categoryId: string | null
+  categoryName?: string | null
+  unitId: string | null
+  unitName?: string | null
+  purchasePrice: number
+  defaultSalePrice: number
+  stockQuantity: number
+  effectivePrice?: number
+  isActive: string
+}
 
 export async function getProducts(): Promise<Product[]> {
-  await sleep(300)
-  return [...products]
+  const { data } = await apiClient.get<{ data: Product[] }>('/api/products', { params: { pageSize: 500 } })
+  return data.data
 }
 
-export async function getProductById(id: string): Promise<Product | undefined> {
-  await sleep(200)
-  return products.find((p) => p.id === id)
+export async function getProductById(id: string, priceListId?: string): Promise<Product> {
+  const { data } = await apiClient.get<{ data: Product }>(`/api/products/${id}`, { params: { priceListId } })
+  return data.data
 }
 
-export async function searchProducts(query: string): Promise<Product[]> {
-  await sleep(200)
-  const q = query.toLowerCase()
-  return products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(q) ||
-      p.code.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q)
-  )
+export async function searchProducts(query: string, priceListId?: string): Promise<Product[]> {
+  const { data } = await apiClient.get<{ data: Product[] }>('/api/products', { params: { q: query, priceListId, pageSize: 50 } })
+  return data.data
 }
 
-export async function createProduct(data: Omit<Product, 'id'>): Promise<Product> {
-  await sleep(500)
-  const newProduct: Product = {
-    ...data,
-    id: `p${Date.now()}`,
-  }
-  products.push(newProduct)
-
-  // Auto-add to general price list
-  const general = priceLists.find((pl) => pl.companyId === '')
-  if (general) {
-    general.items.push({ productId: newProduct.id, product: newProduct, customPrice: data.defaultSalePrice })
-  }
-
-  return newProduct
+export async function createProduct(input: Omit<Product, 'id' | 'categoryName' | 'unitName' | 'effectivePrice' | 'isActive'>): Promise<Product> {
+  const { data } = await apiClient.post<{ data: Product }>('/api/products', input)
+  return data.data
 }
 
-export async function updateProduct(id: string, data: Partial<Product>): Promise<Product> {
-  await sleep(500)
-  const idx = products.findIndex((p) => p.id === id)
-  if (idx === -1) throw new Error('Product not found')
-  products[idx] = { ...products[idx], ...data }
-  return products[idx]
+export async function updateProduct(id: string, input: Partial<Omit<Product, 'id'>>): Promise<Product> {
+  const { data } = await apiClient.patch<{ data: Product }>(`/api/products/${id}`, input)
+  return data.data
 }
 
 export async function deleteProduct(id: string): Promise<void> {
-  await sleep(300)
-  const idx = products.findIndex((p) => p.id === id)
-  if (idx !== -1) products.splice(idx, 1)
+  await apiClient.delete(`/api/products/${id}`)
 }

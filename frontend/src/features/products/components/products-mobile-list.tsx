@@ -49,13 +49,13 @@ export function ProductsMobileList({ products, onEdit, onDelete }: ProductsMobil
             <div className='flex items-center gap-1.5'>
               <span className='truncate text-sm font-medium'>{product.name}</span>
               <span className='shrink-0 rounded bg-muted px-1.5 py-px text-[10px] leading-tight text-muted-foreground'>
-                {product.unit}
+                {product.unitName ?? ''}
               </span>
             </div>
             <div className='mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground'>
               <span className='font-mono'>{product.code}</span>
               <span>·</span>
-              <span>{product.category}</span>
+              <span>{product.categoryName ?? ''}</span>
             </div>
           </div>
           <span className='shrink-0 pt-0.5 text-sm font-semibold tabular-nums'>

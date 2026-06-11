@@ -1,0 +1,61 @@
+{
+  "name": "kiosk-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Wholesale management API — Hono + Drizzle + PostgreSQL",
+  "scripts": {
+    "dev": "concurrently -k -n api,migrate,seed -c blue,green,magenta \"pnpm dev:api\" \"pnpm dev:noop\" \"pnpm dev:noop\"",
+    "dev:api": "tsx watch src/server.ts",
+    "dev:noop": "node -e \"setInterval(()=>{},1<<30)\"",
+    "start": "node dist/server.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:wait": "tsx src/db/wait.ts",
+    "db:reset": "tsx src/db/reset.ts",
+    "admin:create": "tsx src/db/create-admin.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.0",
+    "@hono/zod-validator": "^0.4.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.36.0",
+    "exceljs": "^4.4.0",
+    "google-auth-library": "^9.14.0",
+    "hono": "^4.6.0",
+    "ioredis": "^5.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.0",
+    "pdfkit": "^0.15.0",
+    "pino": "^9.5.0",
+    "pino-pretty": "^11.3.0",
+    "uuid": "^11.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.0.0",
+    "@types/pdfkit": "^0.13.0",
+    "@types/pg": "^8.11.0",
+    "@types/uuid": "^10.0.0",
+    "concurrently": "^9.0.0",
+    "drizzle-kit": "^0.28.0",
+    "eslint": "^9.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

@@ -1,48 +1,75 @@
-import type { Customer } from '@/types/customer'
-import { customers } from '@/mock/customers'
-import { sleep } from '@/lib/utils'
+/**
+ * Customers (branches). Belong to a company; inherit the company's price list.
+ */
+import { apiClient } from '@/lib/api-client'
 
-export async function getCustomers(): Promise<Customer[]> {
-  await sleep(300)
-  return [...customers]
+export interface Customer {
+  id: string
+  code: string
+  name: string
+  companyId: string
+  companyName: string | null
+  priceListId: string | null
+  phone: string | null
+  email: string | null
+  taxId: string | null
+  address: string | null
+  isActive: string
 }
 
-export async function getCustomerById(id: string): Promise<Customer | undefined> {
-  await sleep(200)
-  return customers.find((c) => c.id === id)
+export interface PaginatedResponse<T> {
+  data: T[]
+  meta: { page: number; pageSize: number; total: number; totalPages: number }
 }
 
-export async function searchCustomers(query: string): Promise<Customer[]> {
-  await sleep(200)
-  const q = query.toLowerCase()
-  return customers.filter(
-    (c) =>
-      c.name.toLowerCase().includes(q) ||
-      c.code.toLowerCase().includes(q) ||
-      c.phone.includes(q)
+export async function getCustomers(params?: {
+  q?: string
+  companyId?: string
+  page?: number
+  pageSize?: number
+}): Promise<Customer[]> {
+  const { data } = await apiClient.get<{ data: Customer[]; meta: PaginatedResponse<Customer>['meta'] }>(
+    '/api/customers',
+    { params: { ...params, pageSize: params?.pageSize ?? 500 } }
   )
+  return data.data
 }
 
-export async function createCustomer(data: Omit<Customer, 'id'>): Promise<Customer> {
-  await sleep(500)
-  const newCustomer: Customer = {
-    ...data,
-    id: `cu${Date.now()}`,
+export async function getCustomerById(id: string): Promise<Customer> {
+  const { data } = await apiClient.get<{ data: Customer }>(`/api/customers/${id}`)
+  return data.data
+}
+
+export async function createCustomer(input: {
+  code: string
+  name: string
+  companyId: string
+  phone?: string
+  email?: string
+  taxId?: string
+  address?: string
+  notes?: string
+}): Promise<Customer> {
+  const { data } = await apiClient.post<{ data: Customer }>('/api/customers', input)
+  return data.data
+}
+
+export async function updateCustomer(
+  id: string,
+  input: {
+    code?: string
+    name?: string
+    phone?: string
+    email?: string
+    taxId?: string
+    address?: string
+    notes?: string
   }
-  customers.push(newCustomer)
-  return newCustomer
-}
-
-export async function updateCustomer(id: string, data: Partial<Customer>): Promise<Customer> {
-  await sleep(500)
-  const idx = customers.findIndex((c) => c.id === id)
-  if (idx === -1) throw new Error('Customer not found')
-  customers[idx] = { ...customers[idx], ...data }
-  return customers[idx]
+): Promise<Customer> {
+  const { data } = await apiClient.patch<{ data: Customer }>(`/api/customers/${id}`, input)
+  return data.data
 }
 
 export async function deleteCustomer(id: string): Promise<void> {
-  await sleep(300)
-  const idx = customers.findIndex((c) => c.id === id)
-  if (idx !== -1) customers.splice(idx, 1)
+  await apiClient.delete(`/api/customers/${id}`)
 }

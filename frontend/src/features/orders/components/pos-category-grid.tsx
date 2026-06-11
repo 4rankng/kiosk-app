@@ -28,7 +28,7 @@ export function POSCategoryGrid({ priceListId, onAddProduct }: POSCategoryGridPr
   const categories = useMemo(() => {
     const map = new Map<string, typeof products>()
     for (const p of products) {
-      const cat = p.category || 'Khác'
+      const cat = p.categoryName || 'Khác'
       if (!map.has(cat)) map.set(cat, [])
       map.get(cat)!.push(p)
     }
@@ -52,9 +52,9 @@ export function POSCategoryGrid({ priceListId, onAddProduct }: POSCategoryGridPr
     return defaultSalePrice
   }
 
-  function handleAdd(product: { id: string; name: string; unit: string; defaultSalePrice: number }) {
+  function handleAdd(product: { id: string; name: string; unitName: string | null; defaultSalePrice: number }) {
     onAddProduct(
-      { id: product.id, name: product.name, unit: product.unit },
+      { id: product.id, name: product.name, unit: product.unitName ?? '' },
       getPrice(product.id, product.defaultSalePrice)
     )
   }
@@ -91,7 +91,7 @@ export function POSCategoryGrid({ priceListId, onAddProduct }: POSCategoryGridPr
             <div className='flex-1 min-w-0'>
               <div className='text-sm font-medium truncate'>{p.name}</div>
               <div className='text-xs text-muted-foreground'>
-                {p.unit} · {formatCurrency(getPrice(p.id, p.defaultSalePrice))}
+                {p.unitName ?? ''} · {formatCurrency(getPrice(p.id, p.defaultSalePrice))}
               </div>
             </div>
             <PlusCircle className='ml-2 h-5 w-5 shrink-0 text-muted-foreground' />

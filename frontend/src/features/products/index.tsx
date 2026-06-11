@@ -32,7 +32,7 @@ function ProductsContent() {
   const isMobile = useIsMobile()
 
   const stats = useMemo(() => {
-    const categories = new Set(products.map((p) => p.category))
+    const categories = new Set(products.map((p) => p.categoryName))
     const totalInventoryValue = products.reduce((sum, p) => sum + p.purchasePrice, 0)
     const avgSalePrice = products.length > 0
       ? products.reduce((sum, p) => sum + p.defaultSalePrice, 0) / products.length

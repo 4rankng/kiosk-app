@@ -78,11 +78,11 @@ export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps)
                 key={p.id}
                 className='flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-accent transition-colors'
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleAdd({ id: p.id, name: p.name, unit: p.unit })}
+                onClick={() => handleAdd({ id: p.id, name: p.name, unit: p.unitName ?? '' })}
               >
                 <div>
                   <span className='font-medium'>{p.name}</span>
-                  <span className='ml-2 text-xs text-muted-foreground'>({p.unit})</span>
+                  <span className='ml-2 text-xs text-muted-foreground'>({p.unitName ?? ''})</span>
                 </div>
                 <div className='flex items-center gap-2'>
                   <span className='text-xs text-muted-foreground'>{formatCurrency(getPrice(p.id))}</span>
@@ -125,13 +125,13 @@ export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps)
                     key={p.id}
                     className='flex w-full items-center justify-between rounded-md px-3 py-3 text-left hover:bg-accent transition-colors'
                     onClick={() => {
-                      handleAdd({ id: p.id, name: p.name, unit: p.unit })
+                      handleAdd({ id: p.id, name: p.name, unit: p.unitName ?? '' })
                       setOpen(false)
                     }}
                   >
                     <div>
                       <div className='font-medium'>{p.name}</div>
-                      <div className='text-xs text-muted-foreground'>{p.code} · {p.unit}</div>
+                      <div className='text-xs text-muted-foreground'>{p.code} · {p.unitName ?? ''}</div>
                     </div>
                     <PlusCircle className='h-5 w-5 text-muted-foreground' />
                   </button>
