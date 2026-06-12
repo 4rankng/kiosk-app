@@ -36,11 +36,31 @@ services:
     restart: unless-stopped
     command: redis-server --appendonly yes
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6382}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  claude-mem-db:
+    image: postgres:16-alpine
+    container_name: kiosk-claude-mem-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: claude_mem
+      POSTGRES_PASSWORD: claude_mem_dev
+      POSTGRES_DB: claude_mem
+    ports:
+      - "5434:5432"
+    volumes:
+      - claude_mem_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U claude_mem -d claude_mem
       interval: 5s
       timeout: 3s
       retries: 10
@@ -50,7 +70,7 @@ services:
     container_name: kiosk-adminer
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "${ADMINER_PORT:-8082}:8080"
     environment:
       ADMINER_DEFAULT_SERVER: postgres
       ADMINER_DESIGN: pepa-linha-dark
@@ -63,3 +83,5 @@ volumes:
     name: kiosk_postgres_data
   redis_data:
     name: kiosk_redis_data
+  claude_mem_data:
+    name: kiosk_claude_mem_data

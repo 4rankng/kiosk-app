@@ -1,12 +1,16 @@
 /**
  * Pino logger — JSON in production, pretty in development.
+ * NOTE: Do not import env.ts at module level to avoid circular deps
+ * (env.ts → logger.ts → env.ts). Read env vars directly.
  */
 import pino from 'pino'
-import { env, isProduction } from './env.js'
+
+const isProd = process.env.NODE_ENV === 'production'
+const level = process.env.LOG_LEVEL || 'info'
 
 export const logger = pino({
-  level: env.LOG_LEVEL,
-  ...(isProduction
+  level,
+  ...(isProd
     ? {}
     : {
         transport: {

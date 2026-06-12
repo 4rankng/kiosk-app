@@ -17,7 +17,8 @@ export function CustomerMutateDialog() {
   const { open, setOpen, selectedCustomer } = useCustomersContext()
   const queryClient = useQueryClient()
   const isEdit = open === 'edit'
-  const { data: companies = [] } = useQuery({ queryKey: ['companies'], queryFn: getCompanies })
+  const { data: companiesData } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
+  const companies = companiesData?.data ?? []
 
   const form = useForm<CustomerSchema>({
     resolver: zodResolver(customerSchema),

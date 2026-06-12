@@ -1,6 +1,1 @@
-export interface Company {
-  id: string
-  name: string
-  priceListId: string
-  taxId: string
-}
+export type { Company } from '@/types/api'

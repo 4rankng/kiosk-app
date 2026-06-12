@@ -12,11 +12,12 @@ import { eq, sql } from 'drizzle-orm'
 import { db } from '../../config/db.js'
 import { businessEntities, orders, invoices } from '../../db/schema/index.js'
 import { requireAuth } from '../../middleware/auth.js'
+import { adminOnly, anyRole } from '../../middleware/rbac.js'
 import { ok, created } from '../../lib/response.js'
 import { Conflict, NotFound } from '../../lib/errors.js'
 
 export const businessEntityRoutes = new Hono()
-businessEntityRoutes.use('*', requireAuth)
+businessEntityRoutes.use('*', requireAuth, anyRole)
 
 const createSchema = z.object({
   name: z.string().min(1).max(160),
@@ -41,9 +42,9 @@ businessEntityRoutes.get('/:id', async (c) => {
   return ok(c, row)
 })
 
-businessEntityRoutes.post('/', zValidator('json', createSchema), async (c) => {
+businessEntityRoutes.post('/', adminOnly, zValidator('json', createSchema), async (c) => {
   const body = c.req.valid('json')
-  const now = new Date().toISOString()
+  const now = new Date()
   const [row] = await db
     .insert(businessEntities)
     .values({ ...body, createdAt: now, updatedAt: now })
@@ -51,20 +52,20 @@ businessEntityRoutes.post('/', zValidator('json', createSchema), async (c) => {
   return created(c, row)
 })
 
-businessEntityRoutes.patch('/:id', zValidator('json', updateSchema), async (c) => {
+businessEntityRoutes.patch('/:id', adminOnly, zValidator('json', updateSchema), async (c) => {
   const id = c.req.param('id')!
   const body = c.req.valid('json')
   const [existing] = await db.select().from(businessEntities).where(eq(businessEntities.id, id)).limit(1)
   if (!existing) throw NotFound('Hộ kinh doanh không tồn tại')
   const [row] = await db
     .update(businessEntities)
-    .set({ ...body, updatedAt: new Date().toISOString() })
+    .set({ ...body, updatedAt: new Date() })
     .where(eq(businessEntities.id, id))
     .returning()
   return ok(c, row)
 })
 
-businessEntityRoutes.delete('/:id', async (c) => {
+businessEntityRoutes.delete('/:id', adminOnly, async (c) => {
   const id = c.req.param('id')!
   const [orderCount] = await db
     .select({ c: sql<number>`count(*)::int` })

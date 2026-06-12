@@ -1,8 +1,7 @@
-import type { Invoice } from '@/types'
-import type { BusinessEntity } from '@/types'
+import type { InvoiceDetail, BusinessEntity } from '@/types/api'
 import { formatCurrency, formatNumber, formatDate } from '@/lib/format'
 
-export function generateInvoiceHTML(invoice: Invoice, entity: BusinessEntity): string {
+export function generateInvoiceHTML(invoice: InvoiceDetail, entity: BusinessEntity): string {
   const itemsRows = invoice.items
     .map(
       (item, i) => `
@@ -47,7 +46,7 @@ export function generateInvoiceHTML(invoice: Invoice, entity: BusinessEntity): s
 
   <div class="info-row">
     <span><strong>Mã hóa đơn:</strong> ${invoice.code}</span>
-    <span><strong>Ngày:</strong> ${formatDate(invoice.date)}</span>
+    <span><strong>Ngày:</strong> ${formatDate(invoice.issuedAt)}</span>
   </div>
   <div class="info-row">
     <span><strong>Khách hàng:</strong> ${invoice.customerName}</span>

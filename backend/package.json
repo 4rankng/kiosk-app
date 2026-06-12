@@ -20,6 +20,7 @@
     "db:studio": "drizzle-kit studio",
     "db:wait": "tsx src/db/wait.ts",
     "db:reset": "tsx src/db/reset.ts",
+    "db:seed": "tsx src/db/seed.ts",
     "admin:create": "tsx src/db/create-admin.ts"
   },
   "dependencies": {

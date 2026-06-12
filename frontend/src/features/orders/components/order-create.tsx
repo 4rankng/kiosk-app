@@ -40,15 +40,13 @@ export function OrderCreate() {
     mutationFn: () =>
       createOrder({
         customerId: selectedCustomer!.id,
-        customerName: selectedCustomer!.name,
-        companyId: selectedCustomer!.companyId,
-        date: new Date().toISOString(),
-        items,
-        subtotal,
-        discount,
-        total,
         businessEntityId,
-        status: 'confirmed',
+        items: items.map((i) => ({
+          productId: i.productId,
+          quantity: i.quantity,
+          unitPrice: i.unitPrice,
+        })),
+        discount,
       }),
     onSuccess: (order) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })

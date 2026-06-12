@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, jsonb } from 'drizzle-orm/pg-core'
+import { pgTable, text, uuid, jsonb, timestamp } from 'drizzle-orm/pg-core'
 
 /**
  * Hộ kinh doanh templates. Each one represents a legal entity (e.g. "Hộ KD
@@ -16,8 +16,8 @@ export const businessEntities = pgTable('business_entities', {
   phone: text('phone'),
   email: text('email'),
   headerLines: jsonb('header_lines').$type<string[]>().notNull().default([]),
-  createdAt: text('created_at').notNull(), // ISO string; created by app
-  updatedAt: text('updated_at').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
 export type BusinessEntity = typeof businessEntities.$inferSelect

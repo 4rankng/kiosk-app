@@ -1,6 +1,9 @@
 -- Initial schema for Kiosk wholesale management system
 -- Generated to match src/db/schema/* — keep in sync.
 
+-- Required extensions for trigram search indexes
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 -- ============================================================================
 -- Enums
 -- ============================================================================
@@ -36,8 +39,8 @@ CREATE TABLE "business_entities" (
   "phone" text,
   "email" text,
   "header_lines" jsonb NOT NULL DEFAULT '[]'::jsonb,
-  "created_at" text NOT NULL,
-  "updated_at" text NOT NULL
+  "created_at" timestamptz NOT NULL DEFAULT now(),
+  "updated_at" timestamptz NOT NULL DEFAULT now()
 );
 
 -- ============================================================================
@@ -47,10 +50,11 @@ CREATE TABLE "categories" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "name" text NOT NULL,
   "parent_id" uuid,
-  "created_at" text NOT NULL
+  "created_at" timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE "categories" ADD CONSTRAINT "categories_parent_fk"
   FOREIGN KEY ("parent_id") REFERENCES "categories"("id") ON DELETE SET NULL;
+CREATE INDEX "categories_parent_idx" ON "categories" ("parent_id");
 
 -- ============================================================================
 -- Units
@@ -59,7 +63,7 @@ CREATE TABLE "units" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "name" text NOT NULL UNIQUE,
   "abbreviation" text,
-  "created_at" text NOT NULL
+  "created_at" timestamptz NOT NULL DEFAULT now()
 );
 
 -- ============================================================================
@@ -74,9 +78,9 @@ CREATE TABLE "companies" (
   "phone" text,
   "email" text,
   "notes" text,
-  "is_active" text NOT NULL DEFAULT 'true',
-  "created_at" text NOT NULL,
-  "updated_at" text NOT NULL
+  "is_active" boolean NOT NULL DEFAULT true,
+  "created_at" timestamptz NOT NULL DEFAULT now(),
+  "updated_at" timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX "companies_name_idx" ON "companies" ("name");
 
@@ -93,9 +97,9 @@ CREATE TABLE "products" (
   "purchase_price" numeric(15, 2) NOT NULL DEFAULT '0',
   "default_sale_price" numeric(15, 2) NOT NULL DEFAULT '0',
   "stock_quantity" integer NOT NULL DEFAULT 0,
-  "is_active" text NOT NULL DEFAULT 'true',
-  "created_at" text NOT NULL,
-  "updated_at" text NOT NULL
+  "is_active" boolean NOT NULL DEFAULT true,
+  "created_at" timestamptz NOT NULL DEFAULT now(),
+  "updated_at" timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE "products" ADD CONSTRAINT "products_category_fk"
   FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE SET NULL;
@@ -104,8 +108,13 @@ ALTER TABLE "products" ADD CONSTRAINT "products_unit_fk"
 CREATE UNIQUE INDEX "products_code_idx" ON "products" ("code");
 CREATE INDEX "products_name_idx" ON "products" ("name");
 CREATE INDEX "products_category_idx" ON "products" ("category_id");
+CREATE INDEX "products_unit_idx" ON "products" ("unit_id");
 -- trigram index for fast ILIKE search
 CREATE INDEX "products_name_trgm_idx" ON "products" USING gin ("name" gin_trgm_ops);
+-- CHECK constraints
+ALTER TABLE "products" ADD CONSTRAINT "products_purchase_price_check" CHECK ("purchase_price" >= 0);
+ALTER TABLE "products" ADD CONSTRAINT "products_sale_price_check" CHECK ("default_sale_price" >= 0);
+ALTER TABLE "products" ADD CONSTRAINT "products_stock_check" CHECK ("stock_quantity" >= 0);
 
 -- ============================================================================
 -- Customers (branches)
@@ -120,13 +129,13 @@ CREATE TABLE "customers" (
   "tax_id" text,
   "address" text,
   "notes" text,
-  "is_active" text NOT NULL DEFAULT 'true',
-  "created_at" text NOT NULL,
-  "updated_at" text NOT NULL
+  "is_active" boolean NOT NULL DEFAULT true,
+  "created_at" timestamptz NOT NULL DEFAULT now(),
+  "updated_at" timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE "customers" ADD CONSTRAINT "customers_company_fk"
   FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE RESTRICT;
-CREATE INDEX "customers_code_idx" ON "customers" ("code");
+CREATE UNIQUE INDEX "customers_code_idx" ON "customers" ("code");
 CREATE INDEX "customers_name_idx" ON "customers" ("name");
 CREATE INDEX "customers_company_idx" ON "customers" ("company_id");
 
@@ -138,22 +147,23 @@ CREATE TABLE "price_lists" (
   "name" text NOT NULL,
   "company_id" uuid,
   "description" text,
-  "is_default" text NOT NULL DEFAULT 'false',
+  "is_default" boolean NOT NULL DEFAULT false,
   "sort_order" integer NOT NULL DEFAULT 0,
-  "created_at" text NOT NULL,
-  "updated_at" text NOT NULL
+  "created_at" timestamptz NOT NULL DEFAULT now(),
+  "updated_at" timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE "price_lists" ADD CONSTRAINT "price_lists_company_fk"
   FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE;
 CREATE INDEX "price_lists_company_idx" ON "price_lists" ("company_id");
+CREATE UNIQUE INDEX "price_lists_single_default" ON "price_lists" ("is_default") WHERE "is_default" = true AND "company_id" IS NULL;
 
 CREATE TABLE "price_list_items" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "price_list_id" uuid NOT NULL,
   "product_id" uuid NOT NULL,
   "custom_price" numeric(15, 2) NOT NULL,
-  "created_at" text NOT NULL,
-  "updated_at" text NOT NULL
+  "created_at" timestamptz NOT NULL DEFAULT now(),
+  "updated_at" timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE "price_list_items" ADD CONSTRAINT "price_list_items_pl_fk"
   FOREIGN KEY ("price_list_id") REFERENCES "price_lists"("id") ON DELETE CASCADE;
@@ -162,6 +172,7 @@ ALTER TABLE "price_list_items" ADD CONSTRAINT "price_list_items_product_fk"
 CREATE UNIQUE INDEX "price_list_items_pl_product_unique"
   ON "price_list_items" ("price_list_id", "product_id");
 CREATE INDEX "price_list_items_product_idx" ON "price_list_items" ("product_id");
+ALTER TABLE "price_list_items" ADD CONSTRAINT "pli_price_check" CHECK ("custom_price" >= 0);
 
 -- ============================================================================
 -- Orders + items + payments
@@ -190,6 +201,14 @@ ALTER TABLE "orders" ADD CONSTRAINT "orders_created_by_fk"
 CREATE INDEX "orders_customer_idx" ON "orders" ("customer_id");
 CREATE INDEX "orders_created_at_idx" ON "orders" ("created_at");
 CREATE INDEX "orders_status_idx" ON "orders" ("status");
+CREATE INDEX "orders_business_entity_idx" ON "orders" ("business_entity_id");
+CREATE INDEX "orders_created_by_idx" ON "orders" ("created_by");
+-- CHECK constraints
+ALTER TABLE "orders" ADD CONSTRAINT "orders_subtotal_check" CHECK ("subtotal" >= 0);
+ALTER TABLE "orders" ADD CONSTRAINT "orders_total_check" CHECK ("total" >= 0);
+ALTER TABLE "orders" ADD CONSTRAINT "orders_paid_check" CHECK ("paid_amount" >= 0);
+ALTER TABLE "orders" ADD CONSTRAINT "orders_discount_check" CHECK ("discount" >= 0);
+ALTER TABLE "orders" ADD CONSTRAINT "orders_discount_within_subtotal" CHECK ("discount" <= "subtotal");
 
 CREATE TABLE "order_items" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -208,6 +227,10 @@ ALTER TABLE "order_items" ADD CONSTRAINT "order_items_product_fk"
   FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT;
 CREATE INDEX "order_items_order_idx" ON "order_items" ("order_id");
 CREATE INDEX "order_items_product_idx" ON "order_items" ("product_id");
+-- CHECK constraints
+ALTER TABLE "order_items" ADD CONSTRAINT "order_items_qty_check" CHECK ("quantity" > 0);
+ALTER TABLE "order_items" ADD CONSTRAINT "order_items_price_check" CHECK ("unit_price" >= 0);
+ALTER TABLE "order_items" ADD CONSTRAINT "order_items_total_check" CHECK ("total_price" >= 0);
 
 CREATE TABLE "payments" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -223,6 +246,10 @@ ALTER TABLE "payments" ADD CONSTRAINT "payments_order_fk"
 ALTER TABLE "payments" ADD CONSTRAINT "payments_created_by_fk"
   FOREIGN KEY ("created_by") REFERENCES "users"("id") ON DELETE SET NULL;
 CREATE INDEX "payments_order_idx" ON "payments" ("order_id");
+CREATE INDEX "payments_created_by_idx" ON "payments" ("created_by");
+CREATE INDEX "payments_paid_at_idx" ON "payments" ("paid_at");
+-- CHECK constraints
+ALTER TABLE "payments" ADD CONSTRAINT "payments_amount_check" CHECK ("amount" > 0);
 
 -- ============================================================================
 -- Invoices
@@ -248,3 +275,14 @@ ALTER TABLE "invoices" ADD CONSTRAINT "invoices_business_entity_fk"
   FOREIGN KEY ("business_entity_id") REFERENCES "business_entities"("id") ON DELETE RESTRICT;
 CREATE INDEX "invoices_customer_idx" ON "invoices" ("customer_id");
 CREATE INDEX "invoices_issued_at_idx" ON "invoices" ("issued_at");
+CREATE INDEX "invoices_business_entity_idx" ON "invoices" ("business_entity_id");
+CREATE INDEX "invoices_status_idx" ON "invoices" ("status");
+
+-- FK from companies to price_lists (circular — added after both tables exist)
+ALTER TABLE "companies" ADD CONSTRAINT "companies_price_list_fk"
+  FOREIGN KEY ("price_list_id") REFERENCES "price_lists"("id") ON DELETE SET NULL;
+CREATE INDEX "companies_price_list_idx" ON "companies" ("price_list_id");
+
+-- Sequences for atomic code generation
+CREATE SEQUENCE IF NOT EXISTS order_code_seq START 1;
+CREATE SEQUENCE IF NOT EXISTS invoice_code_seq START 1;

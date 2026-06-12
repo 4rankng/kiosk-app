@@ -2,8 +2,9 @@
  * JWT auth middleware. Verifies Authorization: Bearer <token>.
  * Stores decoded payload in c.var.user.
  */
-import type { Context, MiddlewareHandler } from 'hono'
+import type { MiddlewareHandler } from 'hono'
 import { verifyAccessToken, type AccessTokenPayload } from '../lib/jwt.js'
+import { Unauthorized } from '../lib/errors.js'
 
 declare module 'hono' {
   interface ContextVariableMap {
@@ -11,14 +12,13 @@ declare module 'hono' {
   }
 }
 
-export const requireAuth: MiddlewareHandler = async (c: Context, next) => {
+export const requireAuth: MiddlewareHandler = async (c, next) => {
   const header = c.req.header('authorization')
   if (!header || !header.toLowerCase().startsWith('bearer ')) {
-    return c.json({ error: { message: 'Missing Authorization header' } }, 401)
+    throw Unauthorized('Missing Authorization header')
   }
   const token = header.slice(7).trim()
   const payload = verifyAccessToken(token)
   c.set('user', payload)
   await next()
-  return
 }

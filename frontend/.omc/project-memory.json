@@ -52,7 +52,7 @@
     "runtime": null
   },
   "build": {
-    "buildCommand": "cd frontend && rtk tsc --noEmit 2>&1 | tail -30",
+    "buildCommand": "cd /Users/dev/Documents/projects/kiosk-app/frontend && rtk tsc --noEmit 2>&1 | tail -30",
     "testCommand": "pnpm test",
     "lintCommand": "pnpm lint",
     "devCommand": "pnpm dev",
@@ -202,8 +202,8 @@
     },
     {
       "path": "src/features/orders/components/order-create.tsx",
-      "accessCount": 12,
-      "lastAccessed": 1780861348838,
+      "accessCount": 15,
+      "lastAccessed": 1781186984983,
       "type": "file"
     },
     {
@@ -219,6 +219,18 @@
       "type": "file"
     },
     {
+      "path": "src/features/auth/sign-in/components/user-auth-form.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1781187160851,
+      "type": "file"
+    },
+    {
+      "path": "src/features/invoices/components/invoices-columns.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1781187257026,
+      "type": "file"
+    },
+    {
       "path": "src/features/dashboard/components/top-customers.tsx",
       "accessCount": 7,
       "lastAccessed": 1780862820435,
@@ -231,18 +243,6 @@
       "type": "file"
     },
     {
-      "path": "src/features/auth/sign-in/components/user-auth-form.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1780821930809,
-      "type": "file"
-    },
-    {
-      "path": "src/features/invoices/components/invoices-columns.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1780823630291,
-      "type": "file"
-    },
-    {
       "path": "src/features/orders/components/order-success-dialog.tsx",
       "accessCount": 5,
       "lastAccessed": 1780823641874,
@@ -252,6 +252,12 @@
       "path": "src/components/layout/header.tsx",
       "accessCount": 5,
       "lastAccessed": 1780858729913,
+      "type": "file"
+    },
+    {
+      "path": "src/features/price-lists/index.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1781186913535,
       "type": "file"
     },
     {
@@ -408,12 +414,6 @@
       "path": "src/features/companies/index.tsx",
       "accessCount": 2,
       "lastAccessed": 1780821963541,
-      "type": "file"
-    },
-    {
-      "path": "src/features/price-lists/index.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1780822816000,
       "type": "file"
     },
     {

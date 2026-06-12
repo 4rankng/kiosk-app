@@ -13,9 +13,9 @@ export function getCompaniesColumns(): ColumnDef<Company>[] {
       header: ({ column }) => <DataTableColumnHeader column={column} title='Tên công ty/chuỗi' />,
     },
     {
-      accessorKey: 'taxId',
+      accessorKey: 'taxCode',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Mã số thuế' />,
-      cell: ({ row }) => row.getValue('taxId') || '—',
+      cell: ({ row }) => row.getValue('taxCode') || '—',
     },
     {
       accessorKey: 'priceListId',

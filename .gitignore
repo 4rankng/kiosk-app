@@ -162,3 +162,6 @@ graphify-out/
 
 # OMC orchestration state
 .omc/
+
+# Upstream shadcn-admin template (not part of kiosk-app)
+templates/

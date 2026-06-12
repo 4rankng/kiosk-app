@@ -17,13 +17,13 @@ export function CompanyMutateDialog() {
   const { open, setOpen, selectedCompany } = useCompaniesContext()
   const queryClient = useQueryClient()
   const isEdit = open === 'edit'
-  const { data: priceLists = [] } = useQuery({ queryKey: ['price-lists'], queryFn: getPriceLists })
+  const { data: priceLists = [] } = useQuery({ queryKey: ['price-lists'], queryFn: () => getPriceLists() })
 
   const form = useForm<CompanySchema>({
     resolver: zodResolver(companySchema),
     defaultValues: isEdit
-      ? { name: selectedCompany?.name ?? '', taxId: selectedCompany?.taxId ?? '', priceListId: selectedCompany?.priceListId ?? '' }
-      : { name: '', taxId: '', priceListId: '' },
+      ? { name: selectedCompany?.name ?? '', taxCode: selectedCompany?.taxCode ?? '', priceListId: selectedCompany?.priceListId ?? '' }
+      : { name: '', taxCode: '', priceListId: '' },
   })
 
   // Reset form when dialog opens with new company data
@@ -31,17 +31,17 @@ export function CompanyMutateDialog() {
     if (open === 'edit' && selectedCompany) {
       form.reset({
         name: selectedCompany.name ?? '',
-        taxId: selectedCompany.taxId ?? '',
+        taxCode: selectedCompany.taxCode ?? '',
         priceListId: selectedCompany.priceListId ?? '',
       })
     } else if (open === 'add') {
-      form.reset({ name: '', taxId: '', priceListId: '' })
+      form.reset({ name: '', taxCode: '', priceListId: '' })
     }
   }, [open, selectedCompany])
 
   const mutation = useMutation({
     mutationFn: (values: CompanySchema) =>
-      isEdit && selectedCompany ? updateCompany(selectedCompany.id, values) : createCompany(values),
+      isEdit && selectedCompany ? updateCompany(selectedCompany.id, values) : createCompany({ ...values, address: null, email: null, phone: null }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] })
       setOpen(null)
@@ -66,7 +66,7 @@ export function CompanyMutateDialog() {
             </div>
             <div className='space-y-2'>
               <Label>MST</Label>
-              <Input {...form.register('taxId')} />
+              <Input {...form.register('taxCode')} />
             </div>
           </div>
             <div className='space-y-2'>

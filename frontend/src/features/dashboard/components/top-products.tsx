@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { getDashboardStats } from '@/services/reports'
 import { formatNumber } from '@/lib/format'
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,

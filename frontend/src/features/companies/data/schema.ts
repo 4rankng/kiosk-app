@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const companySchema = z.object({
   name: z.string().min(1, 'Tên công ty là bắt buộc.'),
-  taxId: z.string(),
+  taxCode: z.string(),
   priceListId: z.string(),
 })
 

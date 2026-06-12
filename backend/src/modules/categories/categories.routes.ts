@@ -12,11 +12,12 @@ import { eq, sql } from 'drizzle-orm'
 import { db } from '../../config/db.js'
 import { categories, products } from '../../db/schema/index.js'
 import { requireAuth } from '../../middleware/auth.js'
+import { adminOnly, anyRole } from '../../middleware/rbac.js'
 import { ok, created } from '../../lib/response.js'
 import { Conflict, NotFound } from '../../lib/errors.js'
 
 export const categoryRoutes = new Hono()
-categoryRoutes.use('*', requireAuth)
+categoryRoutes.use('*', requireAuth, anyRole)
 
 const createSchema = z.object({
   name: z.string().min(1).max(120),
@@ -43,7 +44,7 @@ categoryRoutes.get('/', async (c) => {
   return ok(c, { items: rows, tree: roots })
 })
 
-categoryRoutes.post('/', zValidator('json', createSchema), async (c) => {
+categoryRoutes.post('/', adminOnly, zValidator('json', createSchema), async (c) => {
   const body = c.req.valid('json')
   if (body.parentId) {
     const [parent] = await db.select().from(categories).where(eq(categories.id, body.parentId)).limit(1)
@@ -51,12 +52,12 @@ categoryRoutes.post('/', zValidator('json', createSchema), async (c) => {
   }
   const [row] = await db
     .insert(categories)
-    .values({ name: body.name, parentId: body.parentId ?? null, createdAt: new Date().toISOString() })
+    .values({ name: body.name, parentId: body.parentId ?? null, createdAt: new Date() })
     .returning()
   return created(c, row)
 })
 
-categoryRoutes.patch('/:id', zValidator('json', updateSchema), async (c) => {
+categoryRoutes.patch('/:id', adminOnly, zValidator('json', updateSchema), async (c) => {
   const id = c.req.param('id')!
   const body = c.req.valid('json')
   const [existing] = await db.select().from(categories).where(eq(categories.id, id)).limit(1)
@@ -71,7 +72,7 @@ categoryRoutes.patch('/:id', zValidator('json', updateSchema), async (c) => {
   return ok(c, row)
 })
 
-categoryRoutes.delete('/:id', async (c) => {
+categoryRoutes.delete('/:id', adminOnly, async (c) => {
   const id = c.req.param('id')!
   const [existing] = await db.select().from(categories).where(eq(categories.id, id)).limit(1)
   if (!existing) throw NotFound('Danh mục không tồn tại')

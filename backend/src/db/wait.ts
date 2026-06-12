@@ -4,7 +4,7 @@
  * `docker compose up` and the migration step.
  */
 import pg from 'pg'
-import 'dotenv/config'
+import '../config/dotenv.js'
 
 const { Client } = pg
 

@@ -1,26 +1,11 @@
 /**
  * Products. Backward-compatible signatures.
  */
-import { apiClient } from '@/lib/api-client'
-
-export interface Product {
-  id: string
-  code: string
-  name: string
-  description: string
-  categoryId: string | null
-  categoryName?: string | null
-  unitId: string | null
-  unitName?: string | null
-  purchasePrice: number
-  defaultSalePrice: number
-  stockQuantity: number
-  effectivePrice?: number
-  isActive: string
-}
+import { apiClient, DEFAULT_PAGE_SIZE } from '@/lib/api-client'
+import type { Product } from '@/types/api'
 
 export async function getProducts(): Promise<Product[]> {
-  const { data } = await apiClient.get<{ data: Product[] }>('/api/products', { params: { pageSize: 500 } })
+  const { data } = await apiClient.get<{ data: Product[] }>('/api/products', { params: { pageSize: DEFAULT_PAGE_SIZE } })
   return data.data
 }
 
@@ -34,7 +19,7 @@ export async function searchProducts(query: string, priceListId?: string): Promi
   return data.data
 }
 
-export async function createProduct(input: Omit<Product, 'id' | 'categoryName' | 'unitName' | 'effectivePrice' | 'isActive'>): Promise<Product> {
+export async function createProduct(input: Partial<Omit<Product, 'id' | 'isActive' | 'categoryName' | 'unitName' | 'effectivePrice'>> & Pick<Product, 'code' | 'name'>): Promise<Product> {
   const { data } = await apiClient.post<{ data: Product }>('/api/products', input)
   return data.data
 }

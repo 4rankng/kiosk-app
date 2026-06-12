@@ -16,9 +16,11 @@ import { getCustomersColumns } from './customers-columns'
 import { customersCardConfig } from './customers-mobile-config'
 
 export function CustomersTable() {
-  const { data: customers = [] } = useQuery({ queryKey: ['customers'], queryFn: getCustomers })
-  const { data: companies = [] } = useQuery({ queryKey: ['companies'], queryFn: getCompanies })
-  const companyOptions = companies.map((c) => ({ label: c.name, value: c.id }))
+  const { data: customersData } = useQuery({ queryKey: ['customers'], queryFn: () => getCustomers() })
+  const customers = customersData?.data ?? []
+  const { data: companiesData } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
+  const companies = companiesData?.data ?? []
+  const companyOptions = companies.map((c: { id: string; name: string }) => ({ label: c.name, value: c.id }))
   const columns = getCustomersColumns()
   const isMobile = useIsMobile()
   const [expandedId, setExpandedId] = useState<string | null>(null)

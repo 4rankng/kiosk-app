@@ -10,7 +10,8 @@ import { getCompaniesColumns } from './companies-columns'
 import { companiesCardConfig } from './companies-mobile-config'
 
 export function CompaniesTable() {
-  const { data: companies = [] } = useQuery({ queryKey: ['companies'], queryFn: getCompanies })
+  const { data: companiesData } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
+  const companies = companiesData?.data ?? []
   const isMobile = useIsMobile()
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [sorting, setSorting] = useState<SortingState>([])

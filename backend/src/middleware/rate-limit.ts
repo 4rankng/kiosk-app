@@ -4,6 +4,7 @@
  */
 import type { MiddlewareHandler } from 'hono'
 import { redis } from '../config/redis.js'
+import { AppError } from '../lib/errors.js'
 
 export interface RateLimitOptions {
   key: (c: { req: { header: (k: string) => string | undefined } }) => string
@@ -29,7 +30,7 @@ export function rateLimit(opts: RateLimitOptions): MiddlewareHandler {
 
     if (count > opts.limit) {
       c.header('Retry-After', String(opts.windowSeconds))
-      return c.json({ error: { message: 'Too many requests' } }, 429)
+      throw new AppError(429, 'Too many requests. Please try again later.')
     }
 
     await next()

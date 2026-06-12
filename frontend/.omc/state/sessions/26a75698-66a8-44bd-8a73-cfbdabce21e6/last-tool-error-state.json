@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"cat > /Users/dev/Documents/projects/kiosk-app/frontend/qa-verify.cjs << 'SCRIPT'\\nconst puppeteer = require('puppeteer-core');\\n\\n(async () => {\\n  const browser = await puppeteer.launch({...",
-  "error": "Exit code 1\nfile:///Users/dev/Documents/projects/kiosk-app/frontend/node_modules/.pnpm/puppeteer-core@25.1.0/node_modules/puppeteer-core/lib/puppeteer/cdp/Frame.js:185\n                        ? new Error(`${response.errorText} at ${url}`)\n                          ^\n\nError: net::ERR_CONNECTION_REFUSED at http://localhost:5173/sign-in\n    at navigate (file:///Users/dev/Documents/projects/kiosk-app/frontend/node_modules/.pnpm/puppeteer-core@25.1.0/node_modules/puppeteer-core/lib/puppeteer/cdp/Fram...",
-  "timestamp": "2026-06-07T09:01:08.029Z",
-  "retry_count": 1
-}

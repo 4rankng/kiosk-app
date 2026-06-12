@@ -2,17 +2,7 @@
  * Categories service — backward-compatible.
  */
 import { apiClient } from '@/lib/api-client'
-
-export interface Category {
-  id: string
-  name: string
-  parentId: string | null
-  createdAt: string
-}
-
-export interface CategoryNode extends Category {
-  children: Category[]
-}
+import type { Category, CategoryNode } from '@/types/api'
 
 export async function getCategories(): Promise<Category[]> {
   const { data } = await apiClient.get<{ data: { items: Category[]; tree: CategoryNode[] } }>('/api/categories')

@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, numeric, uniqueIndex, index, integer } from 'drizzle-orm/pg-core'
+import { pgTable, text, uuid, numeric, boolean, timestamp, integer, uniqueIndex, index } from 'drizzle-orm/pg-core'
 import { companies } from './companies.js'
 import { products } from './products.js'
 
@@ -14,10 +14,10 @@ export const priceLists = pgTable(
     name: text('name').notNull(),
     companyId: uuid('company_id').references(() => companies.id, { onDelete: 'cascade' }),
     description: text('description'),
-    isDefault: text('is_default').notNull().default('false'), // "true" for the general PL
+    isDefault: boolean('is_default').notNull().default(false), // true for the general PL
     sortOrder: integer('sort_order').notNull().default(0),
-    createdAt: text('created_at').notNull(),
-    updatedAt: text('updated_at').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     companyIdx: index('price_lists_company_idx').on(t.companyId),
@@ -39,8 +39,8 @@ export const priceListItems = pgTable(
       .notNull()
       .references(() => products.id, { onDelete: 'cascade' }),
     customPrice: numeric('custom_price', { precision: 15, scale: 2 }).notNull(),
-    createdAt: text('created_at').notNull(),
-    updatedAt: text('updated_at').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     uniqProduct: uniqueIndex('price_list_items_pl_product_unique').on(t.priceListId, t.productId),

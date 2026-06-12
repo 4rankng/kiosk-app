@@ -1,22 +1,8 @@
 /**
  * Companies (customer groups).
  */
-import { apiClient } from '@/lib/api-client'
-
-export interface Company {
-  id: string
-  name: string
-  taxCode: string | null
-  priceListId: string | null
-  address: string | null
-  phone: string | null
-  email: string | null
-}
-
-export interface PaginatedResponse<T> {
-  data: T[]
-  meta: { page: number; pageSize: number; total: number; totalPages: number }
-}
+import { apiClient, type PaginatedResponse } from '@/lib/api-client'
+import type { Company } from '@/types/api'
 
 export async function getCompanies(params?: { q?: string; page?: number; pageSize?: number }): Promise<PaginatedResponse<Company>> {
   const { data } = await apiClient.get<{ data: Company[]; meta: PaginatedResponse<Company>['meta'] }>('/api/companies', { params })

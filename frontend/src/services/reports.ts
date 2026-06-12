@@ -2,7 +2,7 @@
  * Reports. Replaces client-side rollups with backend aggregations.
  */
 import { apiClient, getAccessToken } from '@/lib/api-client'
-import type { InvoiceStatus } from './invoices'
+import type { InvoiceStatus } from '@/types/api'
 
 export interface ProductReportRow {
   productId: string

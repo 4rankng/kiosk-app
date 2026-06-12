@@ -2,10 +2,9 @@
  * Validated, typed environment configuration.
  * Throws at boot if anything required is missing or malformed.
  */
-import 'dotenv/config'
+import './dotenv.js'
 import { z } from 'zod'
 import crypto from 'node:crypto'
-import { logger } from './logger.js'
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -40,6 +39,8 @@ const envSchema = z.object({
   MAX_UPLOAD_SIZE_MB: z.coerce.number().int().positive().default(10),
 
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+
+  CSRF_SECRET: z.string().default(''),
 })
 
 const parsed = envSchema.safeParse(process.env)
@@ -58,7 +59,7 @@ if (!env.JWT_SECRET) {
     process.exit(1)
   }
   env.JWT_SECRET = crypto.randomBytes(48).toString('base64')
-  logger.warn('⚠ JWT_SECRET not set — generated an ephemeral dev secret. All tokens will be invalidated on restart.')
+  console.warn('⚠ JWT_SECRET not set — generated an ephemeral dev secret. All tokens will be invalidated on restart.')
 }
 
 // Derived

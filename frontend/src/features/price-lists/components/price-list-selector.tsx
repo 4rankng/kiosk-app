@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getPriceLists, createPriceList } from '@/services/price-lists'
+import type { PriceList as PriceListType } from '@/types/api'
 import { getCompanies } from '@/services/companies'
-import type { PriceList } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import {
@@ -25,8 +25,8 @@ import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 
 interface PriceListSelectorProps {
-  selectedPriceList: PriceList | null
-  onSelect: (pl: PriceList) => void
+  selectedPriceList: PriceListType | null
+  onSelect: (pl: PriceListType) => void
 }
 
 export function PriceListSelector({ selectedPriceList, onSelect }: PriceListSelectorProps) {
@@ -37,16 +37,19 @@ export function PriceListSelector({ selectedPriceList, onSelect }: PriceListSele
 
   const { data: priceLists = [] } = useQuery({
     queryKey: ['price-lists'],
-    queryFn: getPriceLists,
+    queryFn: () => getPriceLists(),
   })
 
   const { data: companies = [] } = useQuery({
     queryKey: ['companies'],
-    queryFn: getCompanies,
+    queryFn: async () => {
+      const res = await getCompanies()
+      return res.data
+    },
   })
 
   const createMutation = useMutation({
-    mutationFn: () => createPriceList(newName, newCompanyId),
+    mutationFn: () => createPriceList({ name: newName, companyId: newCompanyId }),
     onSuccess: (pl) => {
       queryClient.invalidateQueries({ queryKey: ['price-lists'] })
       toast.success('Tạo bảng giá thành công!')

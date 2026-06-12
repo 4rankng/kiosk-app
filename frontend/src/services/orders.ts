@@ -1,38 +1,8 @@
 /**
  * Orders. Backward-compatible signatures.
  */
-import { apiClient } from '@/lib/api-client'
-import type { OrderItem, OrderStatus } from '@/types/order'
-
-export interface Order {
-  id: string
-  code: string
-  customerId: string
-  customerName: string | null
-  companyId: string | null
-  businessEntityId: string
-  businessEntityName: string | null
-  status: OrderStatus
-  subtotal: number
-  discount: number
-  total: number
-  paidAmount: number
-  notes: string | null
-  createdAt: string
-}
-
-export interface OrderDetail extends Order {
-  customerCode: string | null
-  companyName: string | null
-  items: OrderItem[]
-  payments: Array<{
-    id: string
-    amount: number
-    method: string
-    paidAt: string
-    note: string | null
-  }>
-}
+import { apiClient, DEFAULT_PAGE_SIZE } from '@/lib/api-client'
+import type { Order, OrderDetail, OrderStatus } from '@/types/api'
 
 export interface CreateOrderInput {
   customerId: string
@@ -46,7 +16,7 @@ export interface CreateOrderInput {
 }
 
 export async function getOrders(): Promise<Order[]> {
-  const { data } = await apiClient.get<{ data: Order[] }>('/api/orders', { params: { pageSize: 500 } })
+  const { data } = await apiClient.get<{ data: Order[] }>('/api/orders', { params: { pageSize: DEFAULT_PAGE_SIZE } })
   return data.data
 }
 

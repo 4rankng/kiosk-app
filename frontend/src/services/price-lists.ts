@@ -2,27 +2,7 @@
  * Price lists. Backward-compatible signatures.
  */
 import { apiClient } from '@/lib/api-client'
-
-export interface PriceListItem {
-  productId: string
-  code: string
-  name: string
-  unit: string
-  stockQuantity: number
-  basePrice: number
-  customPrice: number
-  hasOverride: boolean
-}
-
-export interface PriceList {
-  id: string
-  name: string
-  companyId: string | null
-  companyName: string | null
-  isDefault: string
-  description: string | null
-  itemCount: number
-}
+import type { PriceList, PriceListItem } from '@/types/api'
 
 export async function getPriceLists(companyId?: string | null): Promise<PriceList[]> {
   const { data } = await apiClient.get<{ data: PriceList[] }>('/api/price-lists', {

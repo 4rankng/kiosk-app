@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { savePriceList } from '@/services/price-lists'
-import type { PriceList, PriceListItem } from '@/types'
+import { bulkUpsertPriceListItems } from '@/services/price-lists'
+import type { PriceList, PriceListItem } from '@/types/api'
 import { formatCurrency } from '@/lib/format'
 import { Input } from '@/components/ui/input'
 import { NumberInput } from '@/components/number-input'
@@ -15,29 +15,35 @@ import { useIsMobile } from '@/hooks/use-mobile'
 
 interface PriceListTableProps {
   priceList: PriceList
+  items: PriceListItem[]
 }
 
-export function PriceListTable({ priceList }: PriceListTableProps) {
+export function PriceListTable({ priceList, items: initialItems }: PriceListTableProps) {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
-  const [items, setItems] = useState<PriceListItem[]>(priceList.items)
+  const [items, setItems] = useState<PriceListItem[]>(initialItems)
   const isMobile = useIsMobile()
 
   // Sync items when priceList changes
   useEffect(() => {
-    setItems(priceList.items)
-  }, [priceList.id])
+    setItems(initialItems)
+  }, [priceList.id, initialItems])
 
   const filteredItems = items.filter(
     (item) =>
-      item.product.name.toLowerCase().includes(search.toLowerCase()) ||
-      item.product.code.toLowerCase().includes(search.toLowerCase())
+      item.name.toLowerCase().includes(search.toLowerCase()) ||
+      item.code.toLowerCase().includes(search.toLowerCase())
   )
 
   const saveMutation = useMutation({
-    mutationFn: () => savePriceList({ ...priceList, items }),
+    mutationFn: () =>
+      bulkUpsertPriceListItems(
+        priceList.id,
+        items.map((item) => ({ productId: item.productId, customPrice: item.customPrice }))
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['price-lists'] })
+      queryClient.invalidateQueries({ queryKey: ['price-list-items'] })
       toast.success('Lưu bảng giá thành công!')
     },
   })
@@ -80,13 +86,13 @@ export function PriceListTable({ priceList }: PriceListTableProps) {
             <TableBody>
               {filteredItems.map((item) => (
                 <TableRow key={item.productId}>
-                  <TableCell className='font-mono text-sm'>{item.product.code}</TableCell>
+                  <TableCell className='font-mono text-sm'>{item.code}</TableCell>
                   <TableCell>
-                    {item.product.name}
-                    <span className='ml-2 text-xs text-muted-foreground'>({item.product.unit})</span>
+                    {item.name}
+                    <span className='ml-2 text-xs text-muted-foreground'>({item.unit})</span>
                   </TableCell>
                   <TableCell className='text-right text-muted-foreground'>
-                    {formatCurrency(item.product.defaultSalePrice)}
+                    {formatCurrency(item.basePrice)}
                   </TableCell>
                   <TableCell className='text-right'>
                     <NumberInput
@@ -168,13 +174,13 @@ function MobilePriceList({
         >
           <div className='flex items-start justify-between gap-2'>
             <div className='min-w-0 flex-1'>
-              <p className='truncate text-sm font-medium'>{item.product.name}</p>
+              <p className='truncate text-sm font-medium'>{item.name}</p>
               <p className='text-xs text-muted-foreground'>
-                {item.product.code} · {item.product.unit}
+                {item.code} · {item.unit}
               </p>
             </div>
             <span className='shrink-0 text-xs text-muted-foreground'>
-              Giá gốc: {formatCurrency(item.product.defaultSalePrice)}
+              Giá gốc: {formatCurrency(item.basePrice)}
             </span>
           </div>
           <div className='flex items-center gap-2'>

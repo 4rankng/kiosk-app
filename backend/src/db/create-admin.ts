@@ -12,7 +12,7 @@
  *
  * Refuses to run if any user already exists. Idempotent / safe.
  */
-import 'dotenv/config'
+import '../config/dotenv.js'
 import { eq, sql } from 'drizzle-orm'
 import { db, pool } from '../config/db.js'
 import { users } from '../db/schema/users.js'
@@ -56,7 +56,7 @@ async function main() {
   const { email, password, name, role } = parseArgs()
 
   // Refuse to run if any users already exist
-  const r = await queryOne<{ count: number }>(sql`SELECT count(*)::int AS count FROM users`)
+  const r = await queryOne<{ count: number }>(db, sql`SELECT count(*)::int AS count FROM users`)
   const count = Number(r?.count ?? 0)
   if (count > 0) {
     const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1)

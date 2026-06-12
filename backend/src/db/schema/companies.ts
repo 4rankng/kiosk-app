@@ -1,8 +1,10 @@
-import { pgTable, text, uuid, index } from 'drizzle-orm/pg-core'
+import { pgTable, text, uuid, boolean, timestamp, index } from 'drizzle-orm/pg-core'
 
 /**
  * A "Công ty / Chuỗi" — the parent customer group. Always assigned a single
  * price list, which all its child branches inherit automatically.
+ *
+ * Note: FK to price_lists is defined in the SQL migration only (circular dep).
  */
 export const companies = pgTable(
   'companies',
@@ -15,9 +17,9 @@ export const companies = pgTable(
     phone: text('phone'),
     email: text('email'),
     notes: text('notes'),
-    isActive: text('is_active').notNull().default('true'),
-    createdAt: text('created_at').notNull(),
-    updatedAt: text('updated_at').notNull(),
+    isActive: boolean('is_active').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     nameIdx: index('companies_name_idx').on(t.name),

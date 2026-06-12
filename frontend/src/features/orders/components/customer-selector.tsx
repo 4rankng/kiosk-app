@@ -20,10 +20,11 @@ export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelecto
   const [sheetOpen, setSheetOpen] = useState(false)
   const blurTimeout = useRef<ReturnType<typeof setTimeout>>(null)
 
-  const { data: customers = [] } = useQuery({
+  const { data: customersData } = useQuery({
     queryKey: ['customers'],
-    queryFn: getCustomers,
+    queryFn: () => getCustomers(),
   })
+  const customers = customersData?.data ?? []
 
   const { data: company } = useQuery({
     queryKey: ['company', selectedCustomer?.companyId],
@@ -44,7 +45,7 @@ export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelecto
       (c) =>
         c.name.toLowerCase().includes(q) ||
         c.code.toLowerCase().includes(q) ||
-        c.phone.includes(q)
+        (c.phone ?? '').includes(q)
     )
   }, [customers, query])
 

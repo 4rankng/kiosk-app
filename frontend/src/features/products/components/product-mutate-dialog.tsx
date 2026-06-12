@@ -86,15 +86,15 @@ export function ProductMutateDialog() {
   })
 
   async function handleCreateCategory(name: string): Promise<string> {
-    const cat = await createCategory(name)
+    const cat = await createCategory({ name })
     queryClient.invalidateQueries({ queryKey: ['categories'] })
-    return cat.name
+    return cat.id
   }
 
   async function handleCreateUnit(name: string): Promise<string> {
-    const u = await createUnit(name)
+    const u = await createUnit({ name })
     queryClient.invalidateQueries({ queryKey: ['units'] })
-    return u.name
+    return u.id
   }
 
   const title = isEdit ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'

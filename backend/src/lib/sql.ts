@@ -1,23 +1,27 @@
 /**
- * Small helpers for working with raw SQL results from drizzle's
- * `db.execute()`. The result has a `.rows` array we want to type.
+ * Small helpers for working with raw SQL via Drizzle's db.execute().
  */
 import { sql } from 'drizzle-orm'
-import type { SQL } from 'drizzle-orm'
+import type { DB } from '../config/db.js'
 
 /**
- * Run a query and return typed rows. Throws if there is no `rows` array
- * (which shouldn't happen for SELECTs).
+ * Run a raw SQL query and return typed rows.
  */
-export async function query<R = Record<string, unknown>>(q: SQL): Promise<R[]> {
-  const res = await (q as unknown as { execute: () => Promise<{ rows: R[] }> }).execute()
-  return res.rows
+export async function query<R = Record<string, unknown>>(
+  db: DB,
+  queryStr: ReturnType<typeof sql>
+): Promise<R[]> {
+  const res = await db.execute(queryStr)
+  return res.rows as R[]
 }
 
 /**
  * Convenience: get the first row, or undefined.
  */
-export async function queryOne<R = Record<string, unknown>>(q: SQL): Promise<R | undefined> {
-  const rows = await query<R>(q)
+export async function queryOne<R = Record<string, unknown>>(
+  db: DB,
+  queryStr: ReturnType<typeof sql>
+): Promise<R | undefined> {
+  const rows = await query<R>(db, queryStr)
   return rows[0]
 }

@@ -22,7 +22,8 @@ export function CustomerReport() {
   const [companyId, setCompanyId] = useState('all')
   const [fetchKey, setFetchKey] = useState(0)
 
-  const { data: companies = [] } = useQuery({ queryKey: ['companies'], queryFn: getCompanies })
+  const { data: companiesResult } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
+  const companies = companiesResult?.data ?? []
 
   const { data: reportData = [], isLoading } = useQuery({
     queryKey: ['customer-report', startDate, endDate, companyId, fetchKey],

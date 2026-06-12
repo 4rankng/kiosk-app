@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getBusinessEntities } from '@/services/business-entities'
+import { getInvoiceById } from '@/services/invoices'
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog'
@@ -12,15 +13,16 @@ export function PrintDialog() {
   const { open, setOpen, selectedInvoice } = useInvoicesContext()
   const { data: entities = [] } = useQuery({
     queryKey: ['business-entities'],
-    queryFn: getBusinessEntities,
+    queryFn: () => getBusinessEntities(),
   })
 
-  function handlePrint(entityId: string) {
+  async function handlePrint(entityId: string) {
     if (!selectedInvoice) return
     const entity = entities.find((e) => e.id === entityId)
     if (!entity) return
 
-    const html = generateInvoiceHTML(selectedInvoice, entity)
+    const detail = await getInvoiceById(selectedInvoice.id)
+    const html = generateInvoiceHTML(detail, entity)
     const printWindow = window.open('', '_blank')
     if (!printWindow) return
 

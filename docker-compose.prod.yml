@@ -1,103 +1,93 @@
 # =============================================================================
-#  Production stack for DigitalOcean droplet
-#  nginx (TLS + reverse proxy) + backend + frontend (static) + postgres + redis
-#  Includes cron sidecar for daily DB backups to S3-compatible storage
+#  Production stack
+#  Backend + Frontend + Postgres + Redis
+#  No Adminer, no dev tools. Postgres not exposed to host.
+#
+#  Reads credentials from the project-root .env file.
+#  Usage: docker compose -f docker-compose.prod.yml up -d
 # =============================================================================
 
 services:
-  nginx:
-    image: nginx:1.27-alpine
-    container_name: kiosk-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./deploy/certs:/etc/nginx/certs:ro
-      - frontend_dist:/usr/share/nginx/html:ro
-      - nginx_logs:/var/log/nginx
-    depends_on:
-      - backend
-    networks: [kiosk]
-
   backend:
     build:
-      context: .
-      dockerfile: deploy/Dockerfile.backend
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: kiosk-backend
-    restart: unless-stopped
-    env_file: .env.production
+    restart: always
+    env_file:
+      - .env
     environment:
-      NODE_ENV: production
-      PORT: 3000
+      POSTGRES_HOST: postgres
+      REDIS_URL: redis://redis:6379
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    networks: [kiosk]
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 20s
+    networks:
+      - backend-network
+      - frontend-network
 
   frontend:
     build:
-      context: .
-      dockerfile: deploy/Dockerfile.frontend
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${API_BASE_URL:-http://localhost:3000}
     container_name: kiosk-frontend
-    restart: "no"  # static build, no process to restart
-    volumes:
-      - frontend_dist:/usr/share/nginx/html
-    networks: [kiosk]
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - frontend-network
 
   postgres:
     image: postgres:16-alpine
     container_name: kiosk-postgres
-    restart: unless-stopped
-    env_file: .env.production
+    restart: always
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks: [kiosk]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - backend-network
 
   redis:
     image: redis:7-alpine
     container_name: kiosk-redis
-    restart: unless-stopped
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
-    env_file: .env.production
+    restart: always
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeme}
     volumes:
       - redis_data:/data
-    networks: [kiosk]
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "--no-auth-warning", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge
+  frontend-network:
+    driver: bridge
 
 volumes:
   postgres_data:
-    name: kiosk_postgres_prod
+    name: kiosk_postgres_data
   redis_data:
-    name: kiosk_redis_prod
-  frontend_dist:
-    name: kiosk_frontend_dist
-  nginx_logs:
-    name: kiosk_nginx_logs
-
-networks:
-  kiosk:
-    name: kiosk_net
-    driver: bridge
+    name: kiosk_redis_data

@@ -11,11 +11,12 @@ import { eq, sql } from 'drizzle-orm'
 import { db } from '../../config/db.js'
 import { units, products } from '../../db/schema/index.js'
 import { requireAuth } from '../../middleware/auth.js'
+import { adminOnly, anyRole } from '../../middleware/rbac.js'
 import { ok, created } from '../../lib/response.js'
 import { Conflict, NotFound } from '../../lib/errors.js'
 
 export const unitRoutes = new Hono()
-unitRoutes.use('*', requireAuth)
+unitRoutes.use('*', requireAuth, anyRole)
 
 const createSchema = z.object({
   name: z.string().min(1).max(40),
@@ -27,12 +28,12 @@ unitRoutes.get('/', async (c) => {
   return ok(c, rows)
 })
 
-unitRoutes.post('/', zValidator('json', createSchema), async (c) => {
+unitRoutes.post('/', adminOnly, zValidator('json', createSchema), async (c) => {
   const body = c.req.valid('json')
   try {
     const [row] = await db
       .insert(units)
-      .values({ name: body.name, abbreviation: body.abbreviation, createdAt: new Date().toISOString() })
+      .values({ name: body.name, abbreviation: body.abbreviation, createdAt: new Date() })
       .returning()
     return created(c, row)
   } catch (e: any) {
@@ -41,7 +42,7 @@ unitRoutes.post('/', zValidator('json', createSchema), async (c) => {
   }
 })
 
-unitRoutes.delete('/:id', async (c) => {
+unitRoutes.delete('/:id', adminOnly, async (c) => {
   const id = c.req.param('id')!
   const [count] = await db
     .select({ c: sql<number>`count(*)::int` })

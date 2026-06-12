@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, integer, numeric, index, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, text, uuid, integer, numeric, boolean, timestamp, index, uniqueIndex } from 'drizzle-orm/pg-core'
 import { categories } from './categories.js'
 import { units } from './units.js'
 
@@ -20,9 +20,9 @@ export const products = pgTable(
     purchasePrice: numeric('purchase_price', { precision: 15, scale: 2 }).notNull().default('0'),
     defaultSalePrice: numeric('default_sale_price', { precision: 15, scale: 2 }).notNull().default('0'),
     stockQuantity: integer('stock_quantity').notNull().default(0),
-    isActive: text('is_active').notNull().default('true'),
-    createdAt: text('created_at').notNull(),
-    updatedAt: text('updated_at').notNull(),
+    isActive: boolean('is_active').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     codeIdx: uniqueIndex('products_code_idx').on(t.code),

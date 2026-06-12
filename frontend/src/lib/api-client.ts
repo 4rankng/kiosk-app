@@ -58,6 +58,21 @@ export function clearTokens() {
   localStorage.removeItem(USER_KEY)
 }
 
+// ---------------------------------------------------------------------------
+//  Shared types
+// ---------------------------------------------------------------------------
+export interface PaginatedResponse<T> {
+  data: T[]
+  meta: {
+    page: number
+    pageSize: number
+    total: number
+    totalPages: number
+  }
+}
+
+export const DEFAULT_PAGE_SIZE = 20
+
 export function setUser(user: AuthUser) {
   localStorage.setItem(USER_KEY, JSON.stringify(user))
 }
@@ -95,7 +110,7 @@ let refreshQueue: Array<(token: string | null) => void> = []
 
 apiClient.interceptors.response.use(
   (r) => r,
-  async (err: AxiosError<{ error?: { message?: string } }>) => {
+  async (err: AxiosError) => {
     const original = err.config as AxiosRequestConfig & { _retry?: boolean }
     if (err.response?.status === 401 && !original?._retry) {
       const refresh = getRefreshToken()
@@ -157,13 +172,14 @@ export class ApiError extends Error {
   }
 }
 
-function normalizeError(err: AxiosError<{ error?: { message?: string; details?: unknown } }>): ApiError {
+function normalizeError(err: AxiosError): ApiError {
   const status = err.response?.status ?? 0
+  const data = err.response?.data as { error?: { message?: string; details?: unknown } } | undefined
   const message =
-    err.response?.data?.error?.message ||
+    data?.error?.message ||
     err.message ||
     'Đã xảy ra lỗi, vui lòng thử lại'
-  return new ApiError(message, status, err.response?.data?.error?.details)
+  return new ApiError(message, status, data?.error?.details)
 }
 
 function redirectToSignIn() {

@@ -42,10 +42,10 @@ export function UserAuthForm({
     setGoogleLoading(true)
     toast.promise(signInWithGoogle(), {
       loading: 'Đang đăng nhập...',
-      success: (user) => {
+      success: (res) => {
         setGoogleLoading(false)
-        auth.setUser(user)
-        auth.setAccessToken('mock-access-token')
+        auth.setUser(res.user)
+        auth.setAccessToken(res.accessToken)
         navigate({ to: redirectTo || '/', replace: true })
         return 'Đăng nhập thành công!'
       },
@@ -57,11 +57,11 @@ export function UserAuthForm({
   }
 
   function handleEmailSignIn(values: LoginForm) {
-    toast.promise(signInWithEmail(values.email, values.password), {
+    toast.promise(signInWithEmail({ email: values.email, password: values.password }), {
       loading: 'Đang đăng nhập...',
-      success: (user) => {
-        auth.setUser(user)
-        auth.setAccessToken('mock-access-token')
+      success: (res) => {
+        auth.setUser(res.user)
+        auth.setAccessToken(res.accessToken)
         navigate({ to: redirectTo || '/', replace: true })
         return 'Đăng nhập thành công!'
       },

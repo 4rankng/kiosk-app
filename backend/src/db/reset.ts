@@ -2,7 +2,7 @@
  * Drops all tables in the public schema and re-applies migrations + seed.
  * Intended for `make db-reset` (destructive). Will prompt unless FORCE=1.
  */
-import 'dotenv/config'
+import '../config/dotenv.js'
 import pg from 'pg'
 
 const url =
@@ -22,14 +22,14 @@ async function main() {
   console.log('⏳ Dropping public schema…')
   await client.query('DROP SCHEMA public CASCADE; CREATE SCHEMA public;')
   await client.end()
-  console.log('✅ Schema dropped. Running migrations + seed…')
+  console.log('✅ Schema dropped. Running migrations…')
 
-  // Delegate to migrate + seed by spawning tsx
+  // Delegate to migrate by spawning tsx
   const { spawnSync } = await import('node:child_process')
   const migrate = spawnSync('pnpm', ['db:migrate'], { stdio: 'inherit' })
   if (migrate.status !== 0) process.exit(migrate.status ?? 1)
-  const seed = spawnSync('pnpm', ['db:seed'], { stdio: 'inherit' })
-  process.exit(seed.status ?? 1)
+  console.log('✅ Reset complete. Create an admin with: pnpm admin:create')
+  process.exit(0)
 }
 
 main().catch((err) => {

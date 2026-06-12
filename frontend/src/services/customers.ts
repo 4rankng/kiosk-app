@@ -1,38 +1,20 @@
 /**
  * Customers (branches). Belong to a company; inherit the company's price list.
  */
-import { apiClient } from '@/lib/api-client'
-
-export interface Customer {
-  id: string
-  code: string
-  name: string
-  companyId: string
-  companyName: string | null
-  priceListId: string | null
-  phone: string | null
-  email: string | null
-  taxId: string | null
-  address: string | null
-  isActive: string
-}
-
-export interface PaginatedResponse<T> {
-  data: T[]
-  meta: { page: number; pageSize: number; total: number; totalPages: number }
-}
+import { apiClient, DEFAULT_PAGE_SIZE, type PaginatedResponse } from '@/lib/api-client'
+import type { Customer } from '@/types/api'
 
 export async function getCustomers(params?: {
   q?: string
   companyId?: string
   page?: number
   pageSize?: number
-}): Promise<Customer[]> {
-  const { data } = await apiClient.get<{ data: Customer[]; meta: PaginatedResponse<Customer>['meta'] }>(
+}): Promise<PaginatedResponse<Customer>> {
+  const { data: body } = await apiClient.get<PaginatedResponse<Customer>>(
     '/api/customers',
-    { params: { ...params, pageSize: params?.pageSize ?? 500 } }
+    { params: { ...params, pageSize: params?.pageSize ?? DEFAULT_PAGE_SIZE } }
   )
-  return data.data
+  return body
 }
 
 export async function getCustomerById(id: string): Promise<Customer> {

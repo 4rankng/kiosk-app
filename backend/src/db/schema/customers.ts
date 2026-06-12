@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, index } from 'drizzle-orm/pg-core'
+import { pgTable, text, uuid, boolean, timestamp, index, uniqueIndex } from 'drizzle-orm/pg-core'
 import { companies } from './companies.js'
 
 /**
@@ -19,12 +19,12 @@ export const customers = pgTable(
     taxId: text('tax_id'),
     address: text('address'),
     notes: text('notes'),
-    isActive: text('is_active').notNull().default('true'),
-    createdAt: text('created_at').notNull(),
-    updatedAt: text('updated_at').notNull(),
+    isActive: boolean('is_active').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
-    codeIdx: index('customers_code_idx').on(t.code),
+    codeIdx: uniqueIndex('customers_code_idx').on(t.code),
     nameIdx: index('customers_name_idx').on(t.name),
     companyIdx: index('customers_company_idx').on(t.companyId),
   })

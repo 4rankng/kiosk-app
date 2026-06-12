@@ -17,7 +17,7 @@ const statusIconMap: Record<string, { icon: typeof CheckCircle2; bg: string; col
   cancelled: { icon: XCircle, bg: 'bg-red-50', color: 'text-red-600', tip: 'Đã hủy' },
 }
 
-export function getInvoicesColumns(): ColumnDef<Invoice>[] {
+export function getInvoicesColumns(): ColumnDef<Invoice, any>[] {
   return [
     {
       accessorKey: 'code',
@@ -29,9 +29,9 @@ export function getInvoicesColumns(): ColumnDef<Invoice>[] {
       ),
     },
     {
-      accessorKey: 'date',
+      accessorKey: 'issuedAt',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Thời gian' />,
-      cell: ({ row }) => <span className='whitespace-nowrap'>{formatDateTime(row.getValue('date'))}</span>,
+      cell: ({ row }) => <span className='whitespace-nowrap'>{formatDateTime(row.getValue('issuedAt'))}</span>,
     },
     {
       accessorKey: 'customerName',

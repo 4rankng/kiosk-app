@@ -85,7 +85,7 @@ export function POSCategoryGrid({ priceListId, onAddProduct }: POSCategoryGridPr
           <button
             key={p.id}
             type='button'
-            onClick={() => handleAdd(p)}
+            onClick={() => handleAdd({ ...p, unitName: p.unitName ?? null })}
             className='flex items-center justify-between rounded-lg border bg-card p-3 text-left transition-colors active:bg-accent min-h-[44px]'
           >
             <div className='flex-1 min-w-0'>

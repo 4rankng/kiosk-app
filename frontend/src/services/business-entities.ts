@@ -2,16 +2,7 @@
  * Business entities (Hộ kinh doanh) — used for invoice PDF headers.
  */
 import { apiClient } from '@/lib/api-client'
-
-export interface BusinessEntity {
-  id: string
-  name: string
-  taxCode: string | null
-  address: string | null
-  phone: string | null
-  email: string | null
-  headerLines: string[]
-}
+import type { BusinessEntity } from '@/types/api'
 
 export async function getBusinessEntities(): Promise<BusinessEntity[]> {
   const { data } = await apiClient.get<{ data: BusinessEntity[] }>('/api/business-entities')

@@ -1,14 +1,5 @@
-import { type Product } from './product'
-
-export interface PriceListItem {
-  productId: string
-  product: Product
-  customPrice: number
-}
-
-export interface PriceList {
-  id: string
-  name: string
-  companyId: string
-  items: PriceListItem[]
-}
+/**
+ * Re-export price-list types from the canonical api types.
+ * Components should import from here or @/types/api — both are the same.
+ */
+export type { PriceList, PriceListItem } from '@/types/api'

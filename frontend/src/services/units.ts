@@ -2,13 +2,7 @@
  * Units service — backward-compatible.
  */
 import { apiClient } from '@/lib/api-client'
-
-export interface Unit {
-  id: string
-  name: string
-  abbreviation: string | null
-  createdAt: string
-}
+import type { Unit } from '@/types/api'
 
 export async function getUnits(): Promise<Unit[]> {
   const { data } = await apiClient.get<{ data: Unit[] }>('/api/units')
