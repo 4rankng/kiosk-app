@@ -6,7 +6,7 @@
  * DELETE /api/categories/:id   — refuses if products or children exist
  */
 import { Hono } from 'hono'
-import { z } from 'zod'
+import { categoryCreateSchema as createSchema, categoryUpdateSchema as updateSchema } from '@kiosk/shared'
 import { zValidator } from '@hono/zod-validator'
 import { requireAuth } from '../../middleware/auth.js'
 import { adminOnly, anyRole } from '../../middleware/rbac.js'
@@ -16,15 +16,7 @@ import { categoryService } from './categories.service.js'
 export const categoryRoutes = new Hono()
 categoryRoutes.use('*', requireAuth, anyRole)
 
-const createSchema = z.object({
-  name: z.string().min(1).max(120),
-  parentId: z.string().uuid().nullable().optional(),
-})
-
-const updateSchema = z.object({
-  name: z.string().min(1).max(120).optional(),
-  parentId: z.string().uuid().nullable().optional(),
-})
+// createSchema / updateSchema are imported from @kiosk/shared (single source of truth)
 
 categoryRoutes.get('/', async (c) => {
   const result = await categoryService.list()

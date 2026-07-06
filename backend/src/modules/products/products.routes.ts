@@ -7,7 +7,7 @@
  * (matches the spec: "khi sản phẩm được lưu, tạo bản ghi Bảng giá chung mới").
  */
 import { Hono } from 'hono'
-import { z } from 'zod'
+import { productCreateSchema as createSchema, productUpdateSchema as updateSchema } from '@kiosk/shared'
 import { zValidator } from '@hono/zod-validator'
 import { requireAuth } from '../../middleware/auth.js'
 import { adminOnly, anyRole } from '../../middleware/rbac.js'
@@ -18,19 +18,7 @@ import { productService } from './products.service.js'
 export const productRoutes = new Hono()
 productRoutes.use('*', requireAuth, anyRole)
 
-const baseSchema = z.object({
-  code: z.string().min(1).max(40),
-  name: z.string().min(1).max(200),
-  description: z.string().max(2000).default(''),
-  categoryId: z.string().uuid().nullable().optional(),
-  unitId: z.string().uuid().nullable().optional(),
-  purchasePrice: z.coerce.number().min(0),
-  defaultSalePrice: z.coerce.number().min(0),
-  stockQuantity: z.coerce.number().int().default(0),
-})
-
-const createSchema = baseSchema
-const updateSchema = baseSchema.partial()
+// createSchema / updateSchema are imported from @kiosk/shared (single source of truth)
 
 // ---------------------------------------------------------------------------
 productRoutes.get('/', async (c) => {

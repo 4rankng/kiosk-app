@@ -5,7 +5,7 @@
  * DELETE /api/units/:id
  */
 import { Hono } from 'hono'
-import { z } from 'zod'
+import { unitCreateSchema as createSchema } from '@kiosk/shared'
 import { zValidator } from '@hono/zod-validator'
 import { requireAuth } from '../../middleware/auth.js'
 import { adminOnly, anyRole } from '../../middleware/rbac.js'
@@ -15,10 +15,7 @@ import { unitService } from './units.service.js'
 export const unitRoutes = new Hono()
 unitRoutes.use('*', requireAuth, anyRole)
 
-const createSchema = z.object({
-  name: z.string().min(1).max(40),
-  abbreviation: z.string().max(10).optional(),
-})
+// createSchema is imported from @kiosk/shared (single source of truth)
 
 unitRoutes.get('/', async (c) => {
   const rows = await unitService.list()

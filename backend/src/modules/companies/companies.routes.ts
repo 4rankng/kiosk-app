@@ -7,7 +7,7 @@
  * DELETE /api/companies/:id
  */
 import { Hono } from 'hono'
-import { z } from 'zod'
+import { companyCreateSchema as createSchema, companyUpdateSchema as updateSchema } from '@kiosk/shared'
 import { zValidator } from '@hono/zod-validator'
 import { requireAuth } from '../../middleware/auth.js'
 import { anyRole } from '../../middleware/rbac.js'
@@ -18,18 +18,7 @@ import { companyService } from './companies.service.js'
 export const companyRoutes = new Hono()
 companyRoutes.use('*', requireAuth, anyRole)
 
-const baseSchema = z.object({
-  name: z.string().min(1).max(160),
-  taxCode: z.string().optional(),
-  priceListId: z.string().uuid().nullable().optional(),
-  address: z.string().optional(),
-  phone: z.string().optional(),
-  email: z.string().email().optional().or(z.literal('')),
-  notes: z.string().optional(),
-})
-
-const createSchema = baseSchema
-const updateSchema = baseSchema.partial()
+// createSchema / updateSchema are imported from @kiosk/shared (single source of truth)
 
 companyRoutes.get('/', async (c) => {
   const { page, pageSize, offset, q } = parsePagination(c)

@@ -14,6 +14,7 @@
  */
 import { Hono } from 'hono'
 import { z } from 'zod'
+import { orderCreateSchema as createSchema, orderStatusSchema as statusSchema, orderPaymentSchema as paymentSchema } from '@kiosk/shared'
 import { zValidator } from '@hono/zod-validator'
 import { requireAuth } from '../../middleware/auth.js'
 import { anyRole } from '../../middleware/rbac.js'
@@ -24,31 +25,9 @@ import { orderService } from './orders.service.js'
 export const orderRoutes = new Hono()
 orderRoutes.use('*', requireAuth, anyRole)
 
-const itemSchema = z.object({
-  productId: z.string().uuid(),
-  quantity: z.coerce.number().positive(),
-  unitPrice: z.coerce.number().min(0).optional(),
-})
-
-const createSchema = z.object({
-  customerId: z.string().uuid(),
-  businessEntityId: z.string().uuid(),
-  items: z.array(itemSchema).min(1).max(500),
-  discount: z.coerce.number().min(0).default(0),
-  paidAmount: z.coerce.number().min(0).default(0),
-  paymentMethod: z.enum(['cash', 'bank_transfer', 'card', 'other']).default('cash'),
-  notes: z.string().max(500).optional(),
-  generateInvoice: z.boolean().default(true),
-})
-
+// createSchema / statusSchema / paymentSchema are imported from @kiosk/shared.
+// orderStatusFilter is reused for the GET ?status= query param.
 const orderStatusFilter = z.enum(['draft', 'confirmed', 'completed', 'cancelled'])
-const statusSchema = z.object({ status: orderStatusFilter })
-
-const paymentSchema = z.object({
-  amount: z.coerce.number().positive(),
-  method: z.enum(['cash', 'bank_transfer', 'card', 'other']).default('cash'),
-  note: z.string().max(200).optional(),
-})
 
 orderRoutes.get('/', async (c) => {
   const { page, pageSize, offset, q } = parsePagination(c)

@@ -3,17 +3,10 @@
  */
 import { apiClient, DEFAULT_PAGE_SIZE } from '@/lib/api-client'
 import type { Order, OrderDetail, OrderStatus } from '@/types/api'
+import type { OrderCreateInput } from '@kiosk/shared'
 
-export interface CreateOrderInput {
-  customerId: string
-  businessEntityId: string
-  items: Array<{ productId: string; quantity: number; unitPrice?: number }>
-  discount?: number
-  paidAmount?: number
-  paymentMethod?: 'cash' | 'bank_transfer' | 'card' | 'other'
-  notes?: string
-  generateInvoice?: boolean
-}
+/** Order create payload — mirrors the backend via @kiosk/shared (no drift). */
+export type CreateOrderInput = OrderCreateInput
 
 export async function getOrders(): Promise<Order[]> {
   const { data } = await apiClient.get<{ data: Order[] }>('/api/orders', { params: { pageSize: DEFAULT_PAGE_SIZE } })

@@ -52,8 +52,8 @@
     "runtime": null
   },
   "build": {
-    "buildCommand": "pnpm build >/tmp/fb2.txt 2>&1; echo \"BUILD_EXIT=$?\"; grep -E \"error TS|Error|✓ built\" /tmp/fb2.txt | head -30; echo \"--- tail ---\"; tail -4 /tmp/fb2.txt",
-    "testCommand": "pnpm test >/tmp/ft.txt 2>&1; echo \"TEST_EXIT=$?\"; grep -E \"Test Files|Tests |passed|failed\" /tmp/ft.txt | tail -8",
+    "buildCommand": "pnpm install >/tmp/inst3.txt 2>&1; echo \"INSTALL_EXIT=$?\"; grep -iE \"^[-+] \" /tmp/inst3.txt | head; echo \"=== BUILD ===\" && pnpm build >/tmp/fb7.txt 2>&1; echo \"BUILD_EXIT=$?\"; grep -E \"error TS|✓ built\" /tmp/fb7.txt | head; echo \"=== LINT ===\" && pnpm lint >/tmp/fl5.txt 2>&1; echo \"LINT_EXIT=$?\"; grep -E \"problems\" /tmp/fl5.txt; echo \"=== TEST ===\" && pnpm test >/tmp/ft4.txt 2>&1; echo \"TEST_EXIT=$?\"; grep -E \"Test Files|Tests \" /tmp/ft4.txt | tail -2",
+    "testCommand": "pnpm exec vitest run src/lib/handle-server-error.test.ts >/tmp/hse.txt 2>&1; echo \"EXIT=$?\"; grep -E \"Test Files|Tests |✓|✗|×|FAIL|PASS\" /tmp/hse.txt | head -20",
     "lintCommand": "pnpm lint",
     "devCommand": "pnpm dev",
     "scripts": {
