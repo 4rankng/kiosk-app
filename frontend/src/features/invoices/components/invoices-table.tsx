@@ -26,10 +26,11 @@ import { MobileCardView } from '@/components/data-table/mobile-card-view'
 import { EmptyState } from '@/components/empty-state'
 import { getInvoicesColumns } from './invoices-columns'
 import { invoicesCardConfig } from './invoices-mobile-config'
+import { getColumnAriaSort } from '@/components/data-table/aria-sort'
 import { statusOptions } from '../data/data'
 
 export function InvoicesTable() {
-  const { data: invoices = [], isError: isInvoicesError, refetch: refetchInvoices } = useQuery({
+  const { data: invoices = [], isLoading: isInvoicesLoading, isError: isInvoicesError, refetch: refetchInvoices } = useQuery({
     queryKey: ['invoices'],
     queryFn: getInvoices,
   })
@@ -59,6 +60,9 @@ export function InvoicesTable() {
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
+  if (isInvoicesLoading) {
+    return <EmptyState variant='loading' rows={8} />
+  }
   if (isInvoicesError) {
     return (
       <EmptyState
@@ -111,7 +115,7 @@ export function InvoicesTable() {
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className='whitespace-nowrap'>
+                    <TableHead key={header.id} className='whitespace-nowrap' aria-sort={getColumnAriaSort(header.column)}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}

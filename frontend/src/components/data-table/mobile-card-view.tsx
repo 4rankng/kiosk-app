@@ -30,10 +30,15 @@ export function MobileCardView<TData>({
   // Use all filtered rows for infinite scroll, paginated rows otherwise
   const allRows = infiniteScroll ? table.getFilteredRowModel().rows : table.getRowModel().rows
   const [visibleCount, setVisibleCount] = useState(batchSize)
+  const [prevRowCount, setPrevRowCount] = useState(allRows.length)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
-  // Reset visible count when data changes
-  useEffect(() => { setVisibleCount(batchSize) }, [allRows.length, batchSize])
+  // Reset visible count when the row count changes (adjusting state during
+  // render avoids a cascading setState-in-effect render).
+  if (allRows.length !== prevRowCount) {
+    setPrevRowCount(allRows.length)
+    setVisibleCount(batchSize)
+  }
 
   // Infinite scroll observer
   useEffect(() => {
@@ -154,7 +159,7 @@ export function MobileCardView<TData>({
       })}
       {/* Sentinel for infinite scroll */}
       {infiniteScroll && visibleCount < allRows.length && (
-        <div ref={sentinelRef} className='flex justify-center py-4'>
+        <div ref={sentinelRef} role='status' aria-live='polite' className='flex justify-center py-4'>
           <span className='text-sm text-muted-foreground'>Đang tải...</span>
         </div>
       )}

@@ -9,6 +9,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { CheckCircle, Clock, XCircle, AlertCircle, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { EmptyState } from '@/components/empty-state'
 
 function RecentInvoicesSkeleton() {
   return (
@@ -58,9 +59,22 @@ function StatusBadge({ status, isPaid }: { status: string; isPaid: boolean }) {
 }
 
 export function RecentInvoices() {
-  const { data, isLoading } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
+  const { data, isLoading, isError, refetch } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
 
   if (isLoading) return <RecentInvoicesSkeleton />
+
+  if (isError) {
+    return (
+      <>
+        <CardHeader>
+          <CardTitle>Hóa đơn gần đây</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EmptyState variant='error' onRetry={() => refetch()} description='Không tải được danh sách hóa đơn.' />
+        </CardContent>
+      </>
+    )
+  }
 
   const invoices = data?.recentInvoices ?? []
 

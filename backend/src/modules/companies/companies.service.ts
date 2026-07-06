@@ -1,16 +1,17 @@
 /**
  * Company service — business logic extracted from routes.
  */
-import { eq, sql, ilike, and } from 'drizzle-orm'
+import { eq, sql, ilike } from 'drizzle-orm'
 import { db } from '../../config/db.js'
 import { companies, customers, priceLists } from '../../db/schema/index.js'
 import { AppError, Conflict, NotFound } from '../../lib/errors.js'
+import { isPgError } from '../../lib/pg-error.js'
 import { assertExists } from '../../lib/db-helpers.js'
 
 export const companyService = {
   /** List companies with pagination and search. */
   async list(params: { page: number; pageSize: number; offset: number; q?: string }) {
-    const { page, pageSize, offset, q } = params
+    const { pageSize, offset, q } = params
     const where = q ? ilike(companies.name, `%${q}%`) : undefined
     const [rows, [{ total = 0 } = { total: 0 }]] = await Promise.all([
       db.select().from(companies).where(where).orderBy(companies.name).limit(pageSize).offset(offset),
@@ -84,8 +85,8 @@ export const companyService = {
         if (deleted.length === 0) throw NotFound('Công ty không tồn tại')
         return { deleted: true }
       })
-    } catch (e: any) {
-      if (e?.code === '23503') throw Conflict('Không thể xóa: công ty đang được tham chiếu')
+    } catch (e: unknown) {
+      if (isPgError(e) && e.code === '23503') throw Conflict('Không thể xóa: công ty đang được tham chiếu')
       throw e
     }
   },

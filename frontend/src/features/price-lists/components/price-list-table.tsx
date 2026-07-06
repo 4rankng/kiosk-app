@@ -22,12 +22,17 @@ export function PriceListTable({ priceList, items: initialItems }: PriceListTabl
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [items, setItems] = useState<PriceListItem[]>(initialItems)
+  const [prevPriceListId, setPrevPriceListId] = useState(priceList.id)
+  const [prevInitialItems, setPrevInitialItems] = useState(initialItems)
   const isMobile = useIsMobile()
 
-  // Sync items when priceList changes
-  useEffect(() => {
+  // Sync local items when the price list or its source items change (adjusting
+  // state during render avoids a cascading setState-in-effect render).
+  if (priceList.id !== prevPriceListId || initialItems !== prevInitialItems) {
+    setPrevPriceListId(priceList.id)
+    setPrevInitialItems(initialItems)
     setItems(initialItems)
-  }, [priceList.id, initialItems])
+  }
 
   const filteredItems = items.filter(
     (item) =>
@@ -44,6 +49,10 @@ export function PriceListTable({ priceList, items: initialItems }: PriceListTabl
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['price-lists'] })
       queryClient.invalidateQueries({ queryKey: ['price-list-items'] })
+      // Invalidate POS price lookups so edited prices are reflected immediately
+      // (reads use ['price-list', id] and ['price-list-by-company', companyId]).
+      queryClient.invalidateQueries({ queryKey: ['price-list'] })
+      queryClient.invalidateQueries({ queryKey: ['price-list-by-company'] })
       toast.success('Lưu bảng giá thành công!')
     },
   })
@@ -135,10 +144,15 @@ function MobilePriceList({
 }) {
   const batchSize = 20
   const [visibleCount, setVisibleCount] = useState(batchSize)
+  const [prevLength, setPrevLength] = useState(items.length)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
-  // Reset when items change
-  useEffect(() => { setVisibleCount(batchSize) }, [items.length])
+  // Reset visible count when the dataset changes (adjusting state during render
+  // avoids a cascading setState-in-effect render).
+  if (items.length !== prevLength) {
+    setPrevLength(items.length)
+    setVisibleCount(batchSize)
+  }
 
   // Infinite scroll observer
   useEffect(() => {

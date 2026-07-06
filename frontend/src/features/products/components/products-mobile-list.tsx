@@ -13,9 +13,15 @@ interface ProductsMobileListProps {
 export function ProductsMobileList({ products, onEdit, onDelete }: ProductsMobileListProps) {
   const batchSize = 30
   const [visibleCount, setVisibleCount] = useState(batchSize)
+  const [prevLength, setPrevLength] = useState(products.length)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => { setVisibleCount(batchSize) }, [products.length])
+  // Reset visible count when the dataset changes (adjusting state during render
+  // avoids a cascading setState-in-effect render).
+  if (products.length !== prevLength) {
+    setPrevLength(products.length)
+    setVisibleCount(batchSize)
+  }
 
   useEffect(() => {
     if (!sentinelRef.current) return
@@ -48,7 +54,7 @@ export function ProductsMobileList({ products, onEdit, onDelete }: ProductsMobil
           <div className='min-w-0 flex-1'>
             <div className='flex items-center gap-1.5'>
               <span className='truncate text-sm font-medium'>{product.name}</span>
-              <span className='shrink-0 rounded bg-muted px-1.5 py-px text-[10px] leading-tight text-muted-foreground'>
+              <span className='shrink-0 rounded bg-muted px-1.5 py-px text-xs leading-tight text-muted-foreground'>
                 {product.unitName ?? ''}
               </span>
             </div>
@@ -62,17 +68,17 @@ export function ProductsMobileList({ products, onEdit, onDelete }: ProductsMobil
             {formatCurrency(product.defaultSalePrice)}
           </span>
           <div className='flex shrink-0 items-center gap-1 pt-0.5'>
-            <Button variant='ghost' size='icon' className='min-h-[44px] min-w-[44px]' onClick={() => onEdit(product)}>
+            <Button variant='ghost' size='icon' className='min-h-[44px] min-w-[44px]' aria-label='Chỉnh sửa sản phẩm' onClick={() => onEdit(product)}>
               <Pencil className='h-4 w-4' />
             </Button>
-            <Button variant='ghost' size='icon' className='min-h-[44px] min-w-[44px] hover:text-destructive' onClick={() => onDelete(product)}>
+            <Button variant='ghost' size='icon' className='min-h-[44px] min-w-[44px] hover:text-destructive' aria-label='Xóa sản phẩm' onClick={() => onDelete(product)}>
               <Trash2 className='h-4 w-4' />
             </Button>
           </div>
         </div>
       ))}
       {visibleCount < products.length && (
-        <div ref={sentinelRef} className='flex justify-center py-4'>
+        <div ref={sentinelRef} role='status' aria-live='polite' className='flex justify-center py-4'>
           <span className='text-xs text-muted-foreground'>Đang tải...</span>
         </div>
       )}

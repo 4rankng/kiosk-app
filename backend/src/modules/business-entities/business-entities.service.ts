@@ -5,6 +5,7 @@ import { eq, sql } from 'drizzle-orm'
 import { db } from '../../config/db.js'
 import { businessEntities, orders, invoices } from '../../db/schema/index.js'
 import { Conflict, NotFound } from '../../lib/errors.js'
+import { isPgError } from '../../lib/pg-error.js'
 
 export const businessEntityService = {
   /** List all business entities. */
@@ -74,8 +75,8 @@ export const businessEntityService = {
         if (deleted.length === 0) throw NotFound('Hộ kinh doanh không tồn tại')
         return { deleted: true }
       })
-    } catch (e: any) {
-      if (e?.code === '23503') throw Conflict('Không thể xóa: hộ kinh doanh đang được tham chiếu')
+    } catch (e: unknown) {
+      if (isPgError(e) && e.code === '23503') throw Conflict('Không thể xóa: hộ kinh doanh đang được tham chiếu')
       throw e
     }
   },

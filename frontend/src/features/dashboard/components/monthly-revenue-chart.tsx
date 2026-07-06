@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getDashboardStats } from '@/services/reports'
 import { ChartContainer, type ChartConfig } from '@/components/ui/chart'
 import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState } from '@/components/empty-state'
 
 // Lazy-load recharts to keep it out of the initial bundle.
 const ChartInner = lazy(() => import('./monthly-revenue-chart-inner'))
@@ -15,7 +16,15 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function MonthlyRevenueChart() {
-  const { data } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
+  const { data, isError, refetch } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
+
+  if (isError) {
+    return (
+      <div className='flex h-[250px] w-full items-center'>
+        <EmptyState variant='error' className='w-full' onRetry={() => refetch()} description='Không tải được dữ liệu biểu đồ.' />
+      </div>
+    )
+  }
 
   const chartData = (data?.monthlyRevenue ?? []).map((item) => ({
     name: item.week,

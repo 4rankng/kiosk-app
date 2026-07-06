@@ -54,13 +54,6 @@ export interface DebtReportRow {
   total_revenue: number
   unpaid_amount: number
 }
-interface DebtExportRow {
-  code: string
-  customer_name: string
-  company_name: string
-  total_revenue: number
-  unpaid_amount: number
-}
 
 // ---------------------------------------------------------------------------
 //  Helpers
@@ -124,7 +117,7 @@ export const reportService = {
     const yesterdayEnd = endOfDay(new Date(Date.now() - 86400000))
     const monthStart = startOfMonth(new Date())
 
-    const [todayAgg, yesterdayAgg, pendingAgg, monthAgg, weekRows, topCustomers, topProducts, outstandingRows, recentInvoices] =
+    const [todayAgg, yesterdayAgg, pendingAgg, , weekRows, topCustomers, topProducts, outstandingRows, recentInvoices] =
       await Promise.all([
         queryOne<TodayAgg>(sql`
           SELECT COALESCE(SUM(total), 0)::float AS revenue,

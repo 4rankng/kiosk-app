@@ -37,7 +37,7 @@ Get the kiosk-app full stack running end-to-end: backend (Hono + Drizzle + Postg
 - CRUD: categories, units, products, companies, customers, business entities ✓
 - Order creation with price resolution ✓
 - Dashboard reports ✓
-- Admin user created: admin@kiosk.vn / admin1234
+- Admin user created via `pnpm admin:create` (interactive — password is not stored anywhere)
 
 ## Running State
 - Backend: `pnpm dev:api` on port 3000 (running in background)

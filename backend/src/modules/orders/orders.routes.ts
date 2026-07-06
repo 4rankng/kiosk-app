@@ -41,7 +41,8 @@ const createSchema = z.object({
   generateInvoice: z.boolean().default(true),
 })
 
-const statusSchema = z.object({ status: z.enum(['draft', 'confirmed', 'completed', 'cancelled']) })
+const orderStatusFilter = z.enum(['draft', 'confirmed', 'completed', 'cancelled'])
+const statusSchema = z.object({ status: orderStatusFilter })
 
 const paymentSchema = z.object({
   amount: z.coerce.number().positive(),
@@ -51,7 +52,8 @@ const paymentSchema = z.object({
 
 orderRoutes.get('/', async (c) => {
   const { page, pageSize, offset, q } = parsePagination(c)
-  const status = c.req.query('status')
+  const rawStatus = c.req.query('status')
+  const status = rawStatus ? orderStatusFilter.parse(rawStatus) : undefined
   const customerId = c.req.query('customerId')
   const companyId = c.req.query('companyId')
   const from = c.req.query('from')

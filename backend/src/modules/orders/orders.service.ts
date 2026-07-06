@@ -12,7 +12,7 @@
  *   4. Insert order + items + (optional) initial payment + invoice in 1 TX
  *   5. Generate order code (DH000001, ...) and invoice code (HD000001, ...)
  */
-import { eq, and, desc, sql, gte, lte, isNull, inArray, or, ilike } from 'drizzle-orm'
+import { eq, and, desc, sql, gte, lte, inArray, or, ilike } from 'drizzle-orm'
 import { db } from '../../config/db.js'
 import {
   orders,
@@ -23,11 +23,14 @@ import {
   companies,
   businessEntities,
   products,
-  priceListItems,
   units,
+  orderStatusEnum,
 } from '../../db/schema/index.js'
 import { AppError, BadRequest, NotFound } from '../../lib/errors.js'
-import { getGeneralPriceListId } from '../../lib/price-lists.js'
+
+/** Status values allowed on the orders.status column. */
+type OrderStatus = (typeof orderStatusEnum.enumValues)[number]
+import { resolveEffectivePrices } from '../../lib/price-lists.js'
 import { invalidateDashboardCache } from '../reports/reports.service.js'
 
 // ---------------------------------------------------------------------------
@@ -82,16 +85,16 @@ export const orderService = {
     pageSize: number
     offset: number
     q?: string
-    status?: string
+    status?: OrderStatus
     customerId?: string
     companyId?: string
     from?: string
     to?: string
   }) {
-    const { page, pageSize, offset, q, status, customerId, companyId, from, to } = params
+    const { pageSize, offset, q, status, customerId, companyId, from, to } = params
 
     const conditions = []
-    if (status) conditions.push(eq(orders.status, status as 'draft'))
+    if (status) conditions.push(eq(orders.status, status))
     if (customerId) conditions.push(eq(orders.customerId, customerId))
     if (companyId) conditions.push(eq(customers.companyId, companyId))
     if (from) conditions.push(gte(orders.createdAt, new Date(from)))
@@ -215,24 +218,10 @@ export const orderService = {
       }
 
       // 4. Resolve prices: manual override → company PL → general PL → default
+      //    Resolved inside the tx so the price-list reads are consistent with
+      //    the order write (no out-of-transaction cache reads).
       const companyPlId = customer.priceListId
-      const generalPlId = await getGeneralPriceListId()
-
-      const priceLookup = new Map<string, number>()
-      if (generalPlId) {
-        const plItems = await tx
-          .select({ productId: priceListItems.productId, price: priceListItems.customPrice })
-          .from(priceListItems)
-          .where(and(eq(priceListItems.priceListId, generalPlId), inArray(priceListItems.productId, productIds)))
-        for (const i of plItems) priceLookup.set(i.productId, Number(i.price))
-      }
-      if (companyPlId && companyPlId !== generalPlId) {
-        const plItems = await tx
-          .select({ productId: priceListItems.productId, price: priceListItems.customPrice })
-          .from(priceListItems)
-          .where(and(eq(priceListItems.priceListId, companyPlId), inArray(priceListItems.productId, productIds)))
-        for (const i of plItems) priceLookup.set(i.productId, Number(i.price))
-      }
+      const priceLookup = await resolveEffectivePrices(productIds, companyPlId, tx)
 
       // 5. Resolve unit names
       const unitIds = productRows
@@ -358,26 +347,34 @@ export const orderService = {
     return result
   },
 
-  /** Update order status. */
+  /** Update order status. Single atomic UPDATE; NotFound if the row doesn't exist. */
   async updateStatus(id: string, status: 'draft' | 'confirmed' | 'completed' | 'cancelled') {
-    const [order] = await db.select({ id: orders.id, status: orders.status }).from(orders).where(eq(orders.id, id)).limit(1)
-    if (!order) throw NotFound('Đơn hàng không tồn tại')
-    await db.update(orders).set({ status, updatedAt: new Date() }).where(eq(orders.id, id))
+    const [updated] = await db
+      .update(orders)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(orders.id, id))
+      .returning({ id: orders.id })
+    if (!updated) throw NotFound('Đơn hàng không tồn tại')
     return { id, status }
   },
 
-  /** Record a payment against an order. All writes in a Drizzle transaction. */
+  /**
+   * Record a payment against an order. The order row is locked (FOR UPDATE) and
+   * the overpayment guard is re-checked inside the transaction, so concurrent
+   * payments cannot collectively exceed the order total.
+   */
   async recordPayment(id: string, payload: { amount: number; method: 'cash' | 'bank_transfer' | 'card' | 'other'; note?: string }, createdBy: string) {
-    const [order] = await db
-      .select({ id: orders.id, total: orders.total, paidAmount: orders.paidAmount })
-      .from(orders)
-      .where(eq(orders.id, id))
-      .limit(1)
-    if (!order) throw NotFound('Đơn hàng không tồn tại')
-    const newPaid = Number(order.paidAmount) + payload.amount
-    if (newPaid > Number(order.total) + 0.01) throw BadRequest('Tổng tiền thanh toán vượt quá tổng đơn')
+    const result = await db.transaction(async (tx) => {
+      const [order] = await tx
+        .select({ id: orders.id, total: orders.total, paidAmount: orders.paidAmount })
+        .from(orders)
+        .where(eq(orders.id, id))
+        .for('update')
+        .limit(1)
+      if (!order) throw NotFound('Đơn hàng không tồn tại')
+      const newPaid = Number(order.paidAmount) + payload.amount
+      if (newPaid > Number(order.total) + 0.01) throw BadRequest('Tổng tiền thanh toán vượt quá tổng đơn')
 
-    await db.transaction(async (tx) => {
       await tx.insert(payments).values({
         orderId: id,
         amount: String(payload.amount),
@@ -393,9 +390,11 @@ export const orderService = {
         .update(invoices)
         .set({ paidAmount: String(newPaid) })
         .where(eq(invoices.orderId, id))
+
+      return { paidAmount: newPaid, remaining: Number(order.total) - newPaid }
     })
     await invalidateDashboardCache()
 
-    return { paidAmount: newPaid, remaining: Number(order.total) - newPaid }
+    return result
   },
 }

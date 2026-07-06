@@ -55,10 +55,10 @@ export function InlineAddCombobox({
             if (e.key === 'Escape') { setIsAdding(false); setInputValue('') }
           }}
         />
-        <Button type='button' variant='ghost' size='icon' className='h-8 w-8 shrink-0' onClick={handleCreate} disabled={isCreating}>
+        <Button type='button' variant='ghost' size='icon' className='h-8 w-8 shrink-0' aria-label='Xác nhận thêm mới' onClick={handleCreate} disabled={isCreating}>
           <Check className='h-4 w-4' />
         </Button>
-        <Button type='button' variant='ghost' size='icon' className='h-8 w-8 shrink-0' onClick={() => { setIsAdding(false); setInputValue('') }}>
+        <Button type='button' variant='ghost' size='icon' className='h-8 w-8 shrink-0' aria-label='Hủy bỏ' onClick={() => { setIsAdding(false); setInputValue('') }}>
           <X className='h-4 w-4' />
         </Button>
       </div>

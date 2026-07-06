@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
+import { useDocumentTitle } from '@/hooks/use-document-title'
 import { Button } from '@/components/ui/button'
 import { ShoppingCart, ChevronUp } from 'lucide-react'
 import { toast } from 'sonner'
@@ -19,6 +20,7 @@ import { OrderSuccessDialog } from './order-success-dialog'
 import { OrderReviewSheet } from './order-review-sheet'
 
 export function OrderCreate() {
+  useDocumentTitle('Tạo đơn hàng mới')
   const queryClient = useQueryClient()
 
   const isMobile = useIsMobile()
@@ -51,6 +53,7 @@ export function OrderCreate() {
     onSuccess: (order) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
       queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
       setCreatedOrderCode(order.code)
       setShowSuccess(true)
     },
@@ -124,7 +127,7 @@ export function OrderCreate() {
       <Header fixed>
         <div className='me-auto flex items-center gap-2'>
           <ShoppingCart className='h-5 w-5' />
-          <h2 className='text-2xl font-bold tracking-tight'>Tạo đơn hàng mới</h2>
+          <h1 className='font-heading text-h1 font-semibold tracking-tight'>Tạo đơn hàng mới</h1>
         </div>
       </Header>
 
@@ -239,7 +242,7 @@ export function OrderCreate() {
           <div className='mx-auto flex max-w-2xl items-center justify-between gap-4'>
             <div>
               <span className='text-sm text-muted-foreground'>Khách cần trả:</span>
-              <span className='ml-2 text-2xl font-bold'>{formatCurrency(total)}</span>
+              <span className='ml-2 font-heading text-2xl font-semibold'>{formatCurrency(total)}</span>
             </div>
             <Button
               size='lg'

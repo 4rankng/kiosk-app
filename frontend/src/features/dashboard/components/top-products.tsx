@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Package } from 'lucide-react'
+import { EmptyState } from '@/components/empty-state'
 
 function TopProductsSkeleton() {
   return (
@@ -35,9 +36,23 @@ function TopProductsSkeleton() {
 }
 
 export function TopProducts() {
-  const { data, isLoading } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
+  const { data, isLoading, isError, refetch } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
 
   if (isLoading) return <TopProductsSkeleton />
+
+  if (isError) {
+    return (
+      <>
+        <CardHeader>
+          <CardTitle>Sản phẩm bán chạy</CardTitle>
+          <CardDescription>Tháng này</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <EmptyState variant='error' onRetry={() => refetch()} description='Không tải được danh sách sản phẩm.' />
+        </CardContent>
+      </>
+    )
+  }
 
   const products = data?.topProducts ?? []
 

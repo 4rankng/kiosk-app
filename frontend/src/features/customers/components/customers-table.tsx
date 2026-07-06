@@ -15,9 +15,10 @@ import { MobileCardView } from '@/components/data-table/mobile-card-view'
 import { EmptyState } from '@/components/empty-state'
 import { getCustomersColumns } from './customers-columns'
 import { customersCardConfig } from './customers-mobile-config'
+import { getColumnAriaSort } from '@/components/data-table/aria-sort'
 
 export function CustomersTable() {
-  const { data: customersData, isError: isCustomersError, refetch: refetchCustomers } = useQuery({ queryKey: ['customers'], queryFn: () => getCustomers() })
+  const { data: customersData, isLoading: isCustomersLoading, isError: isCustomersError, refetch: refetchCustomers } = useQuery({ queryKey: ['customers'], queryFn: () => getCustomers() })
   const customers = customersData?.data ?? []
   const { data: companiesData } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
   const companies = companiesData?.data ?? []
@@ -44,6 +45,9 @@ export function CustomersTable() {
     getFacetedRowModel: getFacetedRowModel(), getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
+  if (isCustomersLoading) {
+    return <EmptyState variant='loading' rows={8} />
+  }
   if (isCustomersError) {
     return (
       <EmptyState
@@ -83,7 +87,7 @@ export function CustomersTable() {
             <TableHeader>
               {table.getHeaderGroups().map((hg) => (
                 <TableRow key={hg.id}>
-                  {hg.headers.map((h) => <TableHead key={h.id} className='whitespace-nowrap'>{h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}</TableHead>)}
+                  {hg.headers.map((h) => <TableHead key={h.id} className='whitespace-nowrap' aria-sort={getColumnAriaSort(h.column)}>{h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}</TableHead>)}
                 </TableRow>
               ))}
             </TableHeader>

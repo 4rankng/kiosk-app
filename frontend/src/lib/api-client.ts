@@ -9,7 +9,7 @@
  *  - All errors are normalized to an `ApiError` instance with `message`
  *    and optional `status` for ergonomic `try/catch` in services.
  */
-import axios, { AxiosError, type AxiosRequestConfig } from 'axios'
+import axios, { type AxiosError, type AxiosRequestConfig } from 'axios'
 import { getCookie, removeCookie, setCookie } from './cookies'
 
 const ACCESS_COOKIE = 'kiosk_access_token'

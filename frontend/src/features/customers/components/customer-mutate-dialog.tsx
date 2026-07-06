@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useId } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
@@ -17,6 +17,7 @@ export function CustomerMutateDialog() {
   const { open, setOpen, selectedCustomer } = useCustomersContext()
   const queryClient = useQueryClient()
   const isEdit = open === 'edit'
+  const fieldId = useId()
   const { data: companiesData } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
   const companies = companiesData?.data ?? []
 
@@ -65,20 +66,20 @@ export function CustomerMutateDialog() {
           <div className='flex-1 space-y-4 overflow-y-auto'>
             <div className='grid grid-cols-2 gap-3'>
             <div className='space-y-2'>
-              <Label>Mã KH</Label>
-              <Input {...form.register('code')} />
+              <Label htmlFor={`${fieldId}-code`}>Mã KH</Label>
+              <Input id={`${fieldId}-code`} {...form.register('code')} />
               {form.formState.errors.code && <p className='text-sm text-destructive'>{form.formState.errors.code.message}</p>}
             </div>
             <div className='space-y-2'>
-              <Label>Tên nhà hàng</Label>
-              <Input {...form.register('name')} />
+              <Label htmlFor={`${fieldId}-name`}>Tên nhà hàng</Label>
+              <Input id={`${fieldId}-name`} {...form.register('name')} />
               {form.formState.errors.name && <p className='text-sm text-destructive'>{form.formState.errors.name.message}</p>}
             </div>
           </div>
           <div className='space-y-2'>
-            <Label>Công ty</Label>
+            <Label htmlFor={`${fieldId}-company`}>Công ty</Label>
             <Select onValueChange={(v) => form.setValue('companyId', v)} value={form.watch('companyId') ?? ''}>
-              <SelectTrigger><SelectValue placeholder='Chọn công ty...' /></SelectTrigger>
+              <SelectTrigger id={`${fieldId}-company`}><SelectValue placeholder='Chọn công ty...' /></SelectTrigger>
               <SelectContent>
                 {companies.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
               </SelectContent>
@@ -87,22 +88,22 @@ export function CustomerMutateDialog() {
           </div>
           <div className='grid grid-cols-2 gap-3'>
             <div className='space-y-2'>
-              <Label>Điện thoại</Label>
-              <Input {...form.register('phone')} />
+              <Label htmlFor={`${fieldId}-phone`}>Điện thoại</Label>
+              <Input id={`${fieldId}-phone`} {...form.register('phone')} />
             </div>
             <div className='space-y-2'>
-              <Label>Email</Label>
-              <Input {...form.register('email')} />
+              <Label htmlFor={`${fieldId}-email`}>Email</Label>
+              <Input id={`${fieldId}-email`} {...form.register('email')} />
               {form.formState.errors.email && <p className='text-sm text-destructive'>{form.formState.errors.email.message}</p>}
             </div>
           </div>
           <div className='space-y-2'>
-            <Label>Địa chỉ</Label>
-            <Input {...form.register('address')} />
+            <Label htmlFor={`${fieldId}-address`}>Địa chỉ</Label>
+            <Input id={`${fieldId}-address`} {...form.register('address')} />
           </div>
           <div className='space-y-2'>
-            <Label>MST</Label>
-            <Input {...form.register('taxId')} />
+            <Label htmlFor={`${fieldId}-tax`}>MST</Label>
+            <Input id={`${fieldId}-tax`} {...form.register('taxId')} />
           </div>
           </div>
           <DialogFooter className='border-t pt-4'>

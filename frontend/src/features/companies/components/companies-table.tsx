@@ -8,9 +8,11 @@ import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileCardView } from '@/components/data-table/mobile-card-view'
 import { getCompaniesColumns } from './companies-columns'
 import { companiesCardConfig } from './companies-mobile-config'
+import { EmptyState } from '@/components/empty-state'
+import { getColumnAriaSort } from '@/components/data-table/aria-sort'
 
 export function CompaniesTable() {
-  const { data: companiesData } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
+  const { data: companiesData, isLoading, isError, refetch } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
   const companies = companiesData?.data ?? []
   const isMobile = useIsMobile()
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -29,6 +31,20 @@ export function CompaniesTable() {
     getPaginationRowModel: getPaginationRowModel(), getSortedRowModel: getSortedRowModel(),
   })
 
+  if (isLoading) {
+    return <EmptyState variant='loading' rows={6} />
+  }
+  if (isError) {
+    return (
+      <EmptyState
+        variant='error'
+        title='Không tải được danh sách công ty'
+        description='Vui lòng kiểm tra kết nối và thử lại.'
+        onRetry={() => refetch()}
+      />
+    )
+  }
+
   return (
     <div className='space-y-4'>
       {isMobile ? (
@@ -46,7 +62,7 @@ export function CompaniesTable() {
               {table.getHeaderGroups().map((hg) => (
                 <TableRow key={hg.id}>
                   {hg.headers.map((h) => (
-                    <TableHead key={h.id} className='whitespace-nowrap'>
+                    <TableHead key={h.id} className='whitespace-nowrap' aria-sort={getColumnAriaSort(h.column)}>
                       {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
                     </TableHead>
                   ))}

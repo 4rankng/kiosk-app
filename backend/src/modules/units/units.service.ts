@@ -5,6 +5,7 @@ import { eq, sql } from 'drizzle-orm'
 import { db } from '../../config/db.js'
 import { units, products } from '../../db/schema/index.js'
 import { Conflict, NotFound } from '../../lib/errors.js'
+import { isPgError } from '../../lib/pg-error.js'
 
 export const unitService = {
   /** List all units. */
@@ -20,8 +21,8 @@ export const unitService = {
         .values({ name: body.name, abbreviation: body.abbreviation, createdAt: new Date() })
         .returning()
       return row
-    } catch (e: any) {
-      if (e?.code === '23505') throw Conflict('Đơn vị tính đã tồn tại')
+    } catch (e: unknown) {
+      if (isPgError(e) && e.code === '23505') throw Conflict('Đơn vị tính đã tồn tại')
       throw e
     }
   },
@@ -39,8 +40,8 @@ export const unitService = {
         if (deleted.length === 0) throw NotFound('Đơn vị tính không tồn tại')
         return { deleted: true }
       })
-    } catch (e: any) {
-      if (e?.code === '23503') throw Conflict('Không thể xóa: đơn vị đang được tham chiếu')
+    } catch (e: unknown) {
+      if (isPgError(e) && e.code === '23503') throw Conflict('Không thể xóa: đơn vị đang được tham chiếu')
       throw e
     }
   },

@@ -5,6 +5,7 @@ import { eq, sql } from 'drizzle-orm'
 import { db } from '../../config/db.js'
 import { categories, products } from '../../db/schema/index.js'
 import { Conflict, NotFound } from '../../lib/errors.js'
+import { isPgError } from '../../lib/pg-error.js'
 
 export const categoryService = {
   /** List all categories and build a nested tree. */
@@ -69,8 +70,8 @@ export const categoryService = {
         await tx.delete(categories).where(eq(categories.id, id))
         return { deleted: true }
       })
-    } catch (e: any) {
-      if (e?.code === '23503') throw Conflict('Không thể xóa: danh mục đang được tham chiếu')
+    } catch (e: unknown) {
+      if (isPgError(e) && e.code === '23503') throw Conflict('Không thể xóa: danh mục đang được tham chiếu')
       throw e
     }
   },

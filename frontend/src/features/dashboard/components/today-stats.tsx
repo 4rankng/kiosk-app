@@ -135,7 +135,7 @@ export function TodayStats() {
               <Icon className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>{values[config.key]}</div>
+              <div className='font-heading text-display font-semibold tabular-nums'>{values[config.key]}</div>
               {subtitle}
             </CardContent>
           </Card>

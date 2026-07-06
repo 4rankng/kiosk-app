@@ -26,7 +26,7 @@ cd backend && pnpm admin:create -- --email=you@example.com --password=strongpass
 Then open:
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:3000
-- **Adminer** (DB GUI): http://localhost:8080
+- **Adminer** (DB GUI): http://localhost:8082
 
 The system starts **empty** — no demo data, no fake users. You create the first admin,
 then build your catalog (categories, units, products, customers, price lists) through the UI.

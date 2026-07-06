@@ -11,7 +11,10 @@ export function CompanyDeleteDialog() {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: () => deleteCompany(selectedCompany!.id),
+    mutationFn: () => {
+      if (!selectedCompany) throw new Error('Chưa chọn công ty')
+      return deleteCompany(selectedCompany.id)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] })
       setOpen(null)

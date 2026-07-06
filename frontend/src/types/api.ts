@@ -95,7 +95,7 @@ export interface PriceList {
   name: string
   companyId: string | null
   companyName: string | null
-  isDefault: string
+  isDefault: boolean
   description: string | null
   itemCount: number
 }

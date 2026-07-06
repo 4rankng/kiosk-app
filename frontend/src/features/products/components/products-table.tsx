@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { getProductsColumns } from './products-columns'
 import { ProductsMobileList } from './products-mobile-list'
+import { getColumnAriaSort } from '@/components/data-table/aria-sort'
 import { EmptyState } from '@/components/empty-state'
 import type { Product } from '@/types'
 
@@ -22,7 +23,7 @@ interface ProductsTableProps {
 }
 
 export function ProductsTable({ onEdit, onDelete }: ProductsTableProps) {
-  const { data: products = [], isError: isProductsError, refetch: refetchProducts } = useQuery({ queryKey: ['products'], queryFn: getProducts })
+  const { data: products = [], isLoading: isProductsLoading, isError: isProductsError, refetch: refetchProducts } = useQuery({ queryKey: ['products'], queryFn: getProducts })
   const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: getCategories })
   const categoryOptions = useMemo(
     () => categories.map((c) => ({ label: c.name, value: c.name })),
@@ -58,6 +59,9 @@ export function ProductsTable({ onEdit, onDelete }: ProductsTableProps) {
     )
   }, [products, searchValue])
 
+  if (isProductsLoading) {
+    return <EmptyState variant='loading' rows={8} />
+  }
   if (isProductsError) {
     return (
       <EmptyState
@@ -104,7 +108,7 @@ export function ProductsTable({ onEdit, onDelete }: ProductsTableProps) {
               <TableHeader>
                 {table.getHeaderGroups().map((hg) => (
                   <TableRow key={hg.id}>
-                    {hg.headers.map((h) => <TableHead key={h.id} className='whitespace-nowrap'>{h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}</TableHead>)}
+                    {hg.headers.map((h) => <TableHead key={h.id} className='whitespace-nowrap' aria-sort={getColumnAriaSort(h.column)}>{h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}</TableHead>)}
                   </TableRow>
                 ))}
               </TableHeader>

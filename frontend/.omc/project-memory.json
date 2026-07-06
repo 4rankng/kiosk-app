@@ -52,8 +52,8 @@
     "runtime": null
   },
   "build": {
-    "buildCommand": "cd /Users/dev/Documents/projects/kiosk-app/frontend && rtk tsc --noEmit 2>&1 | tail -30",
-    "testCommand": "pnpm test",
+    "buildCommand": "pnpm build >/tmp/fb2.txt 2>&1; echo \"BUILD_EXIT=$?\"; grep -E \"error TS|Error|✓ built\" /tmp/fb2.txt | head -30; echo \"--- tail ---\"; tail -4 /tmp/fb2.txt",
+    "testCommand": "pnpm test >/tmp/ft.txt 2>&1; echo \"TEST_EXIT=$?\"; grep -E \"Test Files|Tests |passed|failed\" /tmp/ft.txt | tail -8",
     "lintCommand": "pnpm lint",
     "devCommand": "pnpm dev",
     "scripts": {
@@ -190,8 +190,14 @@
   "hotPaths": [
     {
       "path": "src/features/dashboard/components/today-stats.tsx",
-      "accessCount": 26,
-      "lastAccessed": 1780862808284,
+      "accessCount": 28,
+      "lastAccessed": 1783334586264,
+      "type": "file"
+    },
+    {
+      "path": "src/features/orders/components/order-create.tsx",
+      "accessCount": 18,
+      "lastAccessed": 1783339203362,
       "type": "file"
     },
     {
@@ -201,21 +207,21 @@
       "type": "file"
     },
     {
-      "path": "src/features/orders/components/order-create.tsx",
-      "accessCount": 15,
-      "lastAccessed": 1781186984983,
-      "type": "file"
-    },
-    {
       "path": "src/features/dashboard/index.tsx",
-      "accessCount": 12,
-      "lastAccessed": 1780862768555,
+      "accessCount": 13,
+      "lastAccessed": 1783334463551,
       "type": "file"
     },
     {
       "path": "src/features/products/index.tsx",
-      "accessCount": 10,
-      "lastAccessed": 1780862610867,
+      "accessCount": 12,
+      "lastAccessed": 1783334561173,
+      "type": "file"
+    },
+    {
+      "path": "src/features/price-lists/index.tsx",
+      "accessCount": 11,
+      "lastAccessed": 1783339349575,
       "type": "file"
     },
     {
@@ -237,6 +243,12 @@
       "type": "file"
     },
     {
+      "path": "src/main.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1783339235941,
+      "type": "file"
+    },
+    {
       "path": "src/components/ui/button.tsx",
       "accessCount": 5,
       "lastAccessed": 1780821151434,
@@ -255,9 +267,21 @@
       "type": "file"
     },
     {
-      "path": "src/features/price-lists/index.tsx",
+      "path": "src/styles/theme.css",
       "accessCount": 5,
-      "lastAccessed": 1781186913535,
+      "lastAccessed": 1783334193109,
+      "type": "file"
+    },
+    {
+      "path": "src/styles/index.css",
+      "accessCount": 5,
+      "lastAccessed": 1783334193398,
+      "type": "file"
+    },
+    {
+      "path": "src/features/companies/index.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1783334427693,
       "type": "file"
     },
     {
@@ -279,15 +303,21 @@
       "type": "file"
     },
     {
-      "path": "src/styles/theme.css",
+      "path": "src/features/customers/index.tsx",
       "accessCount": 4,
-      "lastAccessed": 1780821831171,
+      "lastAccessed": 1783334425487,
       "type": "file"
     },
     {
-      "path": "src/styles/index.css",
+      "path": "src/features/invoices/index.tsx",
       "accessCount": 4,
-      "lastAccessed": 1780821870024,
+      "lastAccessed": 1783334431157,
+      "type": "file"
+    },
+    {
+      "path": "src/features/auth/auth-layout.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1783334588826,
       "type": "file"
     },
     {
@@ -336,12 +366,6 @@
       "path": "src/components/ui/select.tsx",
       "accessCount": 3,
       "lastAccessed": 1780862325915,
-      "type": "file"
-    },
-    {
-      "path": "src/main.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1780820738165,
       "type": "file"
     },
     {
@@ -405,18 +429,6 @@
       "type": "file"
     },
     {
-      "path": "src/features/auth/auth-layout.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1780821905852,
-      "type": "file"
-    },
-    {
-      "path": "src/features/companies/index.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1780821963541,
-      "type": "file"
-    },
-    {
       "path": "src/components/layout/app-sidebar.tsx",
       "accessCount": 2,
       "lastAccessed": 1780824290621,
@@ -462,18 +474,6 @@
       "path": "src/routes/(auth)/sign-in.tsx",
       "accessCount": 1,
       "lastAccessed": 1780821831131,
-      "type": "file"
-    },
-    {
-      "path": "src/features/invoices/index.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780821869858,
-      "type": "file"
-    },
-    {
-      "path": "src/features/customers/index.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780821870152,
       "type": "file"
     },
     {

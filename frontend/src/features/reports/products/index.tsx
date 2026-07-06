@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
+import { PageHeader } from '@/components/page-header'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
@@ -10,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { useQuery } from '@tanstack/react-query'
 import { getProductReport } from '@/services/reports'
 import { ProductReportTable } from './components/product-report-table'
+import { EmptyState } from '@/components/empty-state'
 
 export function ProductReport() {
   const today = new Date().toISOString().slice(0, 10)
@@ -32,10 +34,7 @@ export function ProductReport() {
         <ProfileDropdown />
       </Header>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        <div>
-          <h2 className='text-2xl font-bold tracking-tight'>Báo cáo tổng hợp theo mặt hàng</h2>
-          <p className='text-muted-foreground'>Thống kê doanh thu và số lượng bán ra theo sản phẩm.</p>
-        </div>
+        <PageHeader title='Báo cáo tổng hợp theo mặt hàng' description='Thống kê doanh thu và số lượng bán ra theo sản phẩm.' />
         <div className='flex flex-wrap items-end gap-3'>
           <div className='space-y-1'>
             <Label className='text-sm font-medium'>Từ ngày</Label>
@@ -49,7 +48,8 @@ export function ProductReport() {
             {isLoading ? 'Đang tải...' : 'Xem báo cáo'}
           </Button>
         </div>
-        {fetchKey > 0 && <ProductReportTable data={reportData} />}
+        {fetchKey > 0 && isLoading && <EmptyState variant='loading' rows={6} />}
+        {fetchKey > 0 && !isLoading && <ProductReportTable data={reportData} />}
       </Main>
     </>
   )

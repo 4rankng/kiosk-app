@@ -9,8 +9,12 @@ import {
   orderItems,
   customers,
   businessEntities,
+  invoiceStatusEnum,
 } from '../../db/schema/index.js'
 import { AppError, NotFound } from '../../lib/errors.js'
+
+/** Status values allowed on the invoices.status column. */
+type InvoiceStatus = (typeof invoiceStatusEnum.enumValues)[number]
 
 export const invoiceService = {
   /** List invoices with filters and pagination. */
@@ -19,15 +23,15 @@ export const invoiceService = {
     pageSize: number
     offset: number
     q?: string
-    status?: string
+    status?: InvoiceStatus
     customerId?: string
     from?: string
     to?: string
   }) {
-    const { page, pageSize, offset, q, status, customerId, from, to } = params
+    const { pageSize, offset, q, status, customerId, from, to } = params
 
     const conds = []
-    if (status) conds.push(eq(invoices.status, status as 'completed'))
+    if (status) conds.push(eq(invoices.status, status))
     if (customerId) conds.push(eq(invoices.customerId, customerId))
     if (from) conds.push(gte(invoices.issuedAt, new Date(from)))
     if (to) conds.push(lte(invoices.issuedAt, new Date(to)))

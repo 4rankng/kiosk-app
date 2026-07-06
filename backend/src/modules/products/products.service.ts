@@ -1,7 +1,7 @@
 /**
  * Product service — business logic extracted from routes.
  */
-import { eq, and, or, ilike, sql, isNull, inArray } from 'drizzle-orm'
+import { eq, and, or, ilike, sql } from 'drizzle-orm'
 import { db } from '../../config/db.js'
 import {
   products,
@@ -10,6 +10,7 @@ import {
   priceListItems,
 } from '../../db/schema/index.js'
 import { AppError, NotFound, Conflict } from '../../lib/errors.js'
+import { isPgError } from '../../lib/pg-error.js'
 import { getGeneralPriceListId, resolveEffectivePrices } from '../../lib/price-lists.js'
 
 // ---------------------------------------------------------------------------
@@ -26,7 +27,7 @@ export const productService = {
     categoryId?: string
     priceListId?: string | null
   }) {
-    const { page, pageSize, offset, q, categoryId, priceListId = null } = params
+    const { pageSize, offset, q, categoryId, priceListId = null } = params
 
     const conditions = []
     if (q) conditions.push(or(ilike(products.name, `%${q}%`), ilike(products.code, `%${q}%`)))
@@ -201,8 +202,8 @@ export const productService = {
       const deleted = await db.delete(products).where(eq(products.id, id)).returning()
       if (deleted.length === 0) throw NotFound('Sản phẩm không tồn tại')
       return { deleted: true }
-    } catch (e: any) {
-      if (e?.code === '23503') throw Conflict('Không thể xóa: sản phẩm đã phát sinh giao dịch')
+    } catch (e: unknown) {
+      if (isPgError(e) && e.code === '23503') throw Conflict('Không thể xóa: sản phẩm đã phát sinh giao dịch')
       throw e
     }
   },

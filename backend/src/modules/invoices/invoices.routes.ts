@@ -8,6 +8,7 @@
  *                                    to render with a different one
  */
 import { Hono } from 'hono'
+import { z } from 'zod'
 import { requireAuth } from '../../middleware/auth.js'
 import { anyRole } from '../../middleware/rbac.js'
 import { ok, paginated } from '../../lib/response.js'
@@ -23,7 +24,8 @@ invoiceRoutes.use('*', requireAuth, anyRole)
 // ---------------------------------------------------------------------------
 invoiceRoutes.get('/', async (c) => {
   const { page, pageSize, offset, q } = parsePagination(c)
-  const status = c.req.query('status')
+  const rawStatus = c.req.query('status')
+  const status = rawStatus ? z.enum(['pending', 'completed', 'cancelled']).parse(rawStatus) : undefined
   const customerId = c.req.query('customerId')
   const from = c.req.query('from')
   const to = c.req.query('to')

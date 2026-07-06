@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, boolean, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, uuid, boolean } from 'drizzle-orm/pg-core'
 import { userRoleEnum } from './enums.js'
 
 /**

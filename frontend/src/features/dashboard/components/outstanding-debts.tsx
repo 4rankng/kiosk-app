@@ -10,6 +10,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
 import { HandCoins } from 'lucide-react'
+import { EmptyState } from '@/components/empty-state'
 
 function OutstandingDebtsSkeleton() {
   return (
@@ -34,9 +35,25 @@ function OutstandingDebtsSkeleton() {
 }
 
 export function OutstandingDebts() {
-  const { data, isLoading } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
+  const { data, isLoading, isError, refetch } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
 
   if (isLoading) return <OutstandingDebtsSkeleton />
+
+  if (isError) {
+    return (
+      <>
+        <CardHeader>
+          <CardTitle className='flex items-center gap-2'>
+            <HandCoins className='h-4 w-4' /> Công nợ
+          </CardTitle>
+          <CardDescription>Khách hàng còn nợ</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <EmptyState variant='error' onRetry={() => refetch()} description='Không tải được danh sách công nợ.' />
+        </CardContent>
+      </>
+    )
+  }
 
   const debts = data?.outstandingDebts ?? []
 

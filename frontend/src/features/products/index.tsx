@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
+import { useDocumentTitle } from '@/hooks/use-document-title'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
@@ -27,6 +28,7 @@ function AddProductButton() {
 }
 
 function ProductsContent() {
+  useDocumentTitle('Danh mục sản phẩm')
   const { setOpen, setSelectedProduct } = useProductsContext()
   const { data: products = [] } = useQuery({ queryKey: ['products'], queryFn: getProducts })
   const isMobile = useIsMobile()
@@ -65,7 +67,7 @@ function ProductsContent() {
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <div className='flex items-center justify-between gap-3'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>Danh mục sản phẩm</h2>
+            <h1 className='font-heading text-h1 font-semibold tracking-tight'>Danh mục sản phẩm</h1>
             {!isMobile && (
               <p className='text-muted-foreground'>
                 {stats.total} sản phẩm · {stats.categories} nhóm hàng
@@ -83,7 +85,7 @@ function ProductsContent() {
               <Package className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold tabular-nums'>{stats.total}</div>
+              <div className='font-heading text-2xl font-semibold tabular-nums'>{stats.total}</div>
               {!isMobile && <p className='text-xs text-muted-foreground'>mặt hàng trong kho</p>}
             </CardContent>
           </Card>
@@ -93,7 +95,7 @@ function ProductsContent() {
               <Tags className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold tabular-nums'>{stats.categories}</div>
+              <div className='font-heading text-2xl font-semibold tabular-nums'>{stats.categories}</div>
               {!isMobile && <p className='text-xs text-muted-foreground'>nhóm đang hoạt động</p>}
             </CardContent>
           </Card>
@@ -103,7 +105,7 @@ function ProductsContent() {
               <TrendingUp className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold tabular-nums'>{formatCurrency(stats.inventoryValue)}</div>
+              <div className='font-heading text-2xl font-semibold tabular-nums'>{formatCurrency(stats.inventoryValue)}</div>
               {!isMobile && <p className='text-xs text-muted-foreground'>giá trị vốn hàng</p>}
             </CardContent>
           </Card>
@@ -113,7 +115,7 @@ function ProductsContent() {
               <TrendingUp className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold tabular-nums'>{formatCurrency(stats.avgPrice)}</div>
+              <div className='font-heading text-2xl font-semibold tabular-nums'>{formatCurrency(stats.avgPrice)}</div>
               {!isMobile && <p className='text-xs text-muted-foreground'>trên mỗi mặt hàng</p>}
             </CardContent>
           </Card>

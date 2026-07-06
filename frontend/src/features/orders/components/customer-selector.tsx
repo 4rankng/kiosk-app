@@ -11,7 +11,7 @@ import type { Customer } from '@/types'
 
 interface CustomerSelectorProps {
   selectedCustomer: Customer | null
-  onSelect: (customer: Customer, priceListId: string) => void
+  onSelect: (customer: Customer | null, priceListId: string) => void
 }
 
 export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelectorProps) {
@@ -28,13 +28,21 @@ export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelecto
 
   const { data: company } = useQuery({
     queryKey: ['company', selectedCustomer?.companyId],
-    queryFn: () => getCompanyById(selectedCustomer!.companyId),
+    queryFn: () => {
+      const companyId = selectedCustomer?.companyId
+      if (!companyId) throw new Error('Chưa chọn khách hàng')
+      return getCompanyById(companyId)
+    },
     enabled: !!selectedCustomer?.companyId,
   })
 
   const { data: priceList } = useQuery({
     queryKey: ['price-list-by-company', selectedCustomer?.companyId],
-    queryFn: () => getPriceListByCompany(selectedCustomer!.companyId),
+    queryFn: () => {
+      const companyId = selectedCustomer?.companyId
+      if (!companyId) throw new Error('Chưa chọn khách hàng')
+      return getPriceListByCompany(companyId)
+    },
     enabled: !!selectedCustomer?.companyId,
   })
 
@@ -73,7 +81,7 @@ export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelecto
           <Button
             variant='ghost'
             size='sm'
-            onClick={() => onSelect(null as unknown as Customer, '')}
+            onClick={() => onSelect(null, '')}
             className='h-auto px-2 py-0.5 text-xs text-muted-foreground hover:text-foreground'
           >
             Thay đổi

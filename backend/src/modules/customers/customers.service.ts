@@ -10,7 +10,7 @@ import { assertExists, assertUniqueCode } from '../../lib/db-helpers.js'
 export const customerService = {
   /** List customers with pagination, search, and company filter. */
   async list(params: { page: number; pageSize: number; offset: number; q?: string; companyId?: string }) {
-    const { page, pageSize, offset, q, companyId } = params
+    const { pageSize, offset, q, companyId } = params
 
     const conditions = []
     if (q) conditions.push(ilike(customers.name, `%${q}%`))

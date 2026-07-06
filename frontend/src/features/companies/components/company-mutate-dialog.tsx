@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useId } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
@@ -17,6 +17,7 @@ export function CompanyMutateDialog() {
   const { open, setOpen, selectedCompany } = useCompaniesContext()
   const queryClient = useQueryClient()
   const isEdit = open === 'edit'
+  const fieldId = useId()
   const { data: priceLists = [] } = useQuery({ queryKey: ['price-lists'], queryFn: () => getPriceLists() })
 
   const form = useForm<CompanySchema>({
@@ -60,19 +61,19 @@ export function CompanyMutateDialog() {
           <div className='flex-1 space-y-4 overflow-y-auto'>
             <div className='grid grid-cols-2 gap-3'>
             <div className='space-y-2'>
-              <Label>Tên công ty</Label>
-              <Input {...form.register('name')} />
+              <Label htmlFor={`${fieldId}-name`}>Tên công ty</Label>
+              <Input id={`${fieldId}-name`} {...form.register('name')} />
               {form.formState.errors.name && <p className='text-sm text-destructive'>{form.formState.errors.name.message}</p>}
             </div>
             <div className='space-y-2'>
-              <Label>MST</Label>
-              <Input {...form.register('taxCode')} />
+              <Label htmlFor={`${fieldId}-tax`}>MST</Label>
+              <Input id={`${fieldId}-tax`} {...form.register('taxCode')} />
             </div>
           </div>
             <div className='space-y-2'>
-              <Label>Bảng giá</Label>
+              <Label htmlFor={`${fieldId}-pricelist`}>Bảng giá</Label>
               <Select onValueChange={(v) => form.setValue('priceListId', v)} value={form.watch('priceListId') ?? ''}>
-                <SelectTrigger><SelectValue placeholder='Chọn bảng giá...' /></SelectTrigger>
+                <SelectTrigger id={`${fieldId}-pricelist`}><SelectValue placeholder='Chọn bảng giá...' /></SelectTrigger>
                 <SelectContent>
                   {priceLists.map((pl) => <SelectItem key={pl.id} value={pl.id}>{pl.name}</SelectItem>)}
                 </SelectContent>

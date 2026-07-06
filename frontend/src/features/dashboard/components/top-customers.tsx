@@ -4,6 +4,7 @@ import { formatCurrency } from '@/lib/format'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Trophy, Users } from 'lucide-react'
+import { EmptyState } from '@/components/empty-state'
 
 function TopCustomersSkeleton() {
   return (
@@ -30,9 +31,25 @@ function TopCustomersSkeleton() {
 }
 
 export function TopCustomers() {
-  const { data, isLoading } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
+  const { data, isLoading, isError, refetch } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
 
   if (isLoading) return <TopCustomersSkeleton />
+
+  if (isError) {
+    return (
+      <>
+        <CardHeader>
+          <CardTitle className='flex items-center gap-2'>
+            <Trophy className='h-4 w-4' /> Khách hàng mua nhiều nhất
+          </CardTitle>
+          <CardDescription>Top 10 tháng này</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <EmptyState variant='error' onRetry={() => refetch()} description='Không tải được danh sách khách hàng.' />
+        </CardContent>
+      </>
+    )
+  }
 
   const customers = data?.topCustomers ?? []
 

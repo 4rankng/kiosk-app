@@ -1,5 +1,6 @@
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
+import { useDocumentTitle } from '@/hooks/use-document-title'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
@@ -12,6 +13,7 @@ import { OutstandingDebts } from './components/outstanding-debts'
 import { RecentInvoices } from './components/recent-invoices'
 
 export function Dashboard() {
+  useDocumentTitle('Tổng quan')
   return (
     <>
       <Header fixed>
@@ -22,7 +24,7 @@ export function Dashboard() {
       <Main>
         <div className='mb-4 flex items-end justify-between gap-4'>
           <div className='space-y-1'>
-            <h1 className='text-2xl font-bold tracking-tight'>Tổng quan</h1>
+            <h1 className='font-heading text-h1 font-semibold tracking-tight'>Tổng quan</h1>
             <p className='text-sm text-muted-foreground'>Tình hình kinh doanh hôm nay.</p>
           </div>
         </div>
