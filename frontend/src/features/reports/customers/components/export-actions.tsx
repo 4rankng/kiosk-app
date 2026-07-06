@@ -27,13 +27,13 @@ const HEADERS = [
 export function ExportActions({ data, companyName }: ExportActionsProps) {
   const [open, setOpen] = useState(false)
 
-  const handleExportSpreadsheet = () => {
+  const handleExportSpreadsheet = async () => {
     const rows = data.map((row) => ({
       ...row,
       totalRevenueDisplay: formatCurrency(row.totalRevenue),
       unpaidAmountDisplay: formatCurrency(row.unpaidAmount),
     }))
-    exportToXlsx(rows, HEADERS, `bao-cao-khach-hang-${companyName}`)
+    await exportToXlsx(rows, HEADERS, `bao-cao-khach-hang-${companyName}`)
   }
 
   const handlePrint = () => {

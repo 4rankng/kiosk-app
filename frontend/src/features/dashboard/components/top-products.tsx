@@ -70,7 +70,7 @@ export function TopProducts() {
       <CardContent>
         <ul className='space-y-3'>
           {products.map((p) => (
-            <li key={p.rank} className='flex items-center justify-between gap-3'>
+            <li key={p.name} className='flex items-center justify-between gap-3'>
               <div className='min-w-0 flex-1'>
                 <div className='mb-1 text-xs text-muted-foreground'>{p.name}</div>
                 <div className='h-2.5 w-full rounded-full bg-muted'>

@@ -9,7 +9,6 @@ import { db } from '../../config/db.js'
 import { env, googleOAuthConfigured } from '../../config/env.js'
 import { users } from '../../db/schema/index.js'
 import { hashPassword, verifyPassword } from '../../lib/password.js'
-import { queryOne } from '../../lib/sql.js'
 import {
   issueRefreshToken,
   rotateRefreshToken,
@@ -18,7 +17,7 @@ import {
   revokeRefreshToken,
   type AccessTokenPayload,
 } from '../../lib/jwt.js'
-import { BadRequest, Conflict, Forbidden, Unauthorized } from '../../lib/errors.js'
+import { AppError, BadRequest, Conflict, Forbidden, Unauthorized } from '../../lib/errors.js'
 import { logger } from '../../config/logger.js'
 
 export const authService = {
@@ -30,7 +29,7 @@ export const authService = {
 
   /** Count total users in the database. */
   async countUsers(): Promise<number> {
-    const r = await queryOne<{ count: number }>(db, sql`SELECT count(*)::int AS count FROM users`)
+    const [r] = await db.select({ count: sql<number>`count(*)::int` }).from(users)
     return Number(r?.count ?? 0)
   },
 
@@ -148,7 +147,9 @@ export const authService = {
           passwordHash: null,
         })
         .returning()
-      user = inserted[0]!
+      const created = inserted[0]
+      if (!created) throw new AppError(500, 'Failed to create user')
+      user = created
     } else if (!user.googleSub) {
       await db
         .update(users)
@@ -219,10 +220,11 @@ export const authService = {
         },
       ])
       .returning()
-    const u = inserted[0]!
+    const u = inserted[0]
+    if (!u) throw new AppError(500, 'Failed to create user')
 
-    logger.info({ user: u!.email, byAdmin: totalUsers > 0 }, 'User registered')
+    logger.info({ user: u.email, byAdmin: totalUsers > 0 }, 'User registered')
 
-    return { id: u!.id, email: u!.email, name: u!.name, role: u!.role }
+    return { id: u.id, email: u.email, name: u.name, role: u.role }
   },
 }

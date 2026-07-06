@@ -17,7 +17,6 @@ import { eq, sql } from 'drizzle-orm'
 import { db, pool } from '../config/db.js'
 import { users } from '../db/schema/users.js'
 import { hashPassword } from '../lib/password.js'
-import { queryOne } from '../lib/sql.js'
 
 function parseArgs(): { email: string; password: string; name: string; role: 'admin' | 'staff' } {
   const argv = process.argv.slice(2)
@@ -56,7 +55,7 @@ async function main() {
   const { email, password, name, role } = parseArgs()
 
   // Refuse to run if any users already exist
-  const r = await queryOne<{ count: number }>(db, sql`SELECT count(*)::int AS count FROM users`)
+  const [r] = await db.select({ count: sql<number>`count(*)::int` }).from(users)
   const count = Number(r?.count ?? 0)
   if (count > 0) {
     const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1)
@@ -82,13 +81,18 @@ async function main() {
       },
     ])
     .returning()
-  const u = inserted[0]!
+  const u = inserted[0]
+  if (!u) {
+    console.error('❌ Failed to create admin user')
+    await pool.end()
+    process.exit(1)
+  }
 
   console.log('✅ Admin user created:')
-  console.log(`   ID:    ${u!.id}`)
-  console.log(`   Email: ${u!.email}`)
-  console.log(`   Name:  ${u!.name}`)
-  console.log(`   Role:  ${u!.role}`)
+  console.log(`   ID:    ${u.id}`)
+  console.log(`   Email: ${u.email}`)
+  console.log(`   Name:  ${u.name}`)
+  console.log(`   Role:  ${u.role}`)
   console.log('')
   console.log('You can now sign in at /api/auth/login')
   await pool.end()

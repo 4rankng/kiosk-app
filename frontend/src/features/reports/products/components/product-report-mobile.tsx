@@ -40,7 +40,7 @@ export function ProductReportMobile({ data }: { data: ProductReportRow[] }) {
             <div className='space-y-1.5'>
               {product.details.map((d, i) => (
                 <div
-                  key={i}
+                  key={`${d.invoiceCode}-${i}`}
                   className='rounded-md bg-muted/40 px-3 py-2 text-sm'
                 >
                   <div className='flex items-center justify-between'>

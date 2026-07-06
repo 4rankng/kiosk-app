@@ -20,6 +20,7 @@ import { invoiceRoutes } from './modules/invoices/invoices.routes.js'
 import { reportRoutes } from './modules/reports/reports.routes.js'
 import { businessEntityRoutes } from './modules/business-entities/business-entities.routes.js'
 import { healthRoutes } from './modules/health/health.routes.js'
+import { requireAuth } from './middleware/auth.js'
 import { NotFound } from './lib/errors.js'
 
 export function createApp() {
@@ -44,6 +45,11 @@ export function createApp() {
 
   // Auth (login + Google OAuth are public; refresh + me + logout are authed)
   app.route('/api/auth', authRoutes)
+
+  // Defense-in-depth: require auth on all remaining /api/* routes.
+  // Health and auth mounts above stay public; routers below that forget
+  // per-router auth are still protected.
+  app.use('/api/*', requireAuth)
 
   // Authenticated modules
   app.route('/api/products', productRoutes)

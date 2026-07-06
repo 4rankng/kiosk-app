@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { getProductsColumns } from './products-columns'
 import { ProductsMobileList } from './products-mobile-list'
+import { EmptyState } from '@/components/empty-state'
 import type { Product } from '@/types'
 
 interface ProductsTableProps {
@@ -21,7 +22,7 @@ interface ProductsTableProps {
 }
 
 export function ProductsTable({ onEdit, onDelete }: ProductsTableProps) {
-  const { data: products = [] } = useQuery({ queryKey: ['products'], queryFn: getProducts })
+  const { data: products = [], isError: isProductsError, refetch: refetchProducts } = useQuery({ queryKey: ['products'], queryFn: getProducts })
   const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: getCategories })
   const categoryOptions = useMemo(
     () => categories.map((c) => ({ label: c.name, value: c.name })),
@@ -56,6 +57,17 @@ export function ProductsTable({ onEdit, onDelete }: ProductsTableProps) {
       (p) => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)
     )
   }, [products, searchValue])
+
+  if (isProductsError) {
+    return (
+      <EmptyState
+        variant='error'
+        title='Không tải được danh sách sản phẩm'
+        description='Vui lòng kiểm tra kết nối và thử lại.'
+        onRetry={() => refetchProducts()}
+      />
+    )
+  }
 
   return (
     <div className='space-y-3'>

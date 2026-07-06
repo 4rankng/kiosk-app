@@ -67,7 +67,7 @@ export function TopCustomers() {
       <CardContent>
         <div className='space-y-3'>
           {customers.map((c) => (
-            <div key={c.rank} className='flex items-center gap-3'>
+            <div key={c.name} className='flex items-center gap-3'>
               <span className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold'>
                 {c.rank}
               </span>

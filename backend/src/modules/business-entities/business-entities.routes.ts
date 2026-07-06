@@ -8,13 +8,10 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
-import { eq, sql } from 'drizzle-orm'
-import { db } from '../../config/db.js'
-import { businessEntities, orders, invoices } from '../../db/schema/index.js'
 import { requireAuth } from '../../middleware/auth.js'
 import { adminOnly, anyRole } from '../../middleware/rbac.js'
 import { ok, created } from '../../lib/response.js'
-import { Conflict, NotFound } from '../../lib/errors.js'
+import { businessEntityService } from './business-entities.service.js'
 
 export const businessEntityRoutes = new Hono()
 businessEntityRoutes.use('*', requireAuth, anyRole)
@@ -31,54 +28,31 @@ const createSchema = z.object({
 const updateSchema = createSchema.partial()
 
 businessEntityRoutes.get('/', async (c) => {
-  const rows = await db.select().from(businessEntities).orderBy(businessEntities.name)
+  const rows = await businessEntityService.list()
   return ok(c, rows)
 })
 
 businessEntityRoutes.get('/:id', async (c) => {
   const id = c.req.param('id')!
-  const [row] = await db.select().from(businessEntities).where(eq(businessEntities.id, id)).limit(1)
-  if (!row) throw NotFound('Hộ kinh doanh không tồn tại')
+  const row = await businessEntityService.getById(id)
   return ok(c, row)
 })
 
 businessEntityRoutes.post('/', adminOnly, zValidator('json', createSchema), async (c) => {
   const body = c.req.valid('json')
-  const now = new Date()
-  const [row] = await db
-    .insert(businessEntities)
-    .values({ ...body, createdAt: now, updatedAt: now })
-    .returning()
+  const row = await businessEntityService.create(body)
   return created(c, row)
 })
 
 businessEntityRoutes.patch('/:id', adminOnly, zValidator('json', updateSchema), async (c) => {
   const id = c.req.param('id')!
   const body = c.req.valid('json')
-  const [existing] = await db.select().from(businessEntities).where(eq(businessEntities.id, id)).limit(1)
-  if (!existing) throw NotFound('Hộ kinh doanh không tồn tại')
-  const [row] = await db
-    .update(businessEntities)
-    .set({ ...body, updatedAt: new Date() })
-    .where(eq(businessEntities.id, id))
-    .returning()
+  const row = await businessEntityService.update(id, body)
   return ok(c, row)
 })
 
 businessEntityRoutes.delete('/:id', adminOnly, async (c) => {
   const id = c.req.param('id')!
-  const [orderCount] = await db
-    .select({ c: sql<number>`count(*)::int` })
-    .from(orders)
-    .where(eq(orders.businessEntityId, id))
-  const [invoiceCount] = await db
-    .select({ c: sql<number>`count(*)::int` })
-    .from(invoices)
-    .where(eq(invoices.businessEntityId, id))
-  if (((orderCount?.c ?? 0) + (invoiceCount?.c ?? 0)) > 0) {
-    throw Conflict('Không thể xóa: hộ kinh doanh đã phát sinh đơn hàng / hóa đơn')
-  }
-  const deleted = await db.delete(businessEntities).where(eq(businessEntities.id, id)).returning()
-  if (deleted.length === 0) throw NotFound('Hộ kinh doanh không tồn tại')
-  return ok(c, { deleted: true })
+  const result = await businessEntityService.remove(id)
+  return ok(c, result)
 })

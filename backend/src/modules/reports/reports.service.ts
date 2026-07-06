@@ -6,8 +6,8 @@
 import { sql } from 'drizzle-orm'
 import ExcelJS from 'exceljs'
 import { db } from '../../config/db.js'
+import { cacheGet, cacheSet, cacheDel } from '../../config/redis.js'
 import { renderInvoicePDF } from '../../lib/pdf.js'
-import { query, queryOne } from '../../lib/sql.js'
 import type { OrderItem } from '../../db/schema/orders.js'
 
 // ---------------------------------------------------------------------------
@@ -83,6 +83,30 @@ function dateRange(q: { from?: string; to?: string }) {
   return { fromIso: from.toISOString(), toIso: to.toISOString() }
 }
 
+/** Run a raw SQL query and return typed rows. */
+async function query<R = Record<string, unknown>>(queryStr: ReturnType<typeof sql>): Promise<R[]> {
+  const res = await db.execute(queryStr)
+  return res.rows as R[]
+}
+
+/** Run a raw SQL query and return the first row, or undefined. */
+async function queryOne<R = Record<string, unknown>>(queryStr: ReturnType<typeof sql>): Promise<R | undefined> {
+  const rows = await query<R>(queryStr)
+  return rows[0]
+}
+
+// ---------------------------------------------------------------------------
+//  Cache keys + TTLs
+// ---------------------------------------------------------------------------
+const DASHBOARD_CACHE_KEY = 'cache:dashboard'
+const DASHBOARD_CACHE_TTL = 45 // 45 seconds
+const REPORT_CACHE_TTL = 600 // 10 minutes — past periods are immutable
+
+/** Invalidate the dashboard cache. Call after order/payment/invoice mutations. */
+export async function invalidateDashboardCache(): Promise<void> {
+  await cacheDel(DASHBOARD_CACHE_KEY)
+}
+
 // ---------------------------------------------------------------------------
 //  Service
 // ---------------------------------------------------------------------------
@@ -91,6 +115,9 @@ export const reportService = {
   //  Dashboard — KPIs
   // -------------------------------------------------------------------------
   async getDashboard() {
+    const cached = await cacheGet<unknown>(DASHBOARD_CACHE_KEY)
+    if (cached) return cached
+
     const today = startOfDay(new Date())
     const todayEnd = endOfDay(new Date())
     const yesterday = startOfDay(new Date(Date.now() - 86400000))
@@ -99,7 +126,7 @@ export const reportService = {
 
     const [todayAgg, yesterdayAgg, pendingAgg, monthAgg, weekRows, topCustomers, topProducts, outstandingRows, recentInvoices] =
       await Promise.all([
-        queryOne<TodayAgg>(db, sql`
+        queryOne<TodayAgg>(sql`
           SELECT COALESCE(SUM(total), 0)::float AS revenue,
                  COUNT(*)::int AS orders,
                  COALESCE(SUM(CASE WHEN paid_amount >= total THEN total ELSE paid_amount END), 0)::float AS paid,
@@ -107,23 +134,23 @@ export const reportService = {
           FROM invoices
           WHERE status = 'completed' AND issued_at BETWEEN ${today.toISOString()} AND ${todayEnd.toISOString()}
         `),
-        queryOne<DayAgg>(db, sql`
+        queryOne<DayAgg>(sql`
           SELECT COALESCE(SUM(total), 0)::float AS revenue,
                  COUNT(*)::int AS orders
           FROM invoices
           WHERE status = 'completed' AND issued_at BETWEEN ${yesterday.toISOString()} AND ${yesterdayEnd.toISOString()}
         `),
-        queryOne<CountAgg>(db, sql`
+        queryOne<CountAgg>(sql`
           SELECT COUNT(*)::int AS count
           FROM orders
           WHERE status = 'draft' AND created_at BETWEEN ${today.toISOString()} AND ${todayEnd.toISOString()}
         `),
-        queryOne<SumAgg>(db, sql`
+        queryOne<SumAgg>(sql`
           SELECT COALESCE(SUM(total), 0)::float AS revenue
           FROM invoices
           WHERE status = 'completed' AND issued_at >= ${monthStart.toISOString()}
         `),
-        query<WeekRow>(db, sql`
+        query<WeekRow>(sql`
           SELECT date_trunc('week', issued_at) AS week,
                  COALESCE(SUM(total), 0)::float AS revenue
           FROM invoices
@@ -131,7 +158,7 @@ export const reportService = {
           GROUP BY 1
           ORDER BY 1
         `),
-        query<TopCustomerRow>(db, sql`
+        query<TopCustomerRow>(sql`
           SELECT c.name,
                  COALESCE(SUM(i.total), 0)::float AS revenue
           FROM invoices i
@@ -141,7 +168,7 @@ export const reportService = {
           ORDER BY revenue DESC
           LIMIT 10
         `),
-        query<TopProductRow>(db, sql`
+        query<TopProductRow>(sql`
           SELECT p.name, u.name AS unit,
                  COALESCE(SUM(oi.quantity::numeric), 0)::float AS quantity,
                  COALESCE(SUM(oi.total_price), 0)::float AS revenue
@@ -155,7 +182,7 @@ export const reportService = {
           ORDER BY quantity DESC
           LIMIT 5
         `),
-        query<DebtRow>(db, sql`
+        query<DebtRow>(sql`
           SELECT c.name AS customer_name,
                  COALESCE(SUM(i.total - i.paid_amount), 0)::float AS amount
           FROM invoices i
@@ -165,7 +192,7 @@ export const reportService = {
           ORDER BY amount DESC
           LIMIT 5
         `),
-        query<RecentInvoiceRow>(db, sql`
+        query<RecentInvoiceRow>(sql`
           SELECT i.code, c.name AS customer_name, i.total, i.status, i.paid_amount,
                  (i.paid_amount >= i.total) AS is_paid,
                  i.issued_at
@@ -191,7 +218,7 @@ export const reportService = {
       weekBuckets[idx] = (weekBuckets[idx] ?? 0) + Number(row.revenue)
     }
 
-    return {
+    const result = {
       todayRevenue: Number(todayAgg?.revenue) || 0,
       todayOrders: Number(todayAgg?.orders) || 0,
       todayPending: Number(pendingAgg?.count) || 0,
@@ -218,12 +245,18 @@ export const reportService = {
         date: i.issued_at,
       })),
     }
+    await cacheSet(DASHBOARD_CACHE_KEY, result, DASHBOARD_CACHE_TTL)
+    return result
   },
 
   // -------------------------------------------------------------------------
   //  Monthly revenue — weekly buckets for a given month
   // -------------------------------------------------------------------------
   async getMonthlyRevenue(month?: string) {
+    const cacheKey = `cache:report:monthly_revenue:${month ?? 'current'}`
+    const cached = await cacheGet<unknown>(cacheKey)
+    if (cached) return cached
+
     const ref = month ? new Date(`${month}-01`) : new Date()
     const monthStart = startOfMonth(ref)
     const next = new Date(ref.getFullYear(), ref.getMonth() + 1, 1)
@@ -233,7 +266,7 @@ export const reportService = {
       const e = Math.min(s + 6, daysInMonth)
       return `${pad(s)}/${pad(monthStart.getMonth() + 1)}-${pad(e)}/${pad(monthStart.getMonth() + 1)}`
     })
-    const rows = await query<WeekRow>(db, sql`
+    const rows = await query<WeekRow>(sql`
       SELECT date_trunc('week', issued_at) AS week, COALESCE(SUM(total), 0)::float AS revenue
       FROM invoices
       WHERE status = 'completed' AND issued_at >= ${monthStart.toISOString()} AND issued_at < ${next.toISOString()}
@@ -245,17 +278,23 @@ export const reportService = {
       const i = Math.min(Math.floor((day - 1) / 7), 3)
       buckets[i] = (buckets[i] ?? 0) + Number(r.revenue)
     }
-    return buckets.map((revenue, i) => ({ week: labels[i] ?? '', revenue }))
+    const result = buckets.map((revenue, i) => ({ week: labels[i] ?? '', revenue }))
+    await cacheSet(cacheKey, result, REPORT_CACHE_TTL)
+    return result
   },
 
   // -------------------------------------------------------------------------
   //  Top customers by revenue
   // -------------------------------------------------------------------------
   async getTopCustomers(month?: string, limit: number = 10) {
+    const cacheKey = `cache:report:top_customers:${month ?? 'current'}:${limit}`
+    const cached = await cacheGet<unknown>(cacheKey)
+    if (cached) return cached
+
     const ref = month ? new Date(`${month}-01`) : new Date()
     const monthStart = startOfMonth(ref)
     const next = new Date(ref.getFullYear(), ref.getMonth() + 1, 1)
-    const rows = await query<TopCustomerRow>(db, sql`
+    const rows = await query<TopCustomerRow>(sql`
       SELECT c.name, COALESCE(SUM(i.total), 0)::float AS revenue
       FROM invoices i
       JOIN customers c ON c.id = i.customer_id
@@ -264,7 +303,9 @@ export const reportService = {
       ORDER BY revenue DESC
       LIMIT ${limit}
     `)
-    return rows.map((r, i) => ({ rank: i + 1, name: r.name, revenue: Number(r.revenue) }))
+    const result = rows.map((r, i) => ({ rank: i + 1, name: r.name, revenue: Number(r.revenue) }))
+    await cacheSet(cacheKey, result, REPORT_CACHE_TTL)
+    return result
   },
 
   // -------------------------------------------------------------------------
@@ -272,7 +313,10 @@ export const reportService = {
   // -------------------------------------------------------------------------
   async getProductReport(from?: string, to?: string) {
     const { fromIso, toIso } = dateRange({ from, to })
-    const rows = await query<ProductAggRow>(db, sql`
+    const cacheKey = `cache:report:product:${fromIso}:${toIso}`
+    const cached = await cacheGet<unknown>(cacheKey)
+    if (cached) return cached
+    const rows = await query<ProductAggRow>(sql`
       SELECT p.id AS product_id, p.code AS product_code, p.name AS product_name,
              u.name AS unit,
              COALESCE(SUM(oi.quantity::numeric), 0)::float AS total_quantity,
@@ -286,7 +330,7 @@ export const reportService = {
       GROUP BY p.id, p.code, p.name, u.name
       ORDER BY total_revenue DESC
     `)
-    return rows.map((r) => ({
+    const result = rows.map((r) => ({
       productId: r.product_id,
       productCode: r.product_code,
       productName: r.product_name,
@@ -294,6 +338,8 @@ export const reportService = {
       totalQuantity: Number(r.total_quantity),
       totalRevenue: Number(r.total_revenue),
     }))
+    await cacheSet(cacheKey, result, REPORT_CACHE_TTL)
+    return result
   },
 
   // -------------------------------------------------------------------------
@@ -301,7 +347,7 @@ export const reportService = {
   // -------------------------------------------------------------------------
   async getProductDetail(productId: string, from?: string, to?: string) {
     const { fromIso, toIso } = dateRange({ from, to })
-    const summary = await queryOne<ProductAggRow>(db, sql`
+    const summary = await queryOne<ProductAggRow>(sql`
       SELECT p.id AS product_id, p.code AS product_code, p.name AS product_name,
              u.name AS unit,
              COALESCE(SUM(oi.quantity::numeric), 0)::float AS total_quantity,
@@ -314,7 +360,7 @@ export const reportService = {
       WHERE i.status = 'completed' AND p.id = ${productId} AND i.issued_at BETWEEN ${fromIso} AND ${toIso}
       GROUP BY p.id, p.code, p.name, u.name
     `)
-    const details = await query<ProductDetailRow>(db, sql`
+    const details = await query<ProductDetailRow>(sql`
       SELECT i.code AS invoice_code, i.issued_at AS date,
              c.name AS customer_name,
              oi.quantity::float AS quantity,
@@ -350,8 +396,12 @@ export const reportService = {
   // -------------------------------------------------------------------------
   async getDebtReportRows(from?: string, to?: string, companyId?: string): Promise<DebtReportRow[]> {
     const { fromIso, toIso } = dateRange({ from, to })
+    const cacheKey = `cache:report:debt:${fromIso}:${toIso}:${companyId ?? 'all'}`
+    const cached = await cacheGet<DebtReportRow[]>(cacheKey)
+    if (cached) return cached
+
     const companyFilter = companyId ? sql`AND c.company_id = ${companyId}` : sql``
-    return query<DebtReportRow>(db, sql`
+    const rows = await query<DebtReportRow>(sql`
       SELECT c.id AS customer_id, c.code AS customer_code, c.name AS customer_name,
              co.id AS company_id, co.name AS company_name,
              COALESCE(SUM(i.total), 0)::float AS total_revenue,
@@ -364,6 +414,8 @@ export const reportService = {
       GROUP BY c.id, c.code, c.name, co.id, co.name
       ORDER BY total_revenue DESC
     `)
+    await cacheSet(cacheKey, rows, REPORT_CACHE_TTL)
+    return rows
   },
 
   // -------------------------------------------------------------------------

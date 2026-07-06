@@ -115,12 +115,18 @@ export const customerService = {
     return row
   },
 
-  /** Delete a customer. Fails if it has orders. */
+  /** Delete a customer. Fails if it has orders (EXISTS check inside TX). */
   async remove(id: string) {
-    const [orderCount] = await db.select({ c: sql<number>`count(*)::int` }).from(orders).where(eq(orders.customerId, id))
-    if ((orderCount?.c ?? 0) > 0) throw Conflict('Không thể xóa: khách hàng đã phát sinh đơn hàng')
-    const deleted = await db.delete(customers).where(eq(customers.id, id)).returning()
-    if (deleted.length === 0) throw NotFound('Khách hàng không tồn tại')
-    return { deleted: true }
+    return await db.transaction(async (tx) => {
+      const [ref] = await tx
+        .select({ id: orders.id })
+        .from(orders)
+        .where(eq(orders.customerId, id))
+        .limit(1)
+      if (ref) throw Conflict('Không thể xóa: khách hàng đã phát sinh đơn hàng')
+      const deleted = await tx.delete(customers).where(eq(customers.id, id)).returning()
+      if (deleted.length === 0) throw NotFound('Khách hàng không tồn tại')
+      return { deleted: true }
+    })
   },
 }

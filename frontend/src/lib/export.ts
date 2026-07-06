@@ -1,12 +1,13 @@
-import * as XLSX from 'xlsx'
-
-export function exportToXlsx(
-  data: Record<string, any>[],
+export async function exportToXlsx(
+  data: Record<string, string | number | null>[],
   headers: { key: string; label: string }[],
   filename: string
 ) {
+  // Dynamic import keeps xlsx out of the initial bundle.
+  const XLSX = await import('xlsx')
+
   const rows = data.map((row) => {
-    const obj: Record<string, any> = {}
+    const obj: Record<string, string | number | null> = {}
     for (const h of headers) {
       obj[h.label] = row[h.key]
     }
@@ -30,7 +31,7 @@ export function exportToXlsx(
 }
 
 export function exportToCsv(
-  data: Record<string, any>[],
+  data: Record<string, string | number | null>[],
   headers: { key: string; label: string }[],
   filename: string
 ) {

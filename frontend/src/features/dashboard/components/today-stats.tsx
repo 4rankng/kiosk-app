@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState } from '@/components/empty-state'
 
 const statsConfig = [
   { key: 'revenue', icon: Wallet, label: 'Doanh thu' },
@@ -26,7 +27,7 @@ function TrendText({ value, suffix, className }: { value: number | string; suffi
     <p className={cn(
       'mt-1 text-xs',
       isUp && 'text-emerald-600',
-      isDown && 'text-red-600',
+      isDown && 'text-destructive',
       !isUp && !isDown && 'text-muted-foreground',
       className,
     )}>
@@ -51,7 +52,18 @@ function StatCardSkeleton() {
 }
 
 export function TodayStats() {
-  const { data, isLoading } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
+  const { data, isLoading, isError, refetch } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
+
+  if (isError) {
+    return (
+      <EmptyState
+        variant='error'
+        title='Không tải được thống kê'
+        description='Đã có lỗi xảy ra khi tải dữ liệu today.'
+        onRetry={() => refetch()}
+      />
+    )
+  }
 
   if (isLoading) {
     return (

@@ -69,17 +69,24 @@ export const companyService = {
     return row
   },
 
-  /** Delete a company. Fails if it has customers. */
+  /** Delete a company. Fails if it has customers (count-then-delete inside TX). */
   async remove(id: string) {
-    const [custCount] = await db
-      .select({ c: sql<number>`count(*)::int` })
-      .from(customers)
-      .where(eq(customers.companyId, id))
-    if ((custCount?.c ?? 0) > 0) {
-      throw Conflict('Không thể xóa: công ty đang có chi nhánh khách hàng')
+    try {
+      return await db.transaction(async (tx) => {
+        const [custCount] = await tx
+          .select({ c: sql<number>`count(*)::int` })
+          .from(customers)
+          .where(eq(customers.companyId, id))
+        if ((custCount?.c ?? 0) > 0) {
+          throw Conflict('Không thể xóa: công ty đang có chi nhánh khách hàng')
+        }
+        const deleted = await tx.delete(companies).where(eq(companies.id, id)).returning()
+        if (deleted.length === 0) throw NotFound('Công ty không tồn tại')
+        return { deleted: true }
+      })
+    } catch (e: any) {
+      if (e?.code === '23503') throw Conflict('Không thể xóa: công ty đang được tham chiếu')
+      throw e
     }
-    const deleted = await db.delete(companies).where(eq(companies.id, id)).returning()
-    if (deleted.length === 0) throw NotFound('Công ty không tồn tại')
-    return { deleted: true }
   },
 }

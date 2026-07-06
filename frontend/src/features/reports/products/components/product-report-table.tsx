@@ -53,7 +53,7 @@ export function ProductReportTable({ data }: { data: ProductReportRow[] }) {
             <React.Fragment key={row.id}>
               <TableRow key={row.id} className='cursor-pointer' onClick={() => row.toggleExpanded()}>
                 <TableCell>
-                  <Button variant='ghost' size='icon' className='h-6 w-6'>
+                  <Button variant='ghost' size='icon' className='min-h-[44px] min-w-[44px]'>
                     {row.getIsExpanded() ? <ChevronDown className='h-4 w-4' /> : <ChevronRight className='h-4 w-4' />}
                   </Button>
                 </TableCell>
@@ -98,7 +98,7 @@ function DetailTable({ details }: { details: ProductReportRow['details'] }) {
         </TableHeader>
         <TableBody>
           {details.map((d, i) => (
-            <TableRow key={i}>
+            <TableRow key={`${d.invoiceCode}-${i}`}>
               <TableCell>{d.invoiceCode}</TableCell>
               <TableCell>{formatDateTime(d.date)}</TableCell>
               <TableCell>{d.customerName}</TableCell>

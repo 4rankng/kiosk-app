@@ -97,7 +97,7 @@ export const productService = {
     return { ...row, effectivePrice: eff.get(id) ?? Number(row.defaultSalePrice) }
   },
 
-  /** Create a product and auto-add to general price list. */
+  /** Create a product and auto-add to general price list (single TX). */
   async create(body: {
     code: string
     name: string
@@ -110,36 +110,39 @@ export const productService = {
   }) {
     const [dup] = await db.select({ id: products.id }).from(products).where(eq(products.code, body.code)).limit(1)
     if (dup) throw Conflict('Mã sản phẩm đã tồn tại')
-    const [row] = await db
-      .insert(products)
-      .values({
-        ...body,
-        purchasePrice: String(body.purchasePrice),
-        defaultSalePrice: String(body.defaultSalePrice),
-        isActive: true,
-      })
-      .returning()
-    if (!row) throw new AppError(500, 'Failed to create product')
 
-    // Auto-add to general price list
-    const generalId = await getGeneralPriceListId()
-    if (generalId) {
-      await db
-        .insert(priceListItems)
+    return await db.transaction(async (tx) => {
+      const [row] = await tx
+        .insert(products)
         .values({
-          priceListId: generalId,
-          productId: row.id,
-          customPrice: String(body.defaultSalePrice),
+          ...body,
+          purchasePrice: String(body.purchasePrice),
+          defaultSalePrice: String(body.defaultSalePrice),
+          isActive: true,
         })
-        .onConflictDoUpdate({
-          target: [priceListItems.priceListId, priceListItems.productId],
-          set: { customPrice: String(body.defaultSalePrice) },
-        })
-    }
-    return row
+        .returning()
+      if (!row) throw new AppError(500, 'Failed to create product')
+
+      // Auto-add to general price list
+      const generalId = await getGeneralPriceListId()
+      if (generalId) {
+        await tx
+          .insert(priceListItems)
+          .values({
+            priceListId: generalId,
+            productId: row.id,
+            customPrice: String(body.defaultSalePrice),
+          })
+          .onConflictDoUpdate({
+            target: [priceListItems.priceListId, priceListItems.productId],
+            set: { customPrice: String(body.defaultSalePrice) },
+          })
+      }
+      return row
+    })
   },
 
-  /** Update a product and sync general price list if sale price changed. */
+  /** Update a product and sync general price list if sale price changed (single TX). */
   async update(id: string, body: {
     code?: string
     name?: string
@@ -156,37 +159,40 @@ export const productService = {
       const [dup] = await db.select({ id: products.id }).from(products).where(eq(products.code, body.code)).limit(1)
       if (dup) throw Conflict('Mã sản phẩm đã tồn tại')
     }
-    const now = new Date()
-    const [row] = await db
-      .update(products)
-      .set({
-        ...body,
-        purchasePrice: body.purchasePrice !== undefined ? String(body.purchasePrice) : undefined,
-        defaultSalePrice: body.defaultSalePrice !== undefined ? String(body.defaultSalePrice) : undefined,
-        updatedAt: now,
-      })
-      .where(eq(products.id, id))
-      .returning()
-    if (!row) throw new AppError(500, 'Failed to update product')
 
-    // If defaultSalePrice changed, sync the general price list entry
-    if (body.defaultSalePrice !== undefined) {
-      const generalId = await getGeneralPriceListId()
-      if (generalId) {
-        await db
-          .insert(priceListItems)
-          .values({
-            priceListId: generalId,
-            productId: id,
-            customPrice: String(body.defaultSalePrice),
-          })
-          .onConflictDoUpdate({
-            target: [priceListItems.priceListId, priceListItems.productId],
-            set: { customPrice: String(body.defaultSalePrice), updatedAt: now },
-          })
+    return await db.transaction(async (tx) => {
+      const now = new Date()
+      const [row] = await tx
+        .update(products)
+        .set({
+          ...body,
+          purchasePrice: body.purchasePrice !== undefined ? String(body.purchasePrice) : undefined,
+          defaultSalePrice: body.defaultSalePrice !== undefined ? String(body.defaultSalePrice) : undefined,
+          updatedAt: now,
+        })
+        .where(eq(products.id, id))
+        .returning()
+      if (!row) throw new AppError(500, 'Failed to update product')
+
+      // If defaultSalePrice changed, sync the general price list entry
+      if (body.defaultSalePrice !== undefined) {
+        const generalId = await getGeneralPriceListId()
+        if (generalId) {
+          await tx
+            .insert(priceListItems)
+            .values({
+              priceListId: generalId,
+              productId: id,
+              customPrice: String(body.defaultSalePrice),
+            })
+            .onConflictDoUpdate({
+              target: [priceListItems.priceListId, priceListItems.productId],
+              set: { customPrice: String(body.defaultSalePrice), updatedAt: now },
+            })
+        }
       }
-    }
-    return row
+      return row
+    })
   },
 
   /** Delete a product. Throws Conflict if referenced by transactions. */

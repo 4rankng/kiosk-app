@@ -8,8 +8,9 @@ import {
   priceListItems,
   products,
   companies,
+  units,
 } from '../../db/schema/index.js'
-import { BadRequest, NotFound, Conflict } from '../../lib/errors.js'
+import { AppError, BadRequest, NotFound, Conflict } from '../../lib/errors.js'
 import { invalidateGeneralPriceListCache } from '../../lib/price-lists.js'
 
 // ---------------------------------------------------------------------------
@@ -46,7 +47,14 @@ export const priceListService = {
   /** Get a price list with all product items. */
   async getItems(id: string) {
     const [pl] = await db
-      .select()
+      .select({
+        id: priceLists.id,
+        name: priceLists.name,
+        companyId: priceLists.companyId,
+        isDefault: priceLists.isDefault,
+        description: priceLists.description,
+        sortOrder: priceLists.sortOrder,
+      })
       .from(priceLists)
       .where(eq(priceLists.id, id))
       .limit(1)
@@ -57,14 +65,17 @@ export const priceListService = {
         productId: products.id,
         code: products.code,
         name: products.name,
-        unitName:
-          sql<string>`(SELECT name FROM units WHERE id = ${products.unitId})`,
+        unitName: units.name,
         stockQuantity: products.stockQuantity,
         defaultSalePrice: products.defaultSalePrice,
         customPrice: priceListItems.customPrice,
         hasOverride: sql<boolean>`${priceListItems.id} IS NOT NULL`,
       })
       .from(products)
+      .leftJoin(
+        units,
+        eq(products.unitId, units.id)
+      )
       .leftJoin(
         priceListItems,
         and(
@@ -93,7 +104,7 @@ export const priceListService = {
     }
   },
 
-  /** Create a price list with validation. */
+  /** Create a price list with validation. Un-default + insert run in one TX. */
   async create(body: {
     name: string
     companyId?: string | null
@@ -110,59 +121,66 @@ export const priceListService = {
     }
     if (body.isDefault && body.companyId)
       throw BadRequest('Bảng giá chung không thể gắn với công ty')
-    if (body.isDefault) {
-      // Unset any existing default
-      await db
-        .update(priceLists)
-        .set({ isDefault: false })
-        .where(eq(priceLists.isDefault, true))
-    }
-    const [row] = await db
-      .insert(priceLists)
-      .values({
-        name: body.name,
-        companyId: body.companyId ?? null,
-        description: body.description,
-        isDefault: body.isDefault,
-        sortOrder: 0,
-      })
-      .returning()
+
+    const row = await db.transaction(async (tx) => {
+      if (body.isDefault) {
+        // Unset any existing default
+        await tx
+          .update(priceLists)
+          .set({ isDefault: false })
+          .where(eq(priceLists.isDefault, true))
+      }
+      const [inserted] = await tx
+        .insert(priceLists)
+        .values({
+          name: body.name,
+          companyId: body.companyId ?? null,
+          description: body.description,
+          isDefault: body.isDefault,
+          sortOrder: 0,
+        })
+        .returning()
+      if (!inserted) throw new AppError(500, 'Failed to create price list')
+      return inserted
+    })
     await invalidateGeneralPriceListCache()
     return row
   },
 
-  /** Bulk upsert items in chunks of 500. */
+  /** Bulk upsert items in chunks of 500. The whole loop runs in one TX. */
   async upsertItems(
     id: string,
     items: Array<{ productId: string; customPrice: number }>
   ) {
     const [pl] = await db
-      .select()
+      .select({ id: priceLists.id })
       .from(priceLists)
       .where(eq(priceLists.id, id))
       .limit(1)
     if (!pl) throw NotFound('Bảng giá không tồn tại')
     if (items.length === 0) return { upserted: 0 }
 
-    const now = new Date()
-    // Upsert in chunks to avoid huge VALUES
-    const CHUNK = 500
-    for (let i = 0; i < items.length; i += CHUNK) {
-      const chunk = items.slice(i, i + CHUNK)
-      await db
-        .insert(priceListItems)
-        .values(
-          chunk.map((it) => ({
-            priceListId: id,
-            productId: it.productId,
-            customPrice: String(it.customPrice),
-          }))
-        )
-        .onConflictDoUpdate({
-          target: [priceListItems.priceListId, priceListItems.productId],
-          set: { customPrice: sql`EXCLUDED.custom_price`, updatedAt: now },
-        })
-    }
+    await db.transaction(async (tx) => {
+      const now = new Date()
+      // Upsert in chunks to avoid huge VALUES
+      const CHUNK = 500
+      for (let i = 0; i < items.length; i += CHUNK) {
+        const chunk = items.slice(i, i + CHUNK)
+        await tx
+          .insert(priceListItems)
+          .values(
+            chunk.map((it) => ({
+              priceListId: id,
+              productId: it.productId,
+              customPrice: String(it.customPrice),
+            }))
+          )
+          .onConflictDoUpdate({
+            target: [priceListItems.priceListId, priceListItems.productId],
+            set: { customPrice: sql`EXCLUDED.custom_price`, updatedAt: now },
+          })
+      }
+    })
     await invalidateGeneralPriceListCache()
     return { upserted: items.length }
   },
@@ -170,7 +188,7 @@ export const priceListService = {
   /** Delete a price list. General PL is protected. */
   async remove(id: string) {
     const [pl] = await db
-      .select()
+      .select({ id: priceLists.id, isDefault: priceLists.isDefault })
       .from(priceLists)
       .where(eq(priceLists.id, id))
       .limit(1)

@@ -1,5 +1,6 @@
 import type { InvoiceDetail, BusinessEntity } from '@/types/api'
 import { formatCurrency, formatNumber, formatDate } from '@/lib/format'
+import { escapeHtml } from '@/lib/escape'
 
 export function generateInvoiceHTML(invoice: InvoiceDetail, entity: BusinessEntity): string {
   const itemsRows = invoice.items
@@ -7,8 +8,8 @@ export function generateInvoiceHTML(invoice: InvoiceDetail, entity: BusinessEnti
       (item, i) => `
       <tr>
         <td style="padding:6px 10px;border:1px solid #333;text-align:center">${i + 1}</td>
-        <td style="padding:6px 10px;border:1px solid #333">${item.productName}</td>
-        <td style="padding:6px 10px;border:1px solid #333;text-align:center">${item.unit}</td>
+        <td style="padding:6px 10px;border:1px solid #333">${escapeHtml(item.productName)}</td>
+        <td style="padding:6px 10px;border:1px solid #333;text-align:center">${escapeHtml(item.unit)}</td>
         <td style="padding:6px 10px;border:1px solid #333;text-align:right">${formatNumber(item.quantity)}</td>
         <td style="padding:6px 10px;border:1px solid #333;text-align:right">${formatCurrency(item.unitPrice)}</td>
         <td style="padding:6px 10px;border:1px solid #333;text-align:right">${formatCurrency(item.total)}</td>
@@ -20,7 +21,7 @@ export function generateInvoiceHTML(invoice: InvoiceDetail, entity: BusinessEnti
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Hóa đơn ${invoice.code}</title>
+  <title>Hóa đơn ${escapeHtml(invoice.code)}</title>
   <style>
     @page { size: A4; margin: 15mm; }
     body { font-family: "Times New Roman", serif; font-size: 13px; color: #000; margin: 0; padding: 20px; }
@@ -39,17 +40,17 @@ export function generateInvoiceHTML(invoice: InvoiceDetail, entity: BusinessEnti
 </head>
 <body>
   <div class="header">
-    ${entity.headerLines.map((line) => `<div class="${line === entity.headerLines[0] ? 'entity-name' : 'entity-info'}">${line}</div>`).join('\n    ')}
+    ${entity.headerLines.map((line) => `<div class="${line === entity.headerLines[0] ? 'entity-name' : 'entity-info'}">${escapeHtml(line)}</div>`).join('\n    ')}
   </div>
 
   <div class="title">HÓA ĐƠN BÁN HÀNG</div>
 
   <div class="info-row">
-    <span><strong>Mã hóa đơn:</strong> ${invoice.code}</span>
+    <span><strong>Mã hóa đơn:</strong> ${escapeHtml(invoice.code)}</span>
     <span><strong>Ngày:</strong> ${formatDate(invoice.issuedAt)}</span>
   </div>
   <div class="info-row">
-    <span><strong>Khách hàng:</strong> ${invoice.customerName}</span>
+    <span><strong>Khách hàng:</strong> ${escapeHtml(invoice.customerName)}</span>
     <span></span>
   </div>
 

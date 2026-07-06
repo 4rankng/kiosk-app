@@ -8,6 +8,20 @@
       "when": 1718150400000,
       "tag": "0000_initial",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1718236800000,
+      "tag": "0001_fix_types_and_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1754794200000,
+      "tag": "0002_composite_indexes",
+      "breakpoints": true
     }
   ]
 }

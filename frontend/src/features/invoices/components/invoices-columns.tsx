@@ -9,15 +9,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { Printer, DollarSign, CheckCircle2, Clock, XCircle } from 'lucide-react'
+import { Printer, DollarSign } from 'lucide-react'
 import { useInvoicesContext } from './invoices-provider'
+import { statusMeta } from '../status-meta'
 
-const statusIconMap: Record<string, { icon: typeof CheckCircle2; bg: string; color: string; tip: string }> = {
-  pending: { icon: Clock, bg: 'bg-amber-50', color: 'text-amber-600', tip: 'Đang xử lý' },
-  cancelled: { icon: XCircle, bg: 'bg-red-50', color: 'text-red-600', tip: 'Đã hủy' },
-}
-
-export function getInvoicesColumns(): ColumnDef<Invoice, any>[] {
+export function getInvoicesColumns(): ColumnDef<Invoice, unknown>[] {
   return [
     {
       accessorKey: 'code',
@@ -47,47 +43,17 @@ export function getInvoicesColumns(): ColumnDef<Invoice, any>[] {
       header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
       cell: ({ row }) => {
         const invoice = row.original
-        // Completed: show payment status instead
-        if (invoice.status === 'completed') {
-          if (invoice.isPaid) {
-            return (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className='inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50'>
-                      <CheckCircle2 className='h-3 w-3 text-emerald-600' />
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>Đã thanh toán</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )
-          }
-          return (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className='inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-50'>
-                    <DollarSign className='h-3 w-3 text-red-600' />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>Chưa thanh toán</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )
-        }
-        const cfg = statusIconMap[invoice.status]
-        if (!cfg) return null
-        const Icon = cfg.icon
+        const meta = statusMeta(invoice.status, invoice.isPaid)
+        const Icon = meta.icon
         return (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${cfg.bg}`}>
-                  <Icon className={`h-3 w-3 ${cfg.color}`} />
+                <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${meta.className}`}>
+                  <Icon className='h-3 w-3' />
                 </span>
               </TooltipTrigger>
-              <TooltipContent>{cfg.tip}</TooltipContent>
+              <TooltipContent>{meta.label}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         )
@@ -112,6 +78,7 @@ export function getInvoicesColumns(): ColumnDef<Invoice, any>[] {
                     variant='ghost'
                     size='icon'
                     className='h-8 w-8'
+                    aria-label='In hóa đơn'
                     onClick={() => {
                       setSelectedInvoice(row.original)
                       setOpen('print')
@@ -129,6 +96,7 @@ export function getInvoicesColumns(): ColumnDef<Invoice, any>[] {
                       variant='ghost'
                       size='icon'
                       className='h-8 w-8'
+                      aria-label='Thu tiền'
                       onClick={() => {
                         setSelectedInvoice(row.original)
                         setOpen('payment')

@@ -73,7 +73,7 @@ export function OutstandingDebts() {
       <CardContent>
         <div className='space-y-3'>
           {debts.map((d, i) => (
-            <div key={i} className='flex items-center gap-3'>
+            <div key={d.customerName} className='flex items-center gap-3'>
               <span className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold'>
                 {i + 1}
               </span>
@@ -87,7 +87,7 @@ export function OutstandingDebts() {
         <Separator className='my-3' />
         <div className='flex items-center justify-between rounded-md bg-muted/50 px-3 py-2'>
           <span className='text-sm font-medium'>Tổng công nợ</span>
-          <span className='text-sm font-bold tabular-nums text-red-600'>{formatCurrency(totalDebt)}</span>
+          <span className='text-sm font-bold tabular-nums text-destructive'>{formatCurrency(totalDebt)}</span>
         </div>
       </CardContent>
     </>

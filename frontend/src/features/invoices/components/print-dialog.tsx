@@ -29,9 +29,34 @@ export function PrintDialog() {
     printWindow.document.write(html)
     printWindow.document.close()
     printWindow.focus()
-    setTimeout(() => printWindow.print(), 300)
 
-    setOpen(null)
+    // Wait for the new window's document to fully load before invoking print,
+    // otherwise the browser may print a blank page (race with document parsing).
+    const triggerPrint = () => {
+      try {
+        printWindow.focus()
+        printWindow.print()
+      } catch {
+        // If print() throws (e.g. blocked), ignore silently.
+      }
+      setOpen(null)
+    }
+
+    if (printWindow.document.readyState === 'complete') {
+      triggerPrint()
+    } else {
+      printWindow.onload = triggerPrint
+      // Safety net: in some browsers onload never fires for about:blank writes,
+      // so poll readyState for a short window.
+      let polls = 0
+      const poll = setInterval(() => {
+        polls += 1
+        if (printWindow.document.readyState === 'complete' || polls > 20) {
+          clearInterval(poll)
+          triggerPrint()
+        }
+      }, 50)
+    }
   }
 
   return (

@@ -35,6 +35,8 @@ export const invoices = pgTable(
   (t) => ({
     customerIdx: index('invoices_customer_idx').on(t.customerId),
     issuedAtIdx: index('invoices_issued_at_idx').on(t.issuedAt),
+    statusIssuedAtIdx: index('invoices_status_issued_at_idx').on(t.status, t.issuedAt),
+    customerIssuedAtIdx: index('invoices_customer_issued_idx').on(t.customerId, t.issuedAt),
   })
 )
 

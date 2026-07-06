@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { db, pool } from '../../config/db.js'
+import { pool } from '../../config/db.js'
 import { redis } from '../../config/redis.js'
 import { ok } from '../../lib/response.js'
 
@@ -26,5 +26,6 @@ healthRoutes.get('/ready', async (c) => {
     checks.redis = 'error'
   }
   const ready = Object.values(checks).every((v) => v === 'ok')
-  return c.json({ status: ready ? 'ready' : 'degraded', checks }, ready ? 200 : 503)
+  const data = { status: ready ? 'ready' : 'degraded', checks }
+  return c.json({ data }, ready ? 200 : 503)
 })

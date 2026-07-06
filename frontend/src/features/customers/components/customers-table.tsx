@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   type SortingState, type ColumnFiltersState, type VisibilityState, type RowSelectionState,
   flexRender, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues,
@@ -12,16 +12,20 @@ import { DataTablePagination, DataTableFacetedFilter, DataTableViewOptions } fro
 import { Input } from '@/components/ui/input'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileCardView } from '@/components/data-table/mobile-card-view'
+import { EmptyState } from '@/components/empty-state'
 import { getCustomersColumns } from './customers-columns'
 import { customersCardConfig } from './customers-mobile-config'
 
 export function CustomersTable() {
-  const { data: customersData } = useQuery({ queryKey: ['customers'], queryFn: () => getCustomers() })
+  const { data: customersData, isError: isCustomersError, refetch: refetchCustomers } = useQuery({ queryKey: ['customers'], queryFn: () => getCustomers() })
   const customers = customersData?.data ?? []
   const { data: companiesData } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
   const companies = companiesData?.data ?? []
-  const companyOptions = companies.map((c: { id: string; name: string }) => ({ label: c.name, value: c.id }))
-  const columns = getCustomersColumns()
+  const companyOptions = useMemo(
+    () => companies.map((c: { id: string; name: string }) => ({ label: c.name, value: c.id })),
+    [companies]
+  )
+  const columns = useMemo(() => getCustomersColumns(), [])
   const isMobile = useIsMobile()
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
@@ -39,6 +43,17 @@ export function CustomersTable() {
     getPaginationRowModel: getPaginationRowModel(), getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(), getFacetedUniqueValues: getFacetedUniqueValues(),
   })
+
+  if (isCustomersError) {
+    return (
+      <EmptyState
+        variant='error'
+        title='Không tải được danh sách khách hàng'
+        description='Vui lòng kiểm tra kết nối và thử lại.'
+        onRetry={() => refetchCustomers()}
+      />
+    )
+  }
 
   return (
     <div className='space-y-4'>

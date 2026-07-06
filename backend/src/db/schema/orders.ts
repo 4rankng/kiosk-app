@@ -34,6 +34,7 @@ export const orders = pgTable(
     customerIdx: index('orders_customer_idx').on(t.customerId),
     createdAtIdx: index('orders_created_at_idx').on(t.createdAt),
     statusIdx: index('orders_status_idx').on(t.status),
+    statusCreatedIdx: index('orders_status_created_idx').on(t.status, t.createdAt),
   })
 )
 
@@ -62,6 +63,7 @@ export const orderItems = pgTable(
   (t) => ({
     orderIdx: index('order_items_order_idx').on(t.orderId),
     productIdx: index('order_items_product_idx').on(t.productId),
+    orderSortIdx: index('order_items_order_sort_idx').on(t.orderId, t.sortOrder),
   })
 )
 
@@ -84,6 +86,7 @@ export const payments = pgTable(
   },
   (t) => ({
     orderIdx: index('payments_order_idx').on(t.orderId),
+    orderPaidAtIdx: index('payments_order_paid_idx').on(t.orderId, t.paidAt),
   })
 )
 

@@ -36,7 +36,7 @@ const statusConfig = {
   cancelled: { icon: XCircle, label: 'Đã hủy', className: 'text-muted-foreground' },
   pending: { icon: Clock, label: 'Chờ TT', className: 'text-amber-600' },
   paid: { icon: CheckCircle, label: 'Đã TT', className: 'text-emerald-600' },
-  unpaid: { icon: AlertCircle, label: 'Chưa TT', className: 'text-red-600' },
+  unpaid: { icon: AlertCircle, label: 'Chưa TT', className: 'text-destructive' },
 } as const
 
 function StatusBadge({ status, isPaid }: { status: string; isPaid: boolean }) {

@@ -34,7 +34,7 @@ const queryClient = new QueryClient({
         )
       },
       refetchOnWindowFocus: import.meta.env.PROD,
-      staleTime: 10 * 1000, // 10s
+      staleTime: 30 * 1000, // 30s
     },
     mutations: {
       onError: (error) => {
@@ -77,7 +77,7 @@ const router = createRouter({
   routeTree,
   context: { queryClient },
   defaultPreload: 'intent',
-  defaultPreloadStaleTime: 0,
+  defaultPreloadStaleTime: 30 * 1000, // 30s
 })
 
 // Register the router instance for type safety

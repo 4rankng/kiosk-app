@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   type SortingState,
   type ColumnFiltersState,
@@ -23,12 +23,13 @@ import { Input } from '@/components/ui/input'
 import { CheckCircle2, Clock, XCircle, DollarSign } from 'lucide-react'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileCardView } from '@/components/data-table/mobile-card-view'
+import { EmptyState } from '@/components/empty-state'
 import { getInvoicesColumns } from './invoices-columns'
 import { invoicesCardConfig } from './invoices-mobile-config'
 import { statusOptions } from '../data/data'
 
 export function InvoicesTable() {
-  const { data: invoices = [] } = useQuery({
+  const { data: invoices = [], isError: isInvoicesError, refetch: refetchInvoices } = useQuery({
     queryKey: ['invoices'],
     queryFn: getInvoices,
   })
@@ -40,7 +41,7 @@ export function InvoicesTable() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
-  const columns = getInvoicesColumns()
+  const columns = useMemo(() => getInvoicesColumns(), [])
 
   const table = useReactTable({
     data: invoices,
@@ -57,6 +58,17 @@ export function InvoicesTable() {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
+
+  if (isInvoicesError) {
+    return (
+      <EmptyState
+        variant='error'
+        title='Không tải được danh sách hóa đơn'
+        description='Vui lòng kiểm tra kết nối và thử lại.'
+        onRetry={() => refetchInvoices()}
+      />
+    )
+  }
 
   return (
     <div className='space-y-4'>
@@ -79,9 +91,9 @@ export function InvoicesTable() {
 
       <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground'>
         <span className='flex items-center gap-1'><CheckCircle2 className='h-3 w-3 text-emerald-600' />Đã TT</span>
-        <span className='flex items-center gap-1'><DollarSign className='h-3 w-3 text-red-600' />Chưa TT</span>
+        <span className='flex items-center gap-1'><DollarSign className='h-3 w-3 text-destructive' />Chưa TT</span>
         <span className='flex items-center gap-1'><Clock className='h-3 w-3 text-amber-600' />Đang xử lý</span>
-        <span className='flex items-center gap-1'><XCircle className='h-3 w-3 text-red-600' />Đã hủy</span>
+        <span className='flex items-center gap-1'><XCircle className='h-3 w-3 text-destructive' />Đã hủy</span>
       </div>
 
       {isMobile ? (

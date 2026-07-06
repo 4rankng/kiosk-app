@@ -61,12 +61,12 @@ export function ProductsMobileList({ products, onEdit, onDelete }: ProductsMobil
           <span className='shrink-0 pt-0.5 text-sm font-semibold tabular-nums'>
             {formatCurrency(product.defaultSalePrice)}
           </span>
-          <div className='flex shrink-0 items-center gap-0.5 pt-0.5'>
-            <Button variant='ghost' size='icon' className='h-7 w-7' onClick={() => onEdit(product)}>
-              <Pencil className='h-3.5 w-3.5' />
+          <div className='flex shrink-0 items-center gap-1 pt-0.5'>
+            <Button variant='ghost' size='icon' className='min-h-[44px] min-w-[44px]' onClick={() => onEdit(product)}>
+              <Pencil className='h-4 w-4' />
             </Button>
-            <Button variant='ghost' size='icon' className='h-7 w-7 hover:text-destructive' onClick={() => onDelete(product)}>
-              <Trash2 className='h-3.5 w-3.5' />
+            <Button variant='ghost' size='icon' className='min-h-[44px] min-w-[44px] hover:text-destructive' onClick={() => onDelete(product)}>
+              <Trash2 className='h-4 w-4' />
             </Button>
           </div>
         </div>

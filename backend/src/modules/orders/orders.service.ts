@@ -28,19 +28,24 @@ import {
 } from '../../db/schema/index.js'
 import { AppError, BadRequest, NotFound } from '../../lib/errors.js'
 import { getGeneralPriceListId } from '../../lib/price-lists.js'
+import { invalidateDashboardCache } from '../reports/reports.service.js'
 
 // ---------------------------------------------------------------------------
-//  Sequence helpers — use raw SQL via db.execute (works inside Drizzle TX)
+//  Sequence helpers — run inside the caller's transaction so the sequence
+//  advance is committed/rolled back together with the order/invoice writes.
 // ---------------------------------------------------------------------------
 
-async function nextOrderCode(): Promise<string> {
-  const result = await db.execute(sql`SELECT nextval('order_code_seq')::text AS nextval`)
+/** Minimal type accepted by the sequence helpers: db or a tx. */
+type Executable = { execute: (q: ReturnType<typeof sql>) => Promise<{ rows: unknown[] }> }
+
+async function nextOrderCode(tx: Executable): Promise<string> {
+  const result = await tx.execute(sql`SELECT nextval('order_code_seq')::text AS nextval`)
   const rows = result.rows as Array<{ nextval: string }>
   return `DH${rows[0]!.nextval.padStart(6, '0')}`
 }
 
-async function nextInvoiceCode(): Promise<string> {
-  const result = await db.execute(sql`SELECT nextval('invoice_code_seq')::text AS nextval`)
+async function nextInvoiceCode(tx: Executable): Promise<string> {
+  const result = await tx.execute(sql`SELECT nextval('invoice_code_seq')::text AS nextval`)
   const rows = result.rows as Array<{ nextval: string }>
   return `HD${rows[0]!.nextval.padStart(6, '0')}`
 }
@@ -118,11 +123,14 @@ export const orderService = {
         .orderBy(desc(orders.createdAt))
         .limit(pageSize)
         .offset(offset),
-      db
-        .select({ total: sql<number>`count(*)::int` })
-        .from(orders)
-        .leftJoin(customers, eq(orders.customerId, customers.id))
-        .where(where),
+      // Count without the customers JOIN when we don't need it for filtering
+      companyId || q
+        ? db
+            .select({ total: sql<number>`count(*)::int` })
+            .from(orders)
+            .leftJoin(customers, eq(orders.customerId, customers.id))
+            .where(where)
+        : db.select({ total: sql<number>`count(*)::int` }).from(orders).where(where),
     ])
     return { items: rows, total: Number(total) }
   },
@@ -167,7 +175,7 @@ export const orderService = {
    *   manual override → company price list → general price list → default sale price
    */
   async create(body: CreateOrderInput, createdBy: string) {
-    return await db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       // 1. Validate customer + resolve company price list
       const [customer] = await tx
         .select({
@@ -264,7 +272,7 @@ export const orderService = {
       if (body.paidAmount > total) throw BadRequest('Tiền khách đưa không được lớn hơn tổng phải trả')
 
       // 7. Insert order
-      const orderCode = await nextOrderCode()
+      const orderCode = await nextOrderCode(tx)
       const [orderRow] = await tx
         .insert(orders)
         .values({
@@ -309,7 +317,7 @@ export const orderService = {
 
       // 10. Generate invoice if requested
       if (body.generateInvoice) {
-        const invoiceCode = await nextInvoiceCode()
+        const invoiceCode = await nextInvoiceCode(tx)
         await tx.insert(invoices).values({
           code: invoiceCode,
           orderId: createdId,
@@ -346,6 +354,8 @@ export const orderService = {
       const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, createdId)).orderBy(orderItems.sortOrder)
       return { ...order, items }
     })
+    await invalidateDashboardCache()
+    return result
   },
 
   /** Update order status. */
@@ -384,6 +394,7 @@ export const orderService = {
         .set({ paidAmount: String(newPaid) })
         .where(eq(invoices.orderId, id))
     })
+    await invalidateDashboardCache()
 
     return { paidAmount: newPaid, remaining: Number(order.total) - newPaid }
   },

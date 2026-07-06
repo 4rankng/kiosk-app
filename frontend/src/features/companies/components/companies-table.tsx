@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { type SortingState, type ColumnFiltersState, type VisibilityState, type RowSelectionState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
 import { useQuery } from '@tanstack/react-query'
 import { getCompanies } from '@/services/companies'
@@ -18,7 +18,7 @@ export function CompaniesTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-  const columns = getCompaniesColumns()
+  const columns = useMemo(() => getCompaniesColumns(), [])
 
   const table = useReactTable({
     data: companies, columns,
