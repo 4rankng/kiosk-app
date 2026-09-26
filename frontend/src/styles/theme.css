@@ -11,7 +11,7 @@
   --color-brand-300: oklch(0.835 0.085 155);
   --color-brand-400: oklch(0.755 0.11 155);
   --color-brand-500: oklch(0.66 0.135 155);
-  --color-brand-600: oklch(0.556 0.12 155);
+  --color-brand-600: oklch(0.549 0.12 155);
   --color-brand-700: oklch(0.47 0.1 155);
   --color-brand-800: oklch(0.4 0.085 155);
   --color-brand-900: oklch(0.34 0.065 155);
@@ -53,6 +53,13 @@
 
   /* 10px Fresh Market corner radius (rounded-lg maps through --radius-lg below). */
   --radius: 0.625rem;
+
+  /* WCAG contrast fixes (≥4.5:1 on white for text pairs):
+     warning text was yellow-600 (2.93:1) → amber 4.70:1; success text was green-600 (3.22:1) → green-700 4.94:1. */
+  --color-fg-warning-primary: oklch(0.562 0.14 75);
+  --color-text-warning-primary: oklch(0.562 0.14 75);
+  --color-fg-success-primary: oklch(0.527 0.154 150);
+  --color-text-success-primary: oklch(0.527 0.154 150);
 
   /* Legacy aliases consumed by ui/chart.tsx and index.css base rules only. */
   --background: var(--color-bg-secondary);

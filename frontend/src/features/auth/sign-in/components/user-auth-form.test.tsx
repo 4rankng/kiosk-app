@@ -33,7 +33,6 @@ vi.mock('@/services/auth', () => ({
       accessToken: 'mock-access-token',
     })
   ),
-  signInWithGoogle: vi.fn(() => Promise.reject(new Error('not used in test'))),
 }))
 
 vi.mock('@tanstack/react-router', async (importOriginal) => {
@@ -71,7 +70,6 @@ vi.mock('@/services/auth', () => ({
     accessToken: 'mock-access-token',
     refreshToken: 'mock-refresh-token',
   }),
-  signInWithGoogle: vi.fn(),
 }))
 
 vi.mock('@/lib/utils', async (orig) => ({
