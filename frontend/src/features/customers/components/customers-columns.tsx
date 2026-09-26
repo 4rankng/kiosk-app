@@ -18,7 +18,7 @@ export function getCustomersColumns(): ColumnDef<Customer>[] {
       cell: ({ row }) => (
         <div className='text-sm'>
           <div>{row.original.phone}</div>
-          {row.original.taxId && <div className='text-muted-foreground'>MST: {row.original.taxId}</div>}
+          {row.original.taxId && <div className='text-tertiary'>MST: {row.original.taxId}</div>}
         </div>
       ),
     },

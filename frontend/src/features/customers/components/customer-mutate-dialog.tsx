@@ -6,18 +6,19 @@ import { createCustomer, updateCustomer } from '@/services/customers'
 import { getCompanies } from '@/services/companies'
 import { customerSchema, type CustomerSchema } from '../data/schema'
 import { useCustomersContext } from './customers-provider'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ModalOverlay, Modal, Dialog } from '@/components/application/modals/modal'
+import { Button } from '@/components/base/buttons/button'
+import { InputBase, TextField } from '@/components/base/input/input'
+import { Label } from '@/components/base/input/label'
+import { Select } from '@/components/base/select/select'
+import { SelectItem } from '@/components/base/select/select-item'
 import { toast } from 'sonner'
 
 export function CustomerMutateDialog() {
   const { open, setOpen, selectedCustomer } = useCustomersContext()
   const queryClient = useQueryClient()
   const isEdit = open === 'edit'
-  const fieldId = useId()
+  const titleId = useId()
   const { data: companiesData } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
   const companies = companiesData?.data ?? []
 
@@ -56,62 +57,89 @@ export function CustomerMutateDialog() {
   })
 
   return (
-    <Dialog open={open === 'add' || open === 'edit'} onOpenChange={() => setOpen(null)}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{isEdit ? 'Chỉnh sửa khách hàng' : 'Thêm mới khách hàng'}</DialogTitle>
-          <DialogDescription>{isEdit ? 'Cập nhật thông tin khách hàng.' : 'Nhập thông tin để tạo khách hàng mới.'}</DialogDescription>
-        </DialogHeader>
-        <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className='flex flex-1 flex-col gap-4'>
-          <div className='flex-1 space-y-4 overflow-y-auto'>
-            <div className='grid grid-cols-2 gap-3'>
-            <div className='space-y-2'>
-              <Label htmlFor={`${fieldId}-code`}>Mã KH</Label>
-              <Input id={`${fieldId}-code`} {...form.register('code')} />
-              {form.formState.errors.code && <p className='text-sm text-destructive'>{form.formState.errors.code.message}</p>}
+    <ModalOverlay isOpen={open === 'add' || open === 'edit'} onOpenChange={() => setOpen(null)}>
+      <Modal className='w-full max-w-lg'>
+        <Dialog aria-labelledby={titleId}>
+          <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className='flex flex-col gap-5 p-5 sm:p-6'>
+            <div className='flex flex-col gap-1 text-start'>
+              <h2 id={titleId} className='text-md font-semibold text-primary'>
+                {isEdit ? 'Chỉnh sửa khách hàng' : 'Thêm mới khách hàng'}
+              </h2>
+              <p className='text-sm text-tertiary'>
+                {isEdit ? 'Cập nhật thông tin khách hàng.' : 'Nhập thông tin để tạo khách hàng mới.'}
+              </p>
             </div>
-            <div className='space-y-2'>
-              <Label htmlFor={`${fieldId}-name`}>Tên nhà hàng</Label>
-              <Input id={`${fieldId}-name`} {...form.register('name')} />
-              {form.formState.errors.name && <p className='text-sm text-destructive'>{form.formState.errors.name.message}</p>}
+            <div className='space-y-4'>
+              <div className='grid grid-cols-2 gap-3'>
+                <div className='space-y-1.5'>
+                  <TextField>
+                    <Label>Mã KH</Label>
+                    <InputBase {...form.register('code')} isInvalid={!!form.formState.errors.code} />
+                  </TextField>
+                  {form.formState.errors.code && <p className='text-xs text-error-primary'>{form.formState.errors.code.message}</p>}
+                </div>
+                <div className='space-y-1.5'>
+                  <TextField>
+                    <Label>Tên nhà hàng</Label>
+                    <InputBase {...form.register('name')} isInvalid={!!form.formState.errors.name} />
+                  </TextField>
+                  {form.formState.errors.name && <p className='text-xs text-error-primary'>{form.formState.errors.name.message}</p>}
+                </div>
+              </div>
+              <div className='space-y-1.5'>
+                <Select
+                  label='Công ty'
+                  placeholder='Chọn công ty...'
+                  selectedKey={form.watch('companyId') || null}
+                  onSelectionChange={(key) => form.setValue('companyId', String(key), { shouldValidate: true })}
+                  isInvalid={!!form.formState.errors.companyId}
+                  items={companies.map((c) => ({ id: c.id, label: c.name }))}
+                >
+                  {(item) => <SelectItem id={item.id}>{item.label}</SelectItem>}
+                </Select>
+                {form.formState.errors.companyId && <p className='text-xs text-error-primary'>{form.formState.errors.companyId.message}</p>}
+              </div>
+              <div className='grid grid-cols-2 gap-3'>
+                <div className='space-y-1.5'>
+                  <TextField>
+                    <Label>Điện thoại</Label>
+                    <InputBase {...form.register('phone')} />
+                  </TextField>
+                </div>
+                <div className='space-y-1.5'>
+                  <TextField>
+                    <Label>Email</Label>
+                    <InputBase {...form.register('email')} isInvalid={!!form.formState.errors.email} />
+                  </TextField>
+                  {form.formState.errors.email && <p className='text-xs text-error-primary'>{form.formState.errors.email.message}</p>}
+                </div>
+              </div>
+              <div className='space-y-1.5'>
+                <TextField>
+                  <Label>Địa chỉ</Label>
+                  <InputBase {...form.register('address')} />
+                </TextField>
+              </div>
+              <div className='space-y-1.5'>
+                <TextField>
+                  <Label>MST</Label>
+                  <InputBase {...form.register('taxId')} />
+                </TextField>
+              </div>
             </div>
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor={`${fieldId}-company`}>Công ty</Label>
-            <Select onValueChange={(v) => form.setValue('companyId', v)} value={form.watch('companyId') ?? ''}>
-              <SelectTrigger id={`${fieldId}-company`}><SelectValue placeholder='Chọn công ty...' /></SelectTrigger>
-              <SelectContent>
-                {companies.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            {form.formState.errors.companyId && <p className='text-sm text-destructive'>{form.formState.errors.companyId.message}</p>}
-          </div>
-          <div className='grid grid-cols-2 gap-3'>
-            <div className='space-y-2'>
-              <Label htmlFor={`${fieldId}-phone`}>Điện thoại</Label>
-              <Input id={`${fieldId}-phone`} {...form.register('phone')} />
+            <div className='flex flex-col-reverse gap-x-2 gap-y-2 border-t border-secondary pt-4 sm:flex-row sm:justify-end'>
+              <Button color='secondary' type='button' onPress={() => setOpen(null)}>Hủy bỏ</Button>
+              <Button
+                type='submit'
+                isLoading={mutation.isPending}
+                showTextWhileLoading
+              >
+                {mutation.isPending ? 'Đang lưu...' : isEdit ? 'Cập nhật' : 'Tạo mới'}
+              </Button>
             </div>
-            <div className='space-y-2'>
-              <Label htmlFor={`${fieldId}-email`}>Email</Label>
-              <Input id={`${fieldId}-email`} {...form.register('email')} />
-              {form.formState.errors.email && <p className='text-sm text-destructive'>{form.formState.errors.email.message}</p>}
-            </div>
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor={`${fieldId}-address`}>Địa chỉ</Label>
-            <Input id={`${fieldId}-address`} {...form.register('address')} />
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor={`${fieldId}-tax`}>MST</Label>
-            <Input id={`${fieldId}-tax`} {...form.register('taxId')} />
-          </div>
-          </div>
-          <DialogFooter className='border-t pt-4'>
-            <Button type='button' variant='outline' onClick={() => setOpen(null)}>Hủy bỏ</Button>
-            <Button type='submit' disabled={mutation.isPending}>{mutation.isPending ? 'Đang lưu...' : isEdit ? 'Cập nhật' : 'Tạo mới'}</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+          </form>
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
   )
 }

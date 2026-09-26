@@ -1,9 +1,9 @@
 import { type ColumnDef } from '@tanstack/react-table'
+import { Pencil01, Trash01 } from '@untitledui/icons'
 import type { Company } from '@/types/company'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Button } from '@/components/base/buttons/button'
+import { Badge } from '@/components/base/badges/badges'
 import { useCompaniesContext } from './companies-provider'
 
 export function getCompaniesColumns(): ColumnDef<Company>[] {
@@ -23,8 +23,8 @@ export function getCompaniesColumns(): ColumnDef<Company>[] {
       cell: ({ row }) => {
         const plId = row.getValue('priceListId') as string
         return plId
-          ? <Badge variant='default' className='text-xs'>Đã gán</Badge>
-          : <Badge variant='outline' className='text-xs text-muted-foreground'>Chưa gán</Badge>
+          ? <Badge type='color' color='brand' size='sm'>Đã gán</Badge>
+          : <Badge type='color' color='gray' size='sm' className='text-tertiary'>Chưa gán</Badge>
       },
     },
     {
@@ -34,12 +34,8 @@ export function getCompaniesColumns(): ColumnDef<Company>[] {
         const { setOpen, setSelectedCompany } = useCompaniesContext()
         return (
           <div className='flex items-center gap-1'>
-            <Button variant='ghost' size='icon' className='h-8 w-8' aria-label='Chỉnh sửa công ty' onClick={() => { setSelectedCompany(row.original); setOpen('edit') }}>
-              <Pencil className='h-4 w-4' />
-            </Button>
-            <Button variant='ghost' size='icon' className='h-8 w-8' aria-label='Xóa công ty' onClick={() => { setSelectedCompany(row.original); setOpen('delete') }}>
-              <Trash2 className='h-4 w-4 text-destructive' />
-            </Button>
+            <Button color='tertiary' size='xs' iconLeading={Pencil01} aria-label='Chỉnh sửa công ty' onPress={() => { setSelectedCompany(row.original); setOpen('edit') }} />
+            <Button color='tertiary-destructive' size='xs' iconLeading={Trash01} aria-label='Xóa công ty' onPress={() => { setSelectedCompany(row.original); setOpen('delete') }} />
           </div>
         )
       },

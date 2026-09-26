@@ -6,18 +6,19 @@ import { createCompany, updateCompany } from '@/services/companies'
 import { getPriceLists } from '@/services/price-lists'
 import { companySchema, type CompanySchema } from '../data/schema'
 import { useCompaniesContext } from './companies-provider'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ModalOverlay, Modal, Dialog } from '@/components/application/modals/modal'
+import { Button } from '@/components/base/buttons/button'
+import { InputBase, TextField } from '@/components/base/input/input'
+import { Label } from '@/components/base/input/label'
+import { Select } from '@/components/base/select/select'
+import { SelectItem } from '@/components/base/select/select-item'
 import { toast } from 'sonner'
 
 export function CompanyMutateDialog() {
   const { open, setOpen, selectedCompany } = useCompaniesContext()
   const queryClient = useQueryClient()
   const isEdit = open === 'edit'
-  const fieldId = useId()
+  const titleId = useId()
   const { data: priceLists = [] } = useQuery({ queryKey: ['price-lists'], queryFn: () => getPriceLists() })
 
   const form = useForm<CompanySchema>({
@@ -51,41 +52,62 @@ export function CompanyMutateDialog() {
   })
 
   return (
-    <Dialog open={open === 'add' || open === 'edit'} onOpenChange={() => setOpen(null)}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{isEdit ? 'Chỉnh sửa công ty' : 'Thêm công ty/chuỗi mới'}</DialogTitle>
-          <DialogDescription>{isEdit ? 'Cập nhật thông tin công ty.' : 'Nhập thông tin để tạo công ty mới.'}</DialogDescription>
-        </DialogHeader>
-        <form onSubmit={form.handleSubmit((v) => mutation.mutate(v as CompanySchema))} className='flex flex-1 flex-col gap-4'>
-          <div className='flex-1 space-y-4 overflow-y-auto'>
-            <div className='grid grid-cols-2 gap-3'>
-            <div className='space-y-2'>
-              <Label htmlFor={`${fieldId}-name`}>Tên công ty</Label>
-              <Input id={`${fieldId}-name`} {...form.register('name')} />
-              {form.formState.errors.name && <p className='text-sm text-destructive'>{form.formState.errors.name.message}</p>}
+    <ModalOverlay isOpen={open === 'add' || open === 'edit'} onOpenChange={() => setOpen(null)}>
+      <Modal className='w-full max-w-lg'>
+        <Dialog aria-labelledby={titleId}>
+          <form onSubmit={form.handleSubmit((v) => mutation.mutate(v as CompanySchema))} className='flex flex-col gap-5 p-5 sm:p-6'>
+            <div className='flex flex-col gap-1 text-start'>
+              <h2 id={titleId} className='text-md font-semibold text-primary'>
+                {isEdit ? 'Chỉnh sửa công ty' : 'Thêm công ty/chuỗi mới'}
+              </h2>
+              <p className='text-sm text-tertiary'>
+                {isEdit ? 'Cập nhật thông tin công ty.' : 'Nhập thông tin để tạo công ty mới.'}
+              </p>
             </div>
-            <div className='space-y-2'>
-              <Label htmlFor={`${fieldId}-tax`}>MST</Label>
-              <Input id={`${fieldId}-tax`} {...form.register('taxCode')} />
+            <div className='space-y-4'>
+              <div className='grid grid-cols-2 gap-3'>
+                <div className='space-y-1.5'>
+                  <TextField>
+                    <Label>Tên công ty</Label>
+                    <InputBase {...form.register('name')} isInvalid={!!form.formState.errors.name} />
+                  </TextField>
+                  {form.formState.errors.name && <p className='text-xs text-error-primary'>{form.formState.errors.name.message}</p>}
+                </div>
+                <div className='space-y-1.5'>
+                  <TextField>
+                    <Label>MST</Label>
+                    <InputBase {...form.register('taxCode')} />
+                  </TextField>
+                </div>
+              </div>
+              <div className='space-y-1.5'>
+                <Select
+                  label='Bảng giá'
+                  placeholder='Chọn bảng giá...'
+                  selectedKey={form.watch('priceListId') || null}
+                  onSelectionChange={(key) => form.setValue('priceListId', String(key), { shouldValidate: true })}
+                  items={priceLists.map((pl) => ({ id: pl.id, label: pl.name }))}
+                >
+                  {(item) => <SelectItem id={item.id}>{item.label}</SelectItem>}
+                </Select>
+                {form.formState.errors.priceListId && <p className='text-xs text-error-primary'>{form.formState.errors.priceListId.message}</p>}
+              </div>
             </div>
-          </div>
-            <div className='space-y-2'>
-              <Label htmlFor={`${fieldId}-pricelist`}>Bảng giá</Label>
-              <Select onValueChange={(v) => form.setValue('priceListId', v)} value={form.watch('priceListId') ?? ''}>
-                <SelectTrigger id={`${fieldId}-pricelist`}><SelectValue placeholder='Chọn bảng giá...' /></SelectTrigger>
-                <SelectContent>
-                  {priceLists.map((pl) => <SelectItem key={pl.id} value={pl.id}>{pl.name}</SelectItem>)}
-                </SelectContent>
-              </Select>
+            <div className='flex flex-col-reverse gap-x-2 gap-y-2 border-t border-secondary pt-4 sm:flex-row sm:justify-end'>
+              <Button color='secondary' type='button' onPress={() => setOpen(null)}>
+                Hủy bỏ
+              </Button>
+              <Button
+                type='submit'
+                isLoading={mutation.isPending}
+                showTextWhileLoading
+              >
+                {mutation.isPending ? 'Đang lưu...' : isEdit ? 'Cập nhật' : 'Tạo mới'}
+              </Button>
             </div>
-          </div>
-          <DialogFooter className='border-t pt-4'>
-            <Button type='button' variant='outline' onClick={() => setOpen(null)}>Hủy bỏ</Button>
-            <Button type='submit' disabled={mutation.isPending}>{mutation.isPending ? 'Đang lưu...' : isEdit ? 'Cập nhật' : 'Tạo mới'}</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+          </form>
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
   )
 }
