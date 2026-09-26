@@ -1,16 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Save01, SearchMd } from '@untitledui/icons'
 import { bulkUpsertPriceListItems } from '@/services/price-lists'
 import type { PriceList, PriceListItem } from '@/types/api'
 import { formatCurrency } from '@/lib/format'
-import { Input } from '@/components/ui/input'
+import { InputBase } from '@/components/base/input/input'
 import { NumberInput } from '@/components/number-input'
-import { Button } from '@/components/ui/button'
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table'
+import { Button } from '@/components/base/buttons/button'
 import { toast } from 'sonner'
-import { Save } from 'lucide-react'
 import { useIsMobile } from '@/hooks/use-mobile'
 
 interface PriceListTableProps {
@@ -68,12 +65,16 @@ export function PriceListTable({ priceList, items: initialItems }: PriceListTabl
   return (
     <div className='space-y-4'>
       <div className='flex flex-wrap items-center gap-2'>
-        <Input
-          placeholder='Tìm kiếm mặt hàng...'
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className={isMobile ? 'h-9 w-full' : 'h-9 w-[300px]'}
-        />
+        <div className={isMobile ? 'w-full' : 'w-[300px]'}>
+          <InputBase
+            size='sm'
+            icon={SearchMd}
+            wrapperClassName='h-9'
+            placeholder='Tìm kiếm mặt hàng...'
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
       </div>
 
       {isMobile ? (
@@ -82,51 +83,48 @@ export function PriceListTable({ priceList, items: initialItems }: PriceListTabl
           onUpdatePrice={updateCustomPrice}
         />
       ) : (
-        <div className='rounded-md border'>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className='w-[100px]'>Mã hàng</TableHead>
-                <TableHead>Tên mặt hàng</TableHead>
-                <TableHead className='w-[130px] text-right'>Giá gốc</TableHead>
-                <TableHead className='w-[160px] text-right'>Giá tùy chỉnh</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        <div className='overflow-hidden rounded-xl bg-primary shadow-xs ring-1 ring-secondary ring-inset'>
+          <table className='w-full text-sm'>
+            <thead>
+              <tr className='bg-secondary'>
+                <th scope='col' className='w-[100px] px-3 py-2.5 text-start text-xs font-medium text-tertiary'>Mã hàng</th>
+                <th scope='col' className='px-3 py-2.5 text-start text-xs font-medium text-tertiary'>Tên mặt hàng</th>
+                <th scope='col' className='w-[130px] px-3 py-2.5 text-end text-xs font-medium text-tertiary'>Giá gốc</th>
+                <th scope='col' className='w-[160px] px-3 py-2.5 text-end text-xs font-medium text-tertiary'>Giá tùy chỉnh</th>
+              </tr>
+            </thead>
+            <tbody>
               {filteredItems.map((item) => (
-                <TableRow key={item.productId}>
-                  <TableCell className='font-mono text-sm'>{item.code}</TableCell>
-                  <TableCell>
+                <tr key={item.productId} className='border-b border-secondary transition-colors last:border-b-0 hover:bg-primary_hover'>
+                  <td className='px-3 py-2.5 font-mono text-sm'>{item.code}</td>
+                  <td className='px-3 py-2.5'>
                     {item.name}
-                    <span className='ml-2 text-xs text-muted-foreground'>({item.unit})</span>
-                  </TableCell>
-                  <TableCell className='text-right text-muted-foreground tabular-nums'>
-                    {formatCurrency(item.basePrice)}
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    <NumberInput
-                      value={item.customPrice}
-                      onValueChange={(val) => updateCustomPrice(item.productId, val)}
-                      className='h-8 w-[130px]'
-                    />
-                  </TableCell>
-                </TableRow>
+                    <span className='ml-2 text-xs text-tertiary'>({item.unit})</span>
+                  </td>
+                  <td className='px-3 py-2.5 text-end text-tertiary tabular-nums'>{formatCurrency(item.basePrice)}</td>
+                  <td className='px-3 py-2.5 text-end'>
+                    <div className='flex justify-end'>
+                      <NumberInput
+                        value={item.customPrice}
+                        onValueChange={(val) => updateCustomPrice(item.productId, val)}
+                        className='w-[130px]'
+                      />
+                    </div>
+                  </td>
+                </tr>
               ))}
               {filteredItems.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={4} className='h-24 text-center'>
-                    Không tìm thấy mặt hàng.
-                  </TableCell>
-                </TableRow>
+                <tr>
+                  <td colSpan={4} className='h-24 text-center text-tertiary'>Không tìm thấy mặt hàng.</td>
+                </tr>
               )}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
       )}
 
       <div className='flex justify-end'>
-        <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
-          <Save className='mr-2 h-4 w-4' />
+        <Button iconLeading={Save01} onPress={() => saveMutation.mutate()} isDisabled={saveMutation.isPending}>
           {saveMutation.isPending ? 'Đang lưu...' : 'Lưu bảng giá'}
         </Button>
       </div>
@@ -173,7 +171,7 @@ function MobilePriceList({
 
   if (items.length === 0) {
     return (
-      <div className='flex h-24 items-center justify-center text-sm text-muted-foreground'>
+      <div className='flex h-24 items-center justify-center text-sm text-tertiary'>
         Không tìm thấy mặt hàng.
       </div>
     )
@@ -184,32 +182,32 @@ function MobilePriceList({
       {visibleItems.map((item) => (
         <div
           key={item.productId}
-          className='rounded-md border bg-card p-3 space-y-2'
+          className='rounded-xl bg-primary shadow-xs ring-1 ring-secondary ring-inset p-3 space-y-2'
         >
           <div className='flex items-start justify-between gap-2'>
             <div className='min-w-0 flex-1'>
               <p className='truncate text-sm font-medium'>{item.name}</p>
-              <p className='text-xs text-muted-foreground'>
+              <p className='text-xs text-tertiary'>
                 {item.code} · {item.unit}
               </p>
             </div>
-            <span className='shrink-0 text-xs text-muted-foreground tabular-nums'>
+            <span className='shrink-0 text-xs text-tertiary tabular-nums'>
               Giá gốc: {formatCurrency(item.basePrice)}
             </span>
           </div>
           <div className='flex items-center gap-2'>
-            <span className='shrink-0 text-xs text-muted-foreground'>Giá bán:</span>
+            <span className='shrink-0 text-xs text-tertiary'>Giá bán:</span>
             <NumberInput
               value={item.customPrice}
               onValueChange={(val) => onUpdatePrice(item.productId, val)}
-              className='h-8 flex-1'
+              className='flex-1'
             />
           </div>
         </div>
       ))}
       {visibleCount < items.length && (
         <div ref={sentinelRef} className='flex justify-center py-4'>
-          <span className='text-sm text-muted-foreground'>Đang tải...</span>
+          <span className='text-sm text-tertiary'>Đang tải...</span>
         </div>
       )}
     </div>

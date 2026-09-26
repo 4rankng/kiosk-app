@@ -5,11 +5,12 @@ import {
   getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable,
 } from '@tanstack/react-table'
 import { useQuery } from '@tanstack/react-query'
+import { SearchMd } from '@untitledui/icons'
 import { getProducts } from '@/services/products'
 import { getCategories } from '@/services/categories'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { DataTablePagination, DataTableFacetedFilter, DataTableViewOptions } from '@/components/data-table'
-import { Input } from '@/components/ui/input'
+import { InputBase } from '@/components/base/input/input'
+import { Button } from '@/components/base/buttons/button'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { getProductsColumns } from './products-columns'
 import { ProductsMobileList } from './products-mobile-list'
@@ -76,54 +77,57 @@ export function ProductsTable({ onEdit, onDelete }: ProductsTableProps) {
   return (
     <div className='space-y-3'>
       <div className='flex items-center gap-2'>
-        <Input
-          placeholder='Tìm mã hàng, tên sản phẩm...'
-          value={searchValue}
-          onChange={(e) => table.getColumn('name')?.setFilterValue(e.target.value)}
-          className={isMobile ? 'h-9' : 'h-9 w-[280px]'}
-        />
+        <div className={isMobile ? undefined : 'w-[280px]'}>
+          <InputBase
+            size='sm'
+            icon={SearchMd}
+            wrapperClassName='h-9'
+            placeholder='Tìm mã hàng, tên sản phẩm...'
+            value={searchValue}
+            onChange={(e) => table.getColumn('name')?.setFilterValue(e.target.value)}
+          />
+        </div>
         {!isMobile && table.getColumn('category') && (
           <DataTableFacetedFilter column={table.getColumn('category')} title='Nhóm hàng' options={categoryOptions} />
         )}
         {isFiltered && (
-          <button
-            onClick={() => table.resetColumnFilters()}
-            className='h-9 px-2 text-sm text-muted-foreground hover:text-foreground transition-colors'
-          >
+          <Button color='tertiary' size='sm' onPress={() => table.resetColumnFilters()}>
             Xóa bộ lọc
-          </button>
+          </Button>
         )}
         {!isMobile && <DataTableViewOptions table={table} />}
       </div>
       {isMobile ? (
-        <ProductsMobileList
-          products={filteredProducts}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
+        <ProductsMobileList products={filteredProducts} onEdit={onEdit} onDelete={onDelete} />
       ) : (
         <>
-          <div className='rounded-md border'>
-            <Table>
-              <TableHeader>
+          <div className='overflow-hidden rounded-xl bg-primary shadow-xs ring-1 ring-secondary ring-inset'>
+            <table className='w-full text-sm'>
+              <thead>
                 {table.getHeaderGroups().map((hg) => (
-                  <TableRow key={hg.id}>
-                    {hg.headers.map((h) => <TableHead key={h.id} className='whitespace-nowrap' aria-sort={getColumnAriaSort(h.column)}>{h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}</TableHead>)}
-                  </TableRow>
+                  <tr key={hg.id} className='bg-secondary'>
+                    {hg.headers.map((h) => (
+                      <th key={h.id} scope='col' aria-sort={getColumnAriaSort(h.column)} className='px-3 py-2.5 text-start text-xs font-medium text-tertiary whitespace-nowrap'>
+                        {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
+                      </th>
+                    ))}
+                  </tr>
                 ))}
-              </TableHeader>
-              <TableBody>
+              </thead>
+              <tbody>
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id}>
-                      {row.getVisibleCells().map((cell) => <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>)}
-                    </TableRow>
+                    <tr key={row.id} className='border-b border-secondary transition-colors last:border-b-0 hover:bg-primary_hover'>
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id} className='px-3 py-2.5 align-middle'>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                      ))}
+                    </tr>
                   ))
                 ) : (
-                  <TableRow><TableCell colSpan={columns.length} className='h-24 text-center'>Không có dữ liệu.</TableCell></TableRow>
+                  <tr><td colSpan={columns.length} className='h-24 text-center text-tertiary'>Không có dữ liệu.</td></tr>
                 )}
-              </TableBody>
-            </Table>
+              </tbody>
+            </table>
           </div>
           <DataTablePagination table={table} />
         </>

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { Pencil01, Trash01 } from '@untitledui/icons'
 import type { Product } from '@/types'
 import { formatCurrency } from '@/lib/format'
-import { Button } from '@/components/ui/button'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Button } from '@/components/base/buttons/button'
 
 interface ProductsMobileListProps {
   products: Product[]
@@ -41,24 +41,24 @@ export function ProductsMobileList({ products, onEdit, onDelete }: ProductsMobil
 
   if (products.length === 0) {
     return (
-      <div className='flex h-24 items-center justify-center text-sm text-muted-foreground'>
+      <div className='flex h-24 items-center justify-center text-sm text-tertiary'>
         Không có dữ liệu.
       </div>
     )
   }
 
   return (
-    <div className='divide-y'>
+    <div className='divide-y divide-secondary'>
       {visible.map((product) => (
         <div key={product.id} className='flex items-start gap-3 py-2.5'>
           <div className='min-w-0 flex-1'>
             <div className='flex items-center gap-1.5'>
               <span className='truncate text-sm font-medium'>{product.name}</span>
-              <span className='shrink-0 rounded bg-muted px-1.5 py-px text-xs leading-tight text-muted-foreground'>
+              <span className='shrink-0 rounded bg-secondary px-1.5 py-px text-xs leading-tight text-tertiary'>
                 {product.unitName ?? ''}
               </span>
             </div>
-            <div className='mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground'>
+            <div className='mt-0.5 flex items-center gap-1.5 text-xs text-tertiary'>
               <span className='font-mono'>{product.code}</span>
               <span>·</span>
               <span>{product.categoryName ?? ''}</span>
@@ -68,18 +68,26 @@ export function ProductsMobileList({ products, onEdit, onDelete }: ProductsMobil
             {formatCurrency(product.defaultSalePrice)}
           </span>
           <div className='flex shrink-0 items-center gap-1 pt-0.5'>
-            <Button variant='ghost' size='icon' className='min-h-[44px] min-w-[44px]' aria-label='Chỉnh sửa sản phẩm' onClick={() => onEdit(product)}>
-              <Pencil className='h-4 w-4' />
-            </Button>
-            <Button variant='ghost' size='icon' className='min-h-[44px] min-w-[44px] hover:text-destructive' aria-label='Xóa sản phẩm' onClick={() => onDelete(product)}>
-              <Trash2 className='h-4 w-4' />
-            </Button>
+            <Button
+              color='tertiary'
+              iconLeading={Pencil01}
+              className='min-h-[44px] min-w-[44px]'
+              aria-label='Chỉnh sửa sản phẩm'
+              onPress={() => onEdit(product)}
+            />
+            <Button
+              color='tertiary'
+              iconLeading={Trash01}
+              className='min-h-[44px] min-w-[44px] hover:text-error-primary'
+              aria-label='Xóa sản phẩm'
+              onPress={() => onDelete(product)}
+            />
           </div>
         </div>
       ))}
       {visibleCount < products.length && (
         <div ref={sentinelRef} role='status' aria-live='polite' className='flex justify-center py-4'>
-          <span className='text-xs text-muted-foreground'>Đang tải...</span>
+          <span className='text-xs text-tertiary'>Đang tải...</span>
         </div>
       )}
     </div>
