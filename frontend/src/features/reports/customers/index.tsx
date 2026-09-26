@@ -13,6 +13,7 @@ import { Button } from '@/components/base/buttons/button'
 import { Label } from '@/components/base/input/label'
 import { Select } from '@/components/base/select/select'
 import { SelectItem } from '@/components/base/select/select-item'
+import { Breadcrumbs } from '@/components/application/breadcrumbs/breadcrumbs'
 import { CustomerReportTable } from './components/customer-report-table'
 import { ExportActions } from './components/export-actions'
 import { EmptyState } from '@/components/empty-state'
@@ -68,7 +69,13 @@ export function CustomerReport() {
         <ProfileDropdown />
       </Header>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        <PageHeader title='Báo cáo doanh thu & đối chiếu công nợ' description='Thống kê doanh thu và công nợ theo từng khách hàng và đối tác.' />
+        <div className='flex flex-col gap-1'>
+          <Breadcrumbs>
+            <Breadcrumbs.Item>Báo cáo</Breadcrumbs.Item>
+            <Breadcrumbs.Item>Khách hàng</Breadcrumbs.Item>
+          </Breadcrumbs>
+          <PageHeader title='Báo cáo doanh thu & đối chiếu công nợ' description='Thống kê doanh thu và công nợ theo từng khách hàng và đối tác.' />
+        </div>
 
         {/* Filters */}
         <div className='flex flex-wrap items-end gap-3'>

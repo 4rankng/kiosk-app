@@ -196,8 +196,8 @@
     },
     {
       "path": "src/features/dashboard/components/today-stats.tsx",
-      "accessCount": 32,
-      "lastAccessed": 1790421667946,
+      "accessCount": 35,
+      "lastAccessed": 1790427980562,
       "type": "file"
     },
     {
@@ -219,21 +219,21 @@
       "type": "file"
     },
     {
-      "path": "src/features/dashboard/index.tsx",
-      "accessCount": 19,
-      "lastAccessed": 1790421987712,
-      "type": "file"
-    },
-    {
       "path": "src/features/dashboard/components/monthly-revenue-chart.tsx",
-      "accessCount": 18,
-      "lastAccessed": 1790421692138,
+      "accessCount": 25,
+      "lastAccessed": 1790428137607,
       "type": "file"
     },
     {
       "path": "src/features/products/index.tsx",
-      "accessCount": 18,
-      "lastAccessed": 1790422271541,
+      "accessCount": 21,
+      "lastAccessed": 1790427993463,
+      "type": "file"
+    },
+    {
+      "path": "src/features/dashboard/index.tsx",
+      "accessCount": 20,
+      "lastAccessed": 1790427505313,
       "type": "file"
     },
     {
@@ -255,6 +255,12 @@
       "type": "file"
     },
     {
+      "path": "src/features/price-lists/index.tsx",
+      "accessCount": 15,
+      "lastAccessed": 1790428001939,
+      "type": "file"
+    },
+    {
       "path": "src/styles/theme.css",
       "accessCount": 14,
       "lastAccessed": 1790421392383,
@@ -267,15 +273,15 @@
       "type": "file"
     },
     {
-      "path": "src/components/layout/authenticated-layout.tsx",
-      "accessCount": 12,
-      "lastAccessed": 1790420023455,
+      "path": "src/features/companies/index.tsx",
+      "accessCount": 13,
+      "lastAccessed": 1790428007978,
       "type": "file"
     },
     {
-      "path": "src/features/price-lists/index.tsx",
+      "path": "src/components/layout/authenticated-layout.tsx",
       "accessCount": 12,
-      "lastAccessed": 1790421116669,
+      "lastAccessed": 1790420023455,
       "type": "file"
     },
     {
@@ -285,9 +291,15 @@
       "type": "file"
     },
     {
-      "path": "src/features/companies/index.tsx",
+      "path": "src/features/customers/index.tsx",
       "accessCount": 10,
-      "lastAccessed": 1790421653459,
+      "lastAccessed": 1790428023898,
+      "type": "file"
+    },
+    {
+      "path": "src/features/auth/auth-layout.tsx",
+      "accessCount": 10,
+      "lastAccessed": 1790428043347,
       "type": "file"
     },
     {
@@ -321,21 +333,15 @@
       "type": "file"
     },
     {
-      "path": "src/features/auth/auth-layout.tsx",
-      "accessCount": 7,
-      "lastAccessed": 1790419765999,
-      "type": "file"
-    },
-    {
-      "path": "src/features/customers/index.tsx",
-      "accessCount": 7,
-      "lastAccessed": 1790421483928,
-      "type": "file"
-    },
-    {
       "path": "src/components/ui/button.tsx",
       "accessCount": 6,
       "lastAccessed": 1790260860523,
+      "type": "file"
+    },
+    {
+      "path": "src/features/invoices/index.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1790427464342,
       "type": "file"
     },
     {
@@ -348,12 +354,6 @@
       "path": "src/features/auth/sign-in/index.tsx",
       "accessCount": 5,
       "lastAccessed": 1790419769043,
-      "type": "file"
-    },
-    {
-      "path": "src/features/invoices/index.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1790421117944,
       "type": "file"
     },
     {

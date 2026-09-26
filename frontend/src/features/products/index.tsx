@@ -9,6 +9,7 @@ import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
 import { Button } from '@/components/base/buttons/button'
 import { FeaturedIcon } from '@/components/foundations/featured-icon/featured-icon'
+import { Breadcrumbs } from '@/components/application/breadcrumbs/breadcrumbs'
 import { ProductsDialogs } from './components/products-dialogs'
 import { ProductsProvider, useProductsContext } from './components/products-provider'
 import { ProductsTable } from './components/products-table'
@@ -88,11 +89,17 @@ function ProductsContent() {
         <ProfileDropdown />
       </Header>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        <PageHeader
-          title='Danh mục sản phẩm'
-          description={isMobile ? undefined : `${stats.total} sản phẩm · ${stats.categories} nhóm hàng`}
-          actions={<AddProductButton />}
-        />
+        <div className='flex flex-col gap-1'>
+          <Breadcrumbs>
+            <Breadcrumbs.Item>Hàng hóa</Breadcrumbs.Item>
+            <Breadcrumbs.Item>Sản phẩm</Breadcrumbs.Item>
+          </Breadcrumbs>
+          <PageHeader
+            title='Danh mục sản phẩm'
+            description={isMobile ? undefined : `${stats.total} sản phẩm · ${stats.categories} nhóm hàng`}
+            actions={<AddProductButton />}
+          />
+        </div>
 
         {/* Summary stats */}
         <div className='grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4'>

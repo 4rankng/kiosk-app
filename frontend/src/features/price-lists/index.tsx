@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/page-header'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
+import { Breadcrumbs } from '@/components/application/breadcrumbs/breadcrumbs'
 import { PriceListSelector } from './components/price-list-selector'
 import { PriceListTable } from './components/price-list-table'
 import { EmptyState } from '@/components/empty-state'
@@ -45,7 +46,13 @@ export function PriceLists() {
         <ProfileDropdown />
       </Header>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        <PageHeader title='Quản lý bảng giá tùy chỉnh' description='Thiết lập giá bán riêng cho từng đối tác.' />
+        <div className='flex flex-col gap-1'>
+          <Breadcrumbs>
+            <Breadcrumbs.Item>Hàng hóa</Breadcrumbs.Item>
+            <Breadcrumbs.Item>Bảng giá</Breadcrumbs.Item>
+          </Breadcrumbs>
+          <PageHeader title='Quản lý bảng giá tùy chỉnh' description='Thiết lập giá bán riêng cho từng đối tác.' />
+        </div>
         <PriceListSelector
           selectedPriceList={effectivePriceList}
           onSelect={setSelectedPriceList}

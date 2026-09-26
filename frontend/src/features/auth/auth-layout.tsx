@@ -1,4 +1,5 @@
 import { Logo } from '@/assets/logo'
+import { BackgroundPattern } from '@/components/shared-assets/background-patterns'
 
 type AuthLayoutProps = {
   children: React.ReactNode
@@ -11,6 +12,12 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <div
           aria-hidden='true'
           className='absolute inset-0 bg-linear-to-b from-white/10 via-transparent to-black/25'
+        />
+        <BackgroundPattern
+          pattern='circle'
+          size='lg'
+          aria-hidden='true'
+          className='absolute -top-40 -right-40 text-white/15!'
         />
         <div className='relative flex h-full flex-col justify-between p-10 text-white'>
           <div className='flex items-center gap-2.5'>

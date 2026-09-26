@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { ChevronDown } from '@untitledui/icons'
+import {
+  Button as AriaButton,
+  Dialog as AriaDialog,
+  DialogTrigger as AriaDialogTrigger,
+  Popover as AriaPopover,
+} from 'react-aria-components'
 import { Tooltip } from '@/components/base/tooltip/tooltip'
 import { cn } from '@/lib/utils'
 import { useLayout } from '@/context/layout-provider'
@@ -38,7 +44,7 @@ export function NavGroup({ title, items, forceExpanded = false }: NavGroupOwnPro
 
           if (rail) {
             return item.items ? (
-              <RailGroupLink key={key} item={item} />
+              <RailGroupLink key={key} item={item} isActive={checkIsActive(href, item)} />
             ) : (
               <RailLink key={key} item={item} isActive={checkIsActive(href, item)} />
             )
@@ -159,24 +165,62 @@ function RailLink({ item, isActive }: { item: NavLink; isActive: boolean }) {
   )
 }
 
-function RailGroupLink({ item }: { item: NavCollapsible }) {
+function RailGroupLink({ item, isActive }: { item: NavCollapsible; isActive: boolean }) {
   const { setOpen } = useSidebarUI()
-  const first = item.items[0]
+  const href = useLocation({ select: (location) => location.href })
   const Icon = item.icon
-  if (!first || !Icon) return null
+  if (!item.items.length || !Icon) return null
 
   return (
     <li>
-      <Tooltip title={item.title} placement='right'>
-        <Link
-          to={first.url}
-          onClick={() => setOpen(false)}
+      <AriaDialogTrigger>
+        <AriaButton
           aria-label={item.title}
           className='flex size-9 items-center justify-center rounded-md outline-focus-ring transition duration-100 ease-linear select-none hover:bg-primary_hover focus-visible:outline-2 focus-visible:-outline-offset-2'
         >
-          <Icon aria-hidden='true' className='size-5 shrink-0 text-fg-quaternary' />
-        </Link>
-      </Tooltip>
+          <Icon aria-hidden='true' className={cn('size-5 shrink-0 text-fg-quaternary', isActive && 'text-fg-quaternary_hover')} />
+        </AriaButton>
+        <AriaPopover
+          placement='right top'
+          offset={8}
+          containerPadding={8}
+          className={(state) =>
+            cn(
+              'origin-(--trigger-anchor-point) will-change-transform w-max min-w-44 rounded-lg bg-primary p-1 shadow-lg ring-1 ring-secondary_alt outline-hidden',
+              state.isEntering &&
+                'duration-150 ease-out animate-in fade-in placement-right:slide-in-from-left-0.5',
+              state.isExiting &&
+                'duration-100 ease-in animate-out fade-out placement-right:slide-out-to-left-0.5',
+            )
+          }
+        >
+          <AriaDialog aria-label={item.title} className='outline-hidden'>
+            {({ close }) => (
+              <ul className='flex flex-col gap-0.5'>
+                {item.items.map((subItem) => {
+                  const active = checkIsActive(href, subItem)
+                  return (
+                    <li key={`${subItem.title}-${subItem.url}`}>
+                      <Link
+                        to={subItem.url}
+                        onClick={() => {
+                          setOpen(false)
+                          close()
+                        }}
+                        aria-current={active ? 'page' : undefined}
+                        className={cn('group/item', itemBase, active && itemActive)}
+                      >
+                        {subItem.icon && <subItem.icon aria-hidden='true' className={cn(itemIcon, active && 'text-fg-quaternary_hover')} />}
+                        <span className='truncate'>{subItem.title}</span>
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </AriaDialog>
+        </AriaPopover>
+      </AriaDialogTrigger>
     </li>
   )
 }

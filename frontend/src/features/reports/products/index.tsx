@@ -10,6 +10,7 @@ import { Package, TrendUp01, ShoppingBag02, File02 } from '@untitledui/icons'
 import { getProductReport } from '@/services/reports'
 import { Button } from '@/components/base/buttons/button'
 import { Label } from '@/components/base/input/label'
+import { Breadcrumbs } from '@/components/application/breadcrumbs/breadcrumbs'
 import { ProductReportTable } from './components/product-report-table'
 import { EmptyState } from '@/components/empty-state'
 import { useDocumentTitle } from '@/hooks/use-document-title'
@@ -58,7 +59,13 @@ export function ProductReport() {
         <ProfileDropdown />
       </Header>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        <PageHeader title='Báo cáo tổng hợp theo mặt hàng' description='Thống kê doanh thu và số lượng bán ra theo từng sản phẩm.' />
+        <div className='flex flex-col gap-1'>
+          <Breadcrumbs>
+            <Breadcrumbs.Item>Báo cáo</Breadcrumbs.Item>
+            <Breadcrumbs.Item>Hàng hóa</Breadcrumbs.Item>
+          </Breadcrumbs>
+          <PageHeader title='Báo cáo tổng hợp theo mặt hàng' description='Thống kê doanh thu và số lượng bán ra theo từng sản phẩm.' />
+        </div>
 
         {/* Filters */}
         <div className='flex flex-wrap items-end gap-3'>

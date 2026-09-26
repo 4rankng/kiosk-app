@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowDown, ArrowUp, AlertCircle, CheckCircle, Package, Wallet01 } from '@untitledui/icons'
+import { AlertCircle, CheckCircle, Package, Wallet01 } from '@untitledui/icons'
 import { getDashboardStats } from '@/services/reports'
 import { formatCurrency, formatNumber } from '@/lib/format'
-import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/empty-state'
+import { MetricChangeIndicator } from '@/components/application/metrics/metrics'
 
 const statsConfig = [
   { key: 'revenue', icon: Wallet01, label: 'Doanh thu' },
@@ -14,24 +14,19 @@ const statsConfig = [
 
 function TrendText({ value, suffix }: { value: number | string; suffix: string }) {
   const num = typeof value === 'string' ? parseFloat(value) : value
-  const isUp = num > 0
-  const isDown = num < 0
-  const text = `${isUp ? '+' : ''}${value}${suffix}`
-  if (!isUp && !isDown) {
+  const text = `${num > 0 ? '+' : ''}${value}${suffix}`
+  if (!Number.isFinite(num) || num === 0) {
     return (
       <p className='mt-1.5 text-xs font-medium text-tertiary'>— {text}</p>
     )
   }
   return (
-    <p
-      className={cn(
-        'mt-1.5 flex items-center gap-0.5 text-xs font-medium',
-        isUp ? 'text-success-primary' : 'text-error-primary',
-      )}
-    >
-      {isUp ? <ArrowUp className='size-3 stroke-[3px]' /> : <ArrowDown className='size-3 stroke-[3px]' />}
-      {text}
-    </p>
+    <MetricChangeIndicator
+      type='modern'
+      trend={num > 0 ? 'positive' : 'negative'}
+      value={text}
+      className='mt-1.5'
+    />
   )
 }
 

@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { BarChart01 } from '@untitledui/icons'
 import { getDashboardStats } from '@/services/reports'
 import { ChartContainer, type ChartConfig } from '@/components/ui/chart'
 import { EmptyState } from '@/components/empty-state'
@@ -15,7 +16,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function MonthlyRevenueChart() {
-  const { data, isError, refetch } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
+  const { data, isLoading, isError, refetch } = useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats })
 
   if (isError) {
     return (
@@ -26,6 +27,24 @@ export function MonthlyRevenueChart() {
   }
 
   const chartData = (data?.monthlyRevenue ?? []).map((item) => ({ name: item.week, total: item.revenue }))
+  const hasRevenue = chartData.some((item) => item.total > 0)
+
+  if (isLoading) {
+    return <div className='h-[250px] w-full animate-pulse rounded bg-secondary' />
+  }
+
+  if (!hasRevenue) {
+    return (
+      <div className='flex h-[250px] w-full items-center justify-center'>
+        <EmptyState
+          variant='empty'
+          icon={<BarChart01 className='size-10 text-fg-quaternary' />}
+          title='Chưa có doanh thu'
+          description='Dữ liệu sẽ xuất hiện khi có đơn hàng trong tháng'
+        />
+      </div>
+    )
+  }
 
   return (
     <ChartContainer config={chartConfig} className='h-[250px] w-full'>
