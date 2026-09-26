@@ -1,17 +1,18 @@
 import { type ReactNode } from 'react'
-import { AlertCircle, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
+import { AlertCircle, RefreshCw01 } from '@untitledui/icons'
+import { Button } from '@/components/base/buttons/button'
+import { EmptyState as UUIEmptyState } from '@/components/application/empty-state/empty-state'
+import { cn } from '@/lib/utils'
 
 interface EmptyStateProps {
-  variant: 'loading' | 'error' | 'empty'
+  variant: 'loading' | 'empty' | 'error'
   /** Title for error/empty variants */
   title?: string
   /** Description for error/empty variants */
   description?: string
   /** Retry callback shown on the error variant */
   onRetry?: () => void
-  /** Custom icon for the empty variant */
+  /** Custom icon (any element) for the empty variant */
   icon?: ReactNode
   /** Number of skeleton rows for the loading variant (default 3) */
   rows?: number
@@ -19,11 +20,12 @@ interface EmptyStateProps {
 }
 
 /**
- * Shared empty-state component for consistent loading / error / empty UI.
+ * Shared empty-state component for consistent loading / error / empty UI,
+ * built on the Untitled UI empty-state primitives.
  *
  * - loading: skeleton rows
- * - error: alert icon + title + description + retry button (calls refetch)
- * - empty: icon + title + description
+ * - error: featured icon + title + description + retry button (calls refetch)
+ * - empty: custom icon (or featured icon) + title + description
  */
 export function EmptyState({
   variant,
@@ -36,43 +38,50 @@ export function EmptyState({
 }: EmptyStateProps) {
   if (variant === 'loading') {
     return (
-      <div className={className}>
-        <div className='space-y-2'>
-          {Array.from({ length: rows }).map((_, i) => (
-            <Skeleton key={i} className='h-10 w-full' />
-          ))}
-        </div>
+      <div className={cn('space-y-2', className)}>
+        {Array.from({ length: rows }).map((_, i) => (
+          <div key={i} className='h-10 w-full animate-pulse rounded-md bg-secondary' />
+        ))}
       </div>
     )
   }
 
   const isWarning = variant === 'error'
-  const defaultTitle = variant === 'error' ? 'Không tải được dữ liệu' : 'Không có dữ liệu'
-  const fallbackIcon = isWarning ? (
-    <AlertCircle className='h-10 w-10 text-destructive' strokeWidth={1.5} />
-  ) : null
+  const defaultTitle = isWarning ? 'Không tải được dữ liệu' : 'Không có dữ liệu'
 
   return (
-    <div
+    <UUIEmptyState
+      size='sm'
       role={isWarning ? 'alert' : undefined}
-      className={`flex flex-col items-center justify-center gap-2 py-8 text-center text-muted-foreground ${className ?? ''}`}
+      className={cn('py-8', className)}
     >
-      {icon ?? fallbackIcon}
-      <p className='text-sm font-medium text-foreground'>
-        {title ?? defaultTitle}
-      </p>
-      {description && <p className='text-xs'>{description}</p>}
+      <UUIEmptyState.Header pattern='none'>
+        {icon ? (
+          <div className='relative z-10 flex items-center justify-center'>{icon}</div>
+        ) : (
+          <UUIEmptyState.FeaturedIcon
+            color={isWarning ? 'error' : 'gray'}
+            theme='light'
+            icon={isWarning ? AlertCircle : undefined}
+          />
+        )}
+      </UUIEmptyState.Header>
+      <UUIEmptyState.Content>
+        <UUIEmptyState.Title className='text-md'>{title ?? defaultTitle}</UUIEmptyState.Title>
+        {description && <UUIEmptyState.Description>{description}</UUIEmptyState.Description>}
+      </UUIEmptyState.Content>
       {isWarning && onRetry && (
-        <Button
-          variant='outline'
-          size='sm'
-          className='mt-2'
-          onClick={onRetry}
-        >
-          <Loader2 className='mr-2 h-4 w-4' />
-          Thử lại
-        </Button>
+        <UUIEmptyState.Footer>
+          <Button
+            color='secondary'
+            size='sm'
+            iconLeading={RefreshCw01}
+            onPress={onRetry}
+          >
+            Thử lại
+          </Button>
+        </UUIEmptyState.Footer>
       )}
-    </div>
+    </UUIEmptyState>
   )
 }

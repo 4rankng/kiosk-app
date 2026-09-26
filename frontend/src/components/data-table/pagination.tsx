@@ -1,19 +1,9 @@
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  DoubleArrowLeftIcon,
-  DoubleArrowRightIcon,
-} from '@radix-ui/react-icons'
+import { ChevronLeft, ChevronLeftDouble, ChevronRight, ChevronRightDouble } from '@untitledui/icons'
 import { type Table } from '@tanstack/react-table'
+import { Button } from '@/components/base/buttons/button'
+import { Select } from '@/components/base/select/select'
+import { SelectItem } from '@/components/base/select/select-item'
 import { cn, getPageNumbers } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 type DataTablePaginationProps<TData> = {
   table: Table<TData>
@@ -42,23 +32,17 @@ export function DataTablePagination<TData>({
           Trang {currentPage}/{totalPages}
         </div>
         <div className='flex items-center gap-2 @max-2xl/content:flex-row-reverse'>
-          <Select
-            value={`${table.getState().pagination.pageSize}`}
-            onValueChange={(value) => {
-              table.setPageSize(Number(value))
-            }}
-          >
-            <SelectTrigger className='h-8 w-17.5'>
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
-            </SelectTrigger>
-            <SelectContent side='top'>
-              {[10, 20, 30, 40, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className='w-17.5'>
+            <Select
+              aria-label='Số dòng mỗi trang'
+              selectedKey={String(table.getState().pagination.pageSize)}
+              onSelectionChange={(key) => table.setPageSize(Number(key))}
+              size='sm'
+              items={[10, 20, 30, 40, 50].map((n) => ({ id: String(n), label: String(n) }))}
+            >
+              {(item) => <SelectItem id={item.id}>{item.label}</SelectItem>}
+            </Select>
+          </div>
           <p className='hidden text-sm font-medium sm:block'>Dòng mỗi trang</p>
         </div>
       </div>
@@ -69,36 +53,34 @@ export function DataTablePagination<TData>({
         </div>
         <div className='flex items-center space-x-2'>
           <Button
-            variant='outline'
-            className='size-8 p-0 @max-md/content:hidden'
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
+            color='secondary'
+            className='@max-md/content:hidden'
+            iconLeading={ChevronLeftDouble}
+            onPress={() => table.setPageIndex(0)}
+            isDisabled={!table.getCanPreviousPage()}
           >
-            <span className='sr-only'>Go to first page</span>
-            <DoubleArrowLeftIcon className='h-4 w-4' />
+            <span className='sr-only'>Trang đầu</span>
           </Button>
           <Button
-            variant='outline'
-            className='size-8 p-0'
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            color='secondary'
+            iconLeading={ChevronLeft}
+            onPress={() => table.previousPage()}
+            isDisabled={!table.getCanPreviousPage()}
           >
-            <span className='sr-only'>Go to previous page</span>
-            <ChevronLeftIcon className='h-4 w-4' />
+            <span className='sr-only'>Trang trước</span>
           </Button>
 
           {/* Page number buttons */}
           {pageNumbers.map((pageNumber, index) => (
             <div key={`${pageNumber}-${index}`} className='flex items-center'>
               {pageNumber === '...' ? (
-                <span className='px-1 text-sm text-muted-foreground'>...</span>
+                <span className='px-1 text-sm text-tertiary'>...</span>
               ) : (
                 <Button
-                  variant={currentPage === pageNumber ? 'default' : 'outline'}
-                  className='h-8 min-w-8 px-2'
-                  onClick={() => table.setPageIndex((pageNumber as number) - 1)}
+                  color={currentPage === pageNumber ? 'primary' : 'secondary'}
+                  className='min-w-8 px-2'
+                  onPress={() => table.setPageIndex((pageNumber as number) - 1)}
                 >
-                  <span className='sr-only'>Go to page {pageNumber}</span>
                   {pageNumber}
                 </Button>
               )}
@@ -106,22 +88,21 @@ export function DataTablePagination<TData>({
           ))}
 
           <Button
-            variant='outline'
-            className='size-8 p-0'
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            color='secondary'
+            iconLeading={ChevronRight}
+            onPress={() => table.nextPage()}
+            isDisabled={!table.getCanNextPage()}
           >
-            <span className='sr-only'>Go to next page</span>
-            <ChevronRightIcon className='h-4 w-4' />
+            <span className='sr-only'>Trang sau</span>
           </Button>
           <Button
-            variant='outline'
-            className='size-8 p-0 @max-md/content:hidden'
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
+            color='secondary'
+            className='@max-md/content:hidden'
+            iconLeading={ChevronRightDouble}
+            onPress={() => table.setPageIndex(table.getPageCount() - 1)}
+            isDisabled={!table.getCanNextPage()}
           >
-            <span className='sr-only'>Go to last page</span>
-            <DoubleArrowRightIcon className='h-4 w-4' />
+            <span className='sr-only'>Trang cuối</span>
           </Button>
         </div>
       </div>

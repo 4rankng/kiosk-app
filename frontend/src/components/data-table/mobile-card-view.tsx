@@ -59,7 +59,7 @@ export function MobileCardView<TData>({
 
   if (rows.length === 0) {
     return (
-      <div className='flex h-24 items-center justify-center text-sm text-muted-foreground'>
+      <div className='flex h-24 items-center justify-center text-sm text-tertiary'>
         Không có dữ liệu.
       </div>
     )
@@ -148,8 +148,8 @@ export function MobileCardView<TData>({
               <div className='grid grid-cols-2 gap-x-4 gap-y-1.5'>
                 {detailFields.map((f) => (
                   <div key={f.key}>
-                    <span className='text-xs text-muted-foreground'>{f.label}</span>
-                    <p className='text-sm'>{f.content}</p>
+                    <span className='text-xs text-tertiary'>{f.label}</span>
+                    <p className='text-sm text-secondary'>{f.content}</p>
                   </div>
                 ))}
               </div>
@@ -160,7 +160,7 @@ export function MobileCardView<TData>({
       {/* Sentinel for infinite scroll */}
       {infiniteScroll && visibleCount < allRows.length && (
         <div ref={sentinelRef} role='status' aria-live='polite' className='flex justify-center py-4'>
-          <span className='text-sm text-muted-foreground'>Đang tải...</span>
+          <span className='text-sm text-tertiary'>Đang tải...</span>
         </div>
       )}
     </div>

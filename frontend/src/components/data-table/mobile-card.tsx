@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight } from '@untitledui/icons'
 import { cn } from '@/lib/utils'
 
 interface MobileCardProps {
@@ -13,6 +12,11 @@ interface MobileCardProps {
   className?: string
 }
 
+/**
+ * Tappable row-card used by mobile table/report views. Visuals follow the
+ * Untitled UI card recipe (bg-primary surface + secondary ring); tap targets
+ * stay within the 44px contract.
+ */
 export function MobileCard({
   title,
   status,
@@ -26,10 +30,10 @@ export function MobileCard({
   const hasDetail = !!children
 
   return (
-    <div className={cn('rounded-md border bg-card', className)}>
+    <div className={cn('rounded-lg bg-primary shadow-xs ring-1 ring-secondary ring-inset', className)}>
       {/* Card header — always visible */}
       {hasDetail ? (
-        /* Expandable: whole row is a button */
+        /* Expandable: whole header is a tappable button */
         <button
           type='button'
           className='flex w-full items-start gap-3 p-3 text-left cursor-pointer'
@@ -39,19 +43,19 @@ export function MobileCard({
           <div className='min-w-0 flex-1'>
             <div className='flex items-center justify-between gap-2'>
               <div className='flex items-center gap-2 min-w-0'>
-                <span className='truncate text-sm font-medium'>{title}</span>
+                <span className='truncate text-sm font-medium text-secondary'>{title}</span>
                 {status}
               </div>
               {metric && (
-                <span className='shrink-0 text-sm tabular-nums'>{metric}</span>
+                <span className='shrink-0 text-sm tabular-nums text-primary'>{metric}</span>
               )}
             </div>
           </div>
-          <span className='mt-0.5 shrink-0 text-muted-foreground'>
+          <span className='mt-0.5 shrink-0 text-fg-quaternary'>
             {expanded ? (
-              <ChevronDown className='h-4 w-4' />
+              <ChevronDown className='size-4' />
             ) : (
-              <ChevronRight className='h-4 w-4' />
+              <ChevronRight className='size-4' />
             )}
           </span>
         </button>
@@ -61,11 +65,11 @@ export function MobileCard({
           <div className='min-w-0 flex-1'>
             <div className='flex items-center justify-between gap-2'>
               <div className='flex items-center gap-2 min-w-0'>
-                <span className='truncate text-sm font-medium'>{title}</span>
+                <span className='truncate text-sm font-medium text-secondary'>{title}</span>
                 {status}
               </div>
               {metric && (
-                <span className='shrink-0 text-sm tabular-nums'>{metric}</span>
+                <span className='shrink-0 text-sm tabular-nums text-primary'>{metric}</span>
               )}
             </div>
           </div>
@@ -77,7 +81,7 @@ export function MobileCard({
 
       {/* Expanded detail — accordion */}
       {expanded && hasDetail && (
-        <div className='border-t px-3 pb-3 pt-2 space-y-2'>
+        <div className='border-t border-primary px-3 pb-3 pt-2 space-y-2'>
           {children}
           {actions && (
             <div className='flex items-center justify-end gap-3 pt-1'>{actions}</div>

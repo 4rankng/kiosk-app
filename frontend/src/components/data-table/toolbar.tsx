@@ -1,7 +1,7 @@
-import { Cross2Icon } from '@radix-ui/react-icons'
+import { SearchMd, XClose } from '@untitledui/icons'
 import { type Table } from '@tanstack/react-table'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/base/buttons/button'
+import { InputBase } from '@/components/base/input/input'
 import { DataTableFacetedFilter } from './faceted-filter'
 import { DataTableViewOptions } from './view-options'
 
@@ -22,7 +22,7 @@ type DataTableToolbarProps<TData> = {
 
 export function DataTableToolbar<TData>({
   table,
-  searchPlaceholder = 'Filter...',
+  searchPlaceholder = 'Lọc...',
   searchKey,
   filters = [],
 }: DataTableToolbarProps<TData>) {
@@ -33,7 +33,9 @@ export function DataTableToolbar<TData>({
     <div className='flex items-center justify-between'>
       <div className='flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2'>
         {searchKey ? (
-          <Input
+          <InputBase
+            size='sm'
+            icon={SearchMd}
             placeholder={searchPlaceholder}
             value={
               (table.getColumn(searchKey)?.getFilterValue() as string) ?? ''
@@ -41,14 +43,16 @@ export function DataTableToolbar<TData>({
             onChange={(event) =>
               table.getColumn(searchKey)?.setFilterValue(event.target.value)
             }
-            className='h-8 w-37.5 lg:w-62.5'
+            wrapperClassName='w-37.5 lg:w-62.5'
           />
         ) : (
-          <Input
+          <InputBase
+            size='sm'
+            icon={SearchMd}
             placeholder={searchPlaceholder}
             value={table.getState().globalFilter ?? ''}
             onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className='h-8 w-37.5 lg:w-62.5'
+            wrapperClassName='w-37.5 lg:w-62.5'
           />
         )}
         <div className='flex gap-x-2'>
@@ -67,15 +71,15 @@ export function DataTableToolbar<TData>({
         </div>
         {isFiltered && (
           <Button
-            variant='ghost'
-            onClick={() => {
+            color='tertiary'
+            size='sm'
+            iconTrailing={XClose}
+            onPress={() => {
               table.resetColumnFilters()
               table.setGlobalFilter('')
             }}
-            className='h-8 px-2 lg:px-3'
           >
-            Reset
-            <Cross2Icon className='ms-2 h-4 w-4' />
+            Đặt lại
           </Button>
         )}
       </div>

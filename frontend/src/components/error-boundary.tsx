@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { AlertCircle, RefreshCw } from 'lucide-react'
+import { AlertCircle, RefreshCw01 } from '@untitledui/icons'
+import { Button } from '@/components/base/buttons/button'
 
 interface Props {
   children: ReactNode
@@ -29,21 +30,20 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className='flex min-h-svh flex-col items-center justify-center gap-4 p-6 text-center'>
-          <AlertCircle className='h-12 w-12 text-destructive' strokeWidth={1.5} />
+          <AlertCircle className='size-12 text-error-primary' strokeWidth={1.5} />
           <div className='space-y-1'>
-            <p className='text-lg font-semibold'>Ứng dụng gặp lỗi</p>
-            <p className='text-sm text-muted-foreground'>
+            <p className='text-md font-semibold text-primary'>Ứng dụng gặp lỗi</p>
+            <p className='text-sm text-tertiary'>
               Đã có lỗi bất ngờ xảy ra. Vui lòng tải lại trang.
             </p>
           </div>
-          <button
-            type='button'
-            onClick={() => window.location.reload()}
-            className='inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
+          <Button
+            color='primary'
+            iconLeading={RefreshCw01}
+            onPress={() => window.location.reload()}
           >
-            <RefreshCw className='h-4 w-4' />
             Tải lại trang
-          </button>
+          </Button>
         </div>
       )
     }
