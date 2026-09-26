@@ -2,6 +2,7 @@
 
 # Development
 dev:
+	@test -f .env || cp .env.example .env
 	docker compose up -d postgres redis adminer
 	@echo "Run in separate terminals:"
 	@echo "  cd backend && pnpm dev"

@@ -81,7 +81,7 @@ export function InvoicesTable() {
           placeholder='Tìm mã hóa đơn, khách hàng...'
           value={(table.getColumn('customerName')?.getFilterValue() as string) ?? ''}
           onChange={(e) => table.getColumn('customerName')?.setFilterValue(e.target.value)}
-          className={isMobile ? 'h-9 w-full' : 'h-9 w-[250px]'}
+          className={isMobile ? 'h-8 w-full' : 'h-8 w-[250px]'}
         />
         {!isMobile && table.getColumn('status') && (
           <DataTableFacetedFilter
@@ -94,9 +94,9 @@ export function InvoicesTable() {
       </div>
 
       <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground'>
-        <span className='flex items-center gap-1'><CheckCircle2 className='h-3 w-3 text-emerald-600' />Đã TT</span>
+        <span className='flex items-center gap-1'><CheckCircle2 className='h-3 w-3 text-success' />Đã TT</span>
         <span className='flex items-center gap-1'><DollarSign className='h-3 w-3 text-destructive' />Chưa TT</span>
-        <span className='flex items-center gap-1'><Clock className='h-3 w-3 text-amber-600' />Đang xử lý</span>
+        <span className='flex items-center gap-1'><Clock className='h-3 w-3 text-warning' />Đang xử lý</span>
         <span className='flex items-center gap-1'><XCircle className='h-3 w-3 text-destructive' />Đã hủy</span>
       </div>
 

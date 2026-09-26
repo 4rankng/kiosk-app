@@ -52,6 +52,7 @@ export const invoiceService = {
           discount: invoices.discount,
           total: invoices.total,
           paidAmount: invoices.paidAmount,
+          isPaid: sql<boolean>`(${invoices.paidAmount} >= ${invoices.total} AND ${invoices.total} > 0)`,
           issuedAt: invoices.issuedAt,
         })
         .from(invoices)
@@ -89,6 +90,7 @@ export const invoiceService = {
         discount: invoices.discount,
         total: invoices.total,
         paidAmount: invoices.paidAmount,
+        isPaid: sql<boolean>`(${invoices.paidAmount} >= ${invoices.total} AND ${invoices.total} > 0)`,
         issuedAt: invoices.issuedAt,
       })
       .from(invoices)

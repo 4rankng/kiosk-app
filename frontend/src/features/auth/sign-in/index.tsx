@@ -16,7 +16,7 @@ export function SignIn() {
     <AuthLayout>
       <Card className='w-full max-w-sm gap-4'>
         <CardHeader className='text-center'>
-          <CardTitle className='text-2xl tracking-tight'>Đăng nhập</CardTitle>
+          <CardTitle className='text-display tracking-tight'>Đăng nhập</CardTitle>
           <CardDescription>
             Đăng nhập bằng tài khoản đã được phê duyệt để truy cập hệ thống.
           </CardDescription>

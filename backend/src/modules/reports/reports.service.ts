@@ -72,7 +72,10 @@ function dateRange(q: { from?: string; to?: string }) {
   const now = new Date()
   const defaultFrom = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30)
   const from = q.from ? new Date(q.from) : defaultFrom
-  const to = q.to ? new Date(q.to + 'T23:59:59') : now
+  let to = now
+  if (q.to) {
+    to = q.to.includes('T') ? new Date(q.to) : new Date(q.to + 'T23:59:59')
+  }
   return { fromIso: from.toISOString(), toIso: to.toISOString() }
 }
 

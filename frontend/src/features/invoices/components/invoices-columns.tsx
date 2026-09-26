@@ -43,19 +43,17 @@ export function getInvoicesColumns(): ColumnDef<Invoice, unknown>[] {
       header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
       cell: ({ row }) => {
         const invoice = row.original
-        const meta = statusMeta(invoice.status, invoice.isPaid)
+        const total = Number(invoice.total || 0)
+        const paidAmount = Number(invoice.paidAmount || 0)
+        const isPaid = typeof invoice.isPaid === 'boolean' ? invoice.isPaid : (paidAmount >= total && total > 0)
+        const partiallyPaid = !isPaid && paidAmount > 0 && paidAmount < total
+        const meta = statusMeta(invoice.status, isPaid, partiallyPaid)
         const Icon = meta.icon
         return (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${meta.className}`}>
-                  <Icon className='h-3 w-3' />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>{meta.label}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${meta.className}`}>
+            <Icon className='h-3.5 w-3.5 shrink-0' />
+            <span>{meta.label}</span>
+          </span>
         )
       },
       filterFn: (row, _columnId, filterValue) => {
@@ -69,6 +67,9 @@ export function getInvoicesColumns(): ColumnDef<Invoice, unknown>[] {
       cell: function InvoiceRowActions({ row }) {
         const { setOpen, setSelectedInvoice } = useInvoicesContext()
         const invoice = row.original
+        const total = Number(invoice.total || 0)
+        const paidAmount = Number(invoice.paidAmount || 0)
+        const isPaid = typeof invoice.isPaid === 'boolean' ? invoice.isPaid : (paidAmount >= total && total > 0)
         return (
           <TooltipProvider>
             <div className='flex items-center gap-1'>
@@ -89,13 +90,13 @@ export function getInvoicesColumns(): ColumnDef<Invoice, unknown>[] {
                 </TooltipTrigger>
                 <TooltipContent>In hóa đơn</TooltipContent>
               </Tooltip>
-              {!invoice.isPaid && (
+              {!isPaid && invoice.status !== 'cancelled' && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant='ghost'
                       size='icon'
-                      className='h-8 w-8'
+                      className='h-8 w-8 text-warning hover:bg-warning/10'
                       aria-label='Thu tiền'
                       onClick={() => {
                         setSelectedInvoice(row.original)

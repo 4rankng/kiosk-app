@@ -23,6 +23,7 @@ ALTER TABLE "price_list_items" ALTER COLUMN "created_at" TYPE timestamptz USING 
 ALTER TABLE "price_list_items" ALTER COLUMN "updated_at" TYPE timestamptz USING ("updated_at"::timestamptz), ALTER COLUMN "updated_at" SET DEFAULT now();
 
 -- 3. Add missing FK on companies.price_list_id
+ALTER TABLE "companies" DROP CONSTRAINT IF EXISTS "companies_price_list_fk";
 ALTER TABLE "companies" ADD CONSTRAINT "companies_price_list_fk"
   FOREIGN KEY ("price_list_id") REFERENCES "price_lists"("id") ON DELETE SET NULL;
 
@@ -42,18 +43,31 @@ DROP INDEX IF EXISTS "customers_code_idx";
 CREATE UNIQUE INDEX "customers_code_idx" ON "customers" ("code");
 
 -- 6. Add CHECK constraints on monetary columns
+ALTER TABLE "products" DROP CONSTRAINT IF EXISTS "products_purchase_price_check";
 ALTER TABLE "products" ADD CONSTRAINT "products_purchase_price_check" CHECK ("purchase_price" >= 0);
+ALTER TABLE "products" DROP CONSTRAINT IF EXISTS "products_sale_price_check";
 ALTER TABLE "products" ADD CONSTRAINT "products_sale_price_check" CHECK ("default_sale_price" >= 0);
+ALTER TABLE "products" DROP CONSTRAINT IF EXISTS "products_stock_check";
 ALTER TABLE "products" ADD CONSTRAINT "products_stock_check" CHECK ("stock_quantity" >= 0);
+ALTER TABLE "orders" DROP CONSTRAINT IF EXISTS "orders_subtotal_check";
 ALTER TABLE "orders" ADD CONSTRAINT "orders_subtotal_check" CHECK ("subtotal" >= 0);
+ALTER TABLE "orders" DROP CONSTRAINT IF EXISTS "orders_total_check";
 ALTER TABLE "orders" ADD CONSTRAINT "orders_total_check" CHECK ("total" >= 0);
+ALTER TABLE "orders" DROP CONSTRAINT IF EXISTS "orders_paid_check";
 ALTER TABLE "orders" ADD CONSTRAINT "orders_paid_check" CHECK ("paid_amount" >= 0);
+ALTER TABLE "orders" DROP CONSTRAINT IF EXISTS "orders_discount_check";
 ALTER TABLE "orders" ADD CONSTRAINT "orders_discount_check" CHECK ("discount" >= 0);
+ALTER TABLE "orders" DROP CONSTRAINT IF EXISTS "orders_discount_within_subtotal";
 ALTER TABLE "orders" ADD CONSTRAINT "orders_discount_within_subtotal" CHECK ("discount" <= "subtotal");
+ALTER TABLE "order_items" DROP CONSTRAINT IF EXISTS "order_items_qty_check";
 ALTER TABLE "order_items" ADD CONSTRAINT "order_items_qty_check" CHECK ("quantity" > 0);
+ALTER TABLE "order_items" DROP CONSTRAINT IF EXISTS "order_items_price_check";
 ALTER TABLE "order_items" ADD CONSTRAINT "order_items_price_check" CHECK ("unit_price" >= 0);
+ALTER TABLE "order_items" DROP CONSTRAINT IF EXISTS "order_items_total_check";
 ALTER TABLE "order_items" ADD CONSTRAINT "order_items_total_check" CHECK ("total_price" >= 0);
+ALTER TABLE "payments" DROP CONSTRAINT IF EXISTS "payments_amount_check";
 ALTER TABLE "payments" ADD CONSTRAINT "payments_amount_check" CHECK ("amount" > 0);
+ALTER TABLE "price_list_items" DROP CONSTRAINT IF EXISTS "pli_price_check";
 ALTER TABLE "price_list_items" ADD CONSTRAINT "pli_price_check" CHECK ("custom_price" >= 0);
 
 -- 7. Partial unique index: only one default price list

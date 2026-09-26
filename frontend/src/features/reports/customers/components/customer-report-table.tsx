@@ -41,15 +41,15 @@ export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
                 {rows.map((row) => (
                   <TableRow key={row.customerId}>
                     <TableCell className='font-mono text-sm'>{row.customerCode}</TableCell>
-                    <TableCell>{row.customerName}</TableCell>
-                    <TableCell className='text-right'>{formatCurrency(row.totalRevenue)}</TableCell>
-                    <TableCell className='text-right'>{formatCurrency(row.unpaidAmount)}</TableCell>
+                    <TableCell className='font-medium'>{row.customerName}</TableCell>
+                    <TableCell className='text-right tabular-nums'>{formatCurrency(row.totalRevenue)}</TableCell>
+                    <TableCell className='text-right tabular-nums font-medium text-warning'>{formatCurrency(row.unpaidAmount)}</TableCell>
                   </TableRow>
                 ))}
-                <TableRow key={`summary-${companyId}`} className='bg-muted/50 font-bold'>
-                  <TableCell colSpan={2}>Tổng cộng công nợ của {rows[0].companyName}:</TableCell>
-                  <TableCell className='text-right font-bold'>{formatCurrency(totals.revenue)}</TableCell>
-                  <TableCell className='text-right font-bold'>{formatCurrency(totals.unpaid)}</TableCell>
+                <TableRow key={`summary-${companyId}`} className='bg-muted/40 font-bold'>
+                  <TableCell colSpan={2}>Tổng cộng công nợ {rows[0].companyName}:</TableCell>
+                  <TableCell className='text-right font-bold tabular-nums'>{formatCurrency(totals.revenue)}</TableCell>
+                  <TableCell className='text-right font-bold tabular-nums text-warning'>{formatCurrency(totals.unpaid)}</TableCell>
                 </TableRow>
               </Fragment>
             )

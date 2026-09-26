@@ -165,3 +165,6 @@ graphify-out/
 
 # Upstream shadcn-admin template (not part of kiosk-app)
 templates/
+
+# local DB backups (contain real data)
+plans/backups/

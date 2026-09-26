@@ -190,14 +190,20 @@
   "hotPaths": [
     {
       "path": "src/features/dashboard/components/today-stats.tsx",
+      "accessCount": 30,
+      "lastAccessed": 1790260996287,
+      "type": "file"
+    },
+    {
+      "path": "src/components/config-drawer.test.tsx",
       "accessCount": 28,
-      "lastAccessed": 1783334586264,
+      "lastAccessed": 1790299408899,
       "type": "file"
     },
     {
       "path": "src/features/orders/components/order-create.tsx",
-      "accessCount": 18,
-      "lastAccessed": 1783339203362,
+      "accessCount": 20,
+      "lastAccessed": 1790298359834,
       "type": "file"
     },
     {
@@ -219,6 +225,12 @@
       "type": "file"
     },
     {
+      "path": "src/components/config-drawer.tsx",
+      "accessCount": 12,
+      "lastAccessed": 1790298393332,
+      "type": "file"
+    },
+    {
       "path": "src/features/price-lists/index.tsx",
       "accessCount": 11,
       "lastAccessed": 1783339349575,
@@ -237,6 +249,18 @@
       "type": "file"
     },
     {
+      "path": "src/context/search-provider.test.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1790298439606,
+      "type": "file"
+    },
+    {
+      "path": "src/styles/theme.css",
+      "accessCount": 8,
+      "lastAccessed": 1790415063686,
+      "type": "file"
+    },
+    {
       "path": "src/features/dashboard/components/top-customers.tsx",
       "accessCount": 7,
       "lastAccessed": 1780862820435,
@@ -249,9 +273,21 @@
       "type": "file"
     },
     {
+      "path": "src/styles/index.css",
+      "accessCount": 7,
+      "lastAccessed": 1790415063608,
+      "type": "file"
+    },
+    {
       "path": "src/components/ui/button.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1780821151434,
+      "accessCount": 6,
+      "lastAccessed": 1790260860523,
+      "type": "file"
+    },
+    {
+      "path": "vite.config.ts",
+      "accessCount": 6,
+      "lastAccessed": 1790299573747,
       "type": "file"
     },
     {
@@ -267,27 +303,21 @@
       "type": "file"
     },
     {
-      "path": "src/styles/theme.css",
-      "accessCount": 5,
-      "lastAccessed": 1783334193109,
-      "type": "file"
-    },
-    {
-      "path": "src/styles/index.css",
-      "accessCount": 5,
-      "lastAccessed": 1783334193398,
-      "type": "file"
-    },
-    {
       "path": "src/features/companies/index.tsx",
       "accessCount": 5,
       "lastAccessed": 1783334427693,
       "type": "file"
     },
     {
-      "path": "src/components/config-drawer.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1780820854119,
+      "path": "src/features/auth/auth-layout.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1790261060690,
+      "type": "file"
+    },
+    {
+      "path": "src/components/command-menu.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1790298362595,
       "type": "file"
     },
     {
@@ -315,9 +345,21 @@
       "type": "file"
     },
     {
-      "path": "src/features/auth/auth-layout.tsx",
+      "path": "src/components/ui/input.tsx",
       "accessCount": 4,
-      "lastAccessed": 1783334588826,
+      "lastAccessed": 1790260861686,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/select.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1790260862973,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/badge.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1790260866951,
       "type": "file"
     },
     {
@@ -327,27 +369,9 @@
       "type": "file"
     },
     {
-      "path": "src/components/command-menu.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1780820840079,
-      "type": "file"
-    },
-    {
       "path": "src/components/ui/sonner.tsx",
       "accessCount": 3,
       "lastAccessed": 1780820840385,
-      "type": "file"
-    },
-    {
-      "path": "src/context/search-provider.test.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1780821003852,
-      "type": "file"
-    },
-    {
-      "path": "src/components/ui/badge.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1780821152014,
       "type": "file"
     },
     {
@@ -357,27 +381,21 @@
       "type": "file"
     },
     {
-      "path": "src/components/ui/input.tsx",
+      "path": "src/components/ui/dropdown-menu.tsx",
       "accessCount": 3,
-      "lastAccessed": 1780821182952,
+      "lastAccessed": 1790260877436,
       "type": "file"
     },
     {
-      "path": "src/components/ui/select.tsx",
+      "path": "src/features/auth/sign-in/index.tsx",
       "accessCount": 3,
-      "lastAccessed": 1780862325915,
+      "lastAccessed": 1790261060610,
       "type": "file"
     },
     {
       "path": "src/features/invoices/data/data.ts",
       "accessCount": 2,
       "lastAccessed": 1780820905679,
-      "type": "file"
-    },
-    {
-      "path": "src/components/config-drawer.test.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1780820967695,
       "type": "file"
     },
     {
@@ -411,21 +429,9 @@
       "type": "file"
     },
     {
-      "path": "src/components/ui/dropdown-menu.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1780821221756,
-      "type": "file"
-    },
-    {
       "path": "src/components/ui/textarea.tsx",
       "accessCount": 2,
       "lastAccessed": 1780821222365,
-      "type": "file"
-    },
-    {
-      "path": "src/features/auth/sign-in/index.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1780821897362,
       "type": "file"
     },
     {
@@ -450,12 +456,6 @@
       "path": "src/lib/cookies.ts",
       "accessCount": 1,
       "lastAccessed": 1780820623774,
-      "type": "file"
-    },
-    {
-      "path": "vite.config.ts",
-      "accessCount": 1,
-      "lastAccessed": 1780820634039,
       "type": "file"
     },
     {

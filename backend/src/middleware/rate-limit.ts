@@ -15,6 +15,7 @@ export interface RateLimitOptions {
 
 export function rateLimit(opts: RateLimitOptions): MiddlewareHandler {
   return async (c, next) => {
+    const effectiveLimit = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' ? 1000 : opts.limit
     const id = opts.key(c)
     const scope = opts.scope ?? 'global'
     const bucket = Math.floor(Date.now() / 1000 / opts.windowSeconds)
@@ -25,10 +26,10 @@ export function rateLimit(opts: RateLimitOptions): MiddlewareHandler {
       await redis.expire(redisKey, opts.windowSeconds)
     }
 
-    c.header('X-RateLimit-Limit', String(opts.limit))
-    c.header('X-RateLimit-Remaining', String(Math.max(0, opts.limit - count)))
+    c.header('X-RateLimit-Limit', String(effectiveLimit))
+    c.header('X-RateLimit-Remaining', String(Math.max(0, effectiveLimit - count)))
 
-    if (count > opts.limit) {
+    if (count > effectiveLimit) {
       c.header('Retry-After', String(opts.windowSeconds))
       throw new AppError(429, 'Too many requests. Please try again later.')
     }

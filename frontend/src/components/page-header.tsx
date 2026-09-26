@@ -20,7 +20,7 @@ export function PageHeader({ title, description, actions, className }: PageHeade
     <div className={cn('flex flex-wrap items-end justify-between gap-2', className)}>
       <div className='min-w-0'>
         <h1 className='font-heading text-h1 font-semibold tracking-tight'>{title}</h1>
-        {description && <p className='text-sm text-muted-foreground'>{description}</p>}
+        {description && <p className='text-xs text-muted-foreground'>{description}</p>}
       </div>
       {actions && <div className='flex shrink-0 items-center gap-2'>{actions}</div>}
     </div>

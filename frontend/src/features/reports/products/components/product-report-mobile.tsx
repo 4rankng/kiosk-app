@@ -29,9 +29,9 @@ export function ProductReportMobile({ data }: { data: ProductReportRow[] }) {
               </span>
             }
             metric={
-              <span className='flex gap-3'>
+              <span className='flex gap-3 tabular-nums'>
                 <span>SL: {formatNumber(product.totalQuantity)}</span>
-                <span>{formatCurrency(product.totalRevenue)}</span>
+                <span className='font-semibold'>{formatCurrency(product.totalRevenue)}</span>
               </span>
             }
             expanded={isExpanded}
@@ -47,14 +47,14 @@ export function ProductReportMobile({ data }: { data: ProductReportRow[] }) {
                     <span className='font-mono text-xs text-muted-foreground'>
                       {d.invoiceCode}
                     </span>
-                    <span className='text-xs text-muted-foreground'>
+                    <span className='text-xs text-muted-foreground tabular-nums'>
                       {formatDateTime(d.date)}
                     </span>
                   </div>
                   <p className='mt-0.5 truncate font-medium'>{d.customerName}</p>
-                  <div className='mt-1 flex items-center justify-between text-xs text-muted-foreground'>
+                  <div className='mt-1 flex items-center justify-between text-xs text-muted-foreground tabular-nums'>
                     <span>
-                      {d.quantity} x {formatCurrency(d.unitPrice)}
+                      {formatNumber(d.quantity)} x {formatCurrency(d.unitPrice)}
                     </span>
                     <span className='font-medium text-foreground'>
                       {formatCurrency(d.total)}

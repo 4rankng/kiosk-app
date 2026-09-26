@@ -32,8 +32,10 @@ export interface Product {
   description: string
   categoryId: string | null
   categoryName?: string | null
+  category?: string | null
   unitId: string | null
   unitName?: string | null
+  unit?: string | null
   purchasePrice: number
   defaultSalePrice: number
   stockQuantity: number

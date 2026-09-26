@@ -1,3 +1,4 @@
+import '@/styles/index.css'
 import { clearCookies } from '@/test-utils/cookies'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, type RenderResult } from 'vitest-browser-react'
@@ -29,10 +30,10 @@ async function renderConfigDrawer({
 
 async function openDrawer(screen: RenderResult) {
   await userEvent.click(
-    screen.getByRole('button', { name: /^Open theme settings$/i })
+    screen.getByRole('button', { name: /^Mở cài đặt giao diện$/i })
   )
   await expect
-    .element(screen.getByText(/^Settings$/i))
+    .element(screen.getByText(/^Cài đặt$/i))
     .toBeInTheDocument()
 }
 
@@ -50,19 +51,19 @@ describe('ConfigDrawer (integration)', () => {
 
     await openDrawer(screen)
 
-    const drawer = screen.getByRole('dialog', { name: /theme settings/i })
+    const drawer = screen.getByRole('dialog', { name: /cài đặt/i })
 
     await expect.element(drawer).toBeInTheDocument()
 
-    await expect.element(drawer.getByText(/^Layout$/i)).toBeInTheDocument()
+    await expect.element(drawer.getByText(/^Bố cục$/i)).toBeInTheDocument()
     await expect
-      .element(drawer.getByText(/^Sidebar$/i).first())
+      .element(drawer.getByText(/^Thanh bên$/i).first())
       .toBeInTheDocument()
-    await expect.element(drawer.getByText(/^Direction$/i)).toBeInTheDocument()
+    await expect.element(drawer.getByText(/^Hướng$/i)).toBeInTheDocument()
     await expect
       .element(
         screen.getByRole('button', {
-          name: /reset all settings to default values/i,
+          name: /đặt lại tất cả cài đặt về mặc định/i,
         })
       )
       .toBeInTheDocument()
@@ -73,8 +74,17 @@ describe('ConfigDrawer (integration)', () => {
       const screen = await renderConfigDrawer()
       await openDrawer(screen)
 
+      // Floating is the app default; select another variant first so the
+      // final click is a real state change (Radix ignores same-value clicks).
       await userEvent.click(
-        screen.getByRole('radio', { name: /select floating/i })
+        screen.getByRole('radio', { name: /chọn lồng/i })
+      )
+      await vi.waitFor(() =>
+        expect(getCookie('layout_variant')).toBe('inset')
+      )
+
+      await userEvent.click(
+        screen.getByRole('radio', { name: /chọn nổi/i })
       )
       await vi.waitFor(() =>
         expect(getCookie('layout_variant')).toBe('floating')
@@ -86,7 +96,7 @@ describe('ConfigDrawer (integration)', () => {
       await openDrawer(screen)
 
       await userEvent.click(
-        screen.getByRole('radio', { name: /^select sidebar$/i })
+        screen.getByRole('radio', { name: /^chọn thanh bên$/i })
       )
       await vi.waitFor(() =>
         expect(getCookie('layout_variant')).toBe('sidebar')
@@ -98,14 +108,14 @@ describe('ConfigDrawer (integration)', () => {
       await openDrawer(screen)
 
       await userEvent.click(
-        screen.getByRole('radio', { name: /select floating/i })
+        screen.getByRole('radio', { name: /chọn thanh bên/i })
       )
       await vi.waitFor(() =>
-        expect(getCookie('layout_variant')).toBe('floating')
+        expect(getCookie('layout_variant')).toBe('sidebar')
       )
 
       await userEvent.click(
-        screen.getByRole('radio', { name: /select inset/i })
+        screen.getByRole('radio', { name: /chọn lồng/i })
       )
       await vi.waitFor(() => expect(getCookie('layout_variant')).toBe('inset'))
     })
@@ -116,7 +126,7 @@ describe('ConfigDrawer (integration)', () => {
     await openDrawer(screen)
 
     await userEvent.click(
-      screen.getByRole('radio', { name: /select full layout/i })
+      screen.getByRole('radio', { name: /chọn toàn phần/i })
     )
     await vi.waitFor(() =>
       expect(getCookie('layout_collapsible')).toBe('offcanvas')
@@ -130,7 +140,7 @@ describe('ConfigDrawer (integration)', () => {
       await openDrawer(screen)
 
       await userEvent.click(
-        screen.getByRole('radio', { name: /select right to left/i })
+        screen.getByRole('radio', { name: /chọn phải sang trái/i })
       )
       await vi.waitFor(() =>
         expect(document.documentElement.getAttribute('dir')).toBe('rtl')
@@ -138,7 +148,7 @@ describe('ConfigDrawer (integration)', () => {
 
       await userEvent.click(
         screen.getByRole('button', {
-          name: /reset text direction to default/i,
+          name: /đặt lại hướng văn bản về mặc định/i,
         })
       )
       await vi.waitFor(() =>
@@ -147,23 +157,25 @@ describe('ConfigDrawer (integration)', () => {
       expect(getCookie('dir')).toBe('ltr')
     })
 
-    it('resets sidebar style via section control after choosing floating', async () => {
+    it('resets sidebar style via section control after choosing inset', async () => {
       const screen = await renderConfigDrawer()
       await openDrawer(screen)
 
+      // Inset differs from the floating default, so the per-section reset
+      // button renders (showReset requires variant !== default).
       await userEvent.click(
-        screen.getByRole('radio', { name: /select floating/i })
+        screen.getByRole('radio', { name: /chọn lồng/i })
       )
       await vi.waitFor(() =>
-        expect(getCookie('layout_variant')).toBe('floating')
+        expect(getCookie('layout_variant')).toBe('inset')
       )
 
       await userEvent.click(
         screen.getByRole('button', {
-          name: /reset sidebar style to default/i,
+          name: /đặt lại kiểu thanh bên về mặc định/i,
         })
       )
-      await vi.waitFor(() => expect(getCookie('layout_variant')).toBe('inset'))
+      await vi.waitFor(() => expect(getCookie('layout_variant')).toBe('floating'))
     })
 
     it('resets layout via section control after choosing compact', async () => {
@@ -171,13 +183,13 @@ describe('ConfigDrawer (integration)', () => {
       await openDrawer(screen)
 
       await userEvent.click(
-        screen.getByRole('radio', { name: /select compact/i })
+        screen.getByRole('radio', { name: /chọn thu gọn/i })
       )
       await vi.waitFor(() => expect(getCookie('sidebar_state')).toBe('false'))
 
       await userEvent.click(
         screen.getByRole('button', {
-          name: /reset layout options to default/i,
+          name: /đặt lại bố cục về mặc định/i,
         })
       )
       await vi.waitFor(() => expect(getCookie('sidebar_state')).toBe('true'))
@@ -193,7 +205,7 @@ describe('ConfigDrawer (integration)', () => {
     await openDrawer(screen)
 
     await userEvent.click(
-      screen.getByRole('radio', { name: /select right to left/i })
+      screen.getByRole('radio', { name: /chọn phải sang trái/i })
     )
     await vi.waitFor(() =>
       expect(document.documentElement.getAttribute('dir')).toBe('rtl')
@@ -207,11 +219,11 @@ describe('ConfigDrawer (integration)', () => {
     await openDrawer(screen)
 
     await expect
-      .element(screen.getByRole('radio', { name: /select default/i }))
+      .element(screen.getByRole('radio', { name: /chọn mặc định/i }))
       .toHaveAttribute('data-state', 'checked')
 
     await userEvent.click(
-      screen.getByRole('radio', { name: /select compact/i })
+      screen.getByRole('radio', { name: /chọn thu gọn/i })
     )
 
     await vi.waitFor(() => expect(getCookie('sidebar_state')).toBe('false'))
@@ -224,30 +236,30 @@ describe('ConfigDrawer (integration)', () => {
     await openDrawer(screen)
 
     await userEvent.click(
-      screen.getByRole('radio', { name: /select right to left/i })
+      screen.getByRole('radio', { name: /chọn phải sang trái/i })
     )
     await userEvent.click(
-      screen.getByRole('radio', { name: /select floating/i })
+      screen.getByRole('radio', { name: /chọn lồng/i })
     )
     await userEvent.click(
-      screen.getByRole('radio', { name: /select full layout/i })
+      screen.getByRole('radio', { name: /chọn toàn phần/i })
     )
 
     await vi.waitFor(() => expect(getCookie('dir')).toBe('rtl'))
-    await vi.waitFor(() => expect(getCookie('layout_variant')).toBe('floating'))
+    await vi.waitFor(() => expect(getCookie('layout_variant')).toBe('inset'))
     await vi.waitFor(() =>
       expect(getCookie('layout_collapsible')).toBe('offcanvas')
     )
 
     await userEvent.click(
       screen.getByRole('button', {
-        name: /reset all settings to default values/i,
+        name: /đặt lại tất cả cài đặt về mặc định/i,
       })
     )
 
     await vi.waitFor(() => expect(getCookie('sidebar_state')).toBe('true'))
     await vi.waitFor(() => expect(getCookie('dir')).toBeUndefined())
-    await vi.waitFor(() => expect(getCookie('layout_variant')).toBe('inset'))
+    await vi.waitFor(() => expect(getCookie('layout_variant')).toBe('floating'))
     await vi.waitFor(() => expect(getCookie('layout_collapsible')).toBe('icon'))
     await vi.waitFor(() =>
       expect(document.documentElement.getAttribute('dir')).toBe('ltr')

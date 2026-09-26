@@ -32,7 +32,7 @@ export function OrderSuccessDialog({
           <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted'>
             <CheckCircle2 className='h-10 w-10 text-primary' />
           </div>
-          <DialogTitle className='text-center text-xl'>
+          <DialogTitle className='text-center text-lg'>
             Tạo đơn hàng thành công!
           </DialogTitle>
           <DialogDescription className='text-center'>
@@ -50,7 +50,7 @@ export function OrderSuccessDialog({
           </div>
           <div className='flex justify-between border-t pt-2'>
             <span className='text-muted-foreground'>Tổng tiền:</span>
-            <span className='text-xl font-bold'>{formatCurrency(total)}</span>
+            <span className='text-lg font-bold'>{formatCurrency(total)}</span>
           </div>
         </div>
         <DialogFooter>

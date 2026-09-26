@@ -3,7 +3,7 @@ import {
   type SortingState, flexRender, getCoreRowModel, getExpandedRowModel,
   getSortedRowModel, useReactTable, type ColumnDef,
 } from '@tanstack/react-table'
-import { formatCurrency, formatDateTime } from '@/lib/format'
+import { formatCurrency, formatDateTime, formatNumber } from '@/lib/format'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { ChevronRight, ChevronDown, Search } from 'lucide-react'
@@ -12,10 +12,26 @@ import { ProductReportMobile } from './product-report-mobile'
 import type { ProductReportRow } from '@/services/reports'
 
 const columns: ColumnDef<ProductReportRow>[] = [
-  { accessorKey: 'productCode', header: 'Mã hàng' },
-  { accessorKey: 'productName', header: 'Tên mặt hàng' },
-  { accessorKey: 'totalQuantity', header: 'SL đã bán' },
-  { accessorKey: 'totalRevenue', header: 'Tổng Doanh Thu', cell: ({ getValue }) => formatCurrency(getValue() as number) },
+  {
+    accessorKey: 'productCode',
+    header: 'Mã hàng',
+    cell: ({ getValue }) => <span className='font-mono text-sm'>{getValue() as string}</span>,
+  },
+  {
+    accessorKey: 'productName',
+    header: 'Tên mặt hàng',
+    cell: ({ getValue }) => <span className='font-medium'>{getValue() as string}</span>,
+  },
+  {
+    accessorKey: 'totalQuantity',
+    header: 'SL đã bán',
+    cell: ({ getValue }) => <span className='tabular-nums'>{getValue() as number}</span>,
+  },
+  {
+    accessorKey: 'totalRevenue',
+    header: 'Tổng Doanh Thu',
+    cell: ({ getValue }) => <span className='tabular-nums font-medium text-success'>{formatCurrency(getValue() as number)}</span>,
+  },
 ]
 
 export function ProductReportTable({ data }: { data: ProductReportRow[] }) {
@@ -51,8 +67,8 @@ export function ProductReportTable({ data }: { data: ProductReportRow[] }) {
           {table.getRowModel().rows.map((row) => (
             <React.Fragment key={row.id}>
               <TableRow key={row.id} className='cursor-pointer' onClick={() => row.toggleExpanded()}>
-                <TableCell>
-                  <Button variant='ghost' size='icon' className='min-h-[44px] min-w-[44px]'>
+                <TableCell className='w-10 p-2'>
+                  <Button variant='ghost' size='icon' className='h-7 w-7 p-0'>
                     {row.getIsExpanded() ? <ChevronDown className='h-4 w-4' /> : <ChevronRight className='h-4 w-4' />}
                   </Button>
                 </TableCell>
@@ -87,23 +103,23 @@ function DetailTable({ details }: { details: ProductReportRow['details'] }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Mã Hóa đơn</TableHead>
-            <TableHead>Ngày giao dịch</TableHead>
+            <TableHead className='w-[130px]'>Mã Hóa đơn</TableHead>
+            <TableHead className='w-[150px]'>Ngày giao dịch</TableHead>
             <TableHead>Tên Nhà Hàng Mua</TableHead>
-            <TableHead>Số lượng</TableHead>
-            <TableHead>Giá bán</TableHead>
-            <TableHead>Thành tiền</TableHead>
+            <TableHead className='w-[100px] text-right'>Số lượng</TableHead>
+            <TableHead className='w-[120px] text-right'>Giá bán</TableHead>
+            <TableHead className='w-[130px] text-right'>Thành tiền</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {details.map((d, i) => (
             <TableRow key={`${d.invoiceCode}-${i}`}>
-              <TableCell>{d.invoiceCode}</TableCell>
-              <TableCell>{formatDateTime(d.date)}</TableCell>
-              <TableCell>{d.customerName}</TableCell>
-              <TableCell>{d.quantity}</TableCell>
-              <TableCell>{formatCurrency(d.unitPrice)}</TableCell>
-              <TableCell>{formatCurrency(d.total)}</TableCell>
+              <TableCell className='font-mono text-sm'>{d.invoiceCode}</TableCell>
+              <TableCell className='text-muted-foreground text-xs tabular-nums'>{formatDateTime(d.date)}</TableCell>
+              <TableCell className='font-medium'>{d.customerName}</TableCell>
+              <TableCell className='text-right tabular-nums'>{formatNumber(d.quantity)}</TableCell>
+              <TableCell className='text-right tabular-nums text-muted-foreground'>{formatCurrency(d.unitPrice)}</TableCell>
+              <TableCell className='text-right tabular-nums font-semibold'>{formatCurrency(d.total)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

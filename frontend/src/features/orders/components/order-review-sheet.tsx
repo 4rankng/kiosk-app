@@ -99,7 +99,7 @@ export function OrderReviewSheet({
         <div className='border-t bg-background px-4 py-3 space-y-2'>
           <Button
             size='lg'
-            className='w-full min-h-[48px]'
+            className='w-full min-h-[44px]'
             onClick={onSubmit}
             disabled={isPending}
           >
@@ -107,7 +107,7 @@ export function OrderReviewSheet({
           </Button>
           <Button
             variant='outline'
-            className='w-full min-h-[44px]'
+            className='w-full h-10'
             onClick={() => onOpenChange(false)}
           >
             Đóng

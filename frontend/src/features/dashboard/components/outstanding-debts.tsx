@@ -97,14 +97,14 @@ export function OutstandingDebts() {
               <div className='min-w-0 flex-1'>
                 <p className='text-sm font-medium leading-none'>{d.customerName}</p>
               </div>
-              <div className='font-medium tabular-nums'>{formatCurrency(d.amount)}</div>
+              <div className='font-medium tabular-nums text-warning'>{formatCurrency(d.amount)}</div>
             </div>
           ))}
         </div>
         <Separator className='my-3' />
         <div className='flex items-center justify-between rounded-md bg-muted/50 px-3 py-2'>
           <span className='text-sm font-medium'>Tổng công nợ</span>
-          <span className='text-sm font-bold tabular-nums text-destructive'>{formatCurrency(totalDebt)}</span>
+          <span className='text-sm font-bold tabular-nums text-warning'>{formatCurrency(totalDebt)}</span>
         </div>
       </CardContent>
     </>

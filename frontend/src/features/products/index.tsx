@@ -34,10 +34,10 @@ function ProductsContent() {
   const isMobile = useIsMobile()
 
   const stats = useMemo(() => {
-    const categories = new Set(products.map((p) => p.categoryName))
-    const totalInventoryValue = products.reduce((sum, p) => sum + p.purchasePrice, 0)
+    const categories = new Set(products.map((p) => p.categoryName).filter(Boolean))
+    const totalInventoryValue = products.reduce((sum, p) => sum + Number(p.purchasePrice || 0), 0)
     const avgSalePrice = products.length > 0
-      ? products.reduce((sum, p) => sum + p.defaultSalePrice, 0) / products.length
+      ? products.reduce((sum, p) => sum + Number(p.defaultSalePrice || 0), 0) / products.length
       : 0
     return {
       total: products.length,
@@ -85,7 +85,7 @@ function ProductsContent() {
               <Package className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='font-heading text-2xl font-semibold tabular-nums'>{stats.total}</div>
+              <div className='font-heading text-display font-semibold tabular-nums'>{stats.total}</div>
               {!isMobile && <p className='text-xs text-muted-foreground'>mặt hàng trong kho</p>}
             </CardContent>
           </Card>
@@ -95,7 +95,7 @@ function ProductsContent() {
               <Tags className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='font-heading text-2xl font-semibold tabular-nums'>{stats.categories}</div>
+              <div className='font-heading text-display font-semibold tabular-nums'>{stats.categories}</div>
               {!isMobile && <p className='text-xs text-muted-foreground'>nhóm đang hoạt động</p>}
             </CardContent>
           </Card>
@@ -105,7 +105,7 @@ function ProductsContent() {
               <TrendingUp className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='font-heading text-2xl font-semibold tabular-nums'>{formatCurrency(stats.inventoryValue)}</div>
+              <div className='font-heading text-display font-semibold tabular-nums'>{formatCurrency(stats.inventoryValue)}</div>
               {!isMobile && <p className='text-xs text-muted-foreground'>giá trị vốn hàng</p>}
             </CardContent>
           </Card>
@@ -115,7 +115,7 @@ function ProductsContent() {
               <TrendingUp className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='font-heading text-2xl font-semibold tabular-nums'>{formatCurrency(stats.avgPrice)}</div>
+              <div className='font-heading text-display font-semibold tabular-nums'>{formatCurrency(stats.avgPrice)}</div>
               {!isMobile && <p className='text-xs text-muted-foreground'>trên mỗi mặt hàng</p>}
             </CardContent>
           </Card>

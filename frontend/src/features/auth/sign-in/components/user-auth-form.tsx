@@ -35,7 +35,7 @@ export function UserAuthForm({
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: 'admin@phuonglinh.vn', password: 'admin123' },
+    defaultValues: { email: '', password: '' },
   })
 
   function handleGoogleSignIn() {
@@ -78,7 +78,7 @@ export function UserAuthForm({
         disabled={googleLoading}
         onClick={handleGoogleSignIn}
         type='button'
-        className='w-full h-11'
+        className='w-full h-9'
       >
         {googleLoading ? (
           <Loader2 className='animate-spin' />
@@ -112,38 +112,38 @@ export function UserAuthForm({
         </span>
       </div>
 
-      <form onSubmit={form.handleSubmit(handleEmailSignIn)} className='space-y-4'>
-        <div className='space-y-2'>
-          <Label htmlFor='email'>Email</Label>
+      <form onSubmit={form.handleSubmit(handleEmailSignIn)} className='space-y-3'>
+        <div className='space-y-1.5'>
+          <Label htmlFor='email' className='text-xs font-medium'>Email</Label>
           <Input
             id='email'
             type='email'
-            placeholder='admin@phuonglinh.vn'
-            className='h-11'
+            placeholder='admin@tingting.vn'
+            className='h-9'
             {...form.register('email')}
           />
           {form.formState.errors.email && (
-            <p className='text-sm text-destructive'>
+            <p className='text-xs text-destructive'>
               {form.formState.errors.email.message}
             </p>
           )}
         </div>
-        <div className='space-y-2'>
-          <Label htmlFor='password'>Mật khẩu</Label>
+        <div className='space-y-1.5'>
+          <Label htmlFor='password' className='text-xs font-medium'>Mật khẩu</Label>
           <Input
             id='password'
             type='password'
             placeholder='••••••••'
-            className='h-11'
+            className='h-9'
             {...form.register('password')}
           />
           {form.formState.errors.password && (
-            <p className='text-sm text-destructive'>
+            <p className='text-xs text-destructive'>
               {form.formState.errors.password.message}
             </p>
           )}
         </div>
-        <Button type='submit' className='w-full h-11' disabled={form.formState.isSubmitting}>
+        <Button type='submit' className='w-full h-9' disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? (
             <Loader2 className='animate-spin' />
           ) : (

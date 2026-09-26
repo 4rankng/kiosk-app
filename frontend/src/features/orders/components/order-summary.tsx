@@ -25,7 +25,7 @@ export function OrderSummary({ subtotal, discount, total, onDiscountChange }: Or
       </div>
       <div className='flex items-center justify-between border-t pt-2'>
         <span className='font-semibold'>Khách cần trả:</span>
-        <span className='text-xl font-bold'>{formatCurrency(total)}</span>
+        <span className='text-lg font-bold'>{formatCurrency(total)}</span>
       </div>
     </div>
   )

@@ -14,6 +14,27 @@ type DataTableViewOptionsProps<TData> = {
   table: Table<TData>
 }
 
+const COLUMN_LABELS: Record<string, string> = {
+  code: 'Mã',
+  name: 'Tên',
+  category: 'Nhóm hàng',
+  categoryName: 'Nhóm hàng',
+  unit: 'ĐVT',
+  unitName: 'ĐVT',
+  purchasePrice: 'Giá nhập',
+  defaultSalePrice: 'Giá bán',
+  issuedAt: 'Thời gian',
+  customerName: 'Khách hàng',
+  total: 'Tổng tiền',
+  paidAmount: 'Đã thanh toán',
+  status: 'Trạng thái',
+  phone: 'Số điện thoại',
+  address: 'Địa chỉ',
+  company: 'Đơn vị',
+  companyName: 'Đơn vị',
+  taxId: 'Mã số thuế',
+}
+
 export function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
@@ -25,12 +46,12 @@ export function DataTableViewOptions<TData>({
           size='sm'
           className='ms-auto hidden h-8 lg:flex'
         >
-          <MixerHorizontalIcon className='size-4' />
-          View
+          <MixerHorizontalIcon className='size-4 mr-1.5' />
+          Hiển thị
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end' className='w-37.5'>
-        <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+      <DropdownMenuContent align='end' className='w-44'>
+        <DropdownMenuLabel>Bật/tắt cột</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
           .getAllColumns()
@@ -39,6 +60,7 @@ export function DataTableViewOptions<TData>({
               typeof column.accessorFn !== 'undefined' && column.getCanHide()
           )
           .map((column) => {
+            const label = COLUMN_LABELS[column.id] || column.id
             return (
               <DropdownMenuCheckboxItem
                 key={column.id}
@@ -46,7 +68,7 @@ export function DataTableViewOptions<TData>({
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
               >
-                {column.id}
+                {label}
               </DropdownMenuCheckboxItem>
             )
           })}

@@ -27,18 +27,21 @@ import { toast } from 'sonner'
 interface PriceListSelectorProps {
   selectedPriceList: PriceListType | null
   onSelect: (pl: PriceListType) => void
+  priceLists?: PriceListType[]
 }
 
-export function PriceListSelector({ selectedPriceList, onSelect }: PriceListSelectorProps) {
+export function PriceListSelector({ selectedPriceList, onSelect, priceLists: priceListsProp }: PriceListSelectorProps) {
   const queryClient = useQueryClient()
   const [showCreate, setShowCreate] = useState(false)
   const [newName, setNewName] = useState('')
   const [newCompanyId, setNewCompanyId] = useState('')
 
-  const { data: priceLists = [] } = useQuery({
+  const { data: fetchedLists = [] } = useQuery({
     queryKey: ['price-lists'],
     queryFn: () => getPriceLists(),
+    enabled: !priceListsProp,
   })
+  const priceLists = priceListsProp || fetchedLists
 
   const { data: companies = [] } = useQuery({
     queryKey: ['companies'],

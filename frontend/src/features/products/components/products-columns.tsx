@@ -33,20 +33,30 @@ export function getProductsColumns(
       ),
     },
     {
-      accessorKey: 'category',
+      id: 'category',
+      accessorKey: 'categoryName',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Nhóm hàng' />,
-      cell: ({ row }) => (
-        <Badge variant='secondary' className='font-normal'>
-          {row.getValue('category')}
-        </Badge>
-      ),
+      cell: ({ row }) => {
+        const val = row.original.categoryName || row.original.category
+        return val ? (
+          <Badge variant='secondary' className='font-normal'>
+            {val}
+          </Badge>
+        ) : (
+          <span className='text-muted-foreground'>—</span>
+        )
+      },
     },
     {
-      accessorKey: 'unit',
+      id: 'unit',
+      accessorKey: 'unitName',
       header: ({ column }) => <DataTableColumnHeader column={column} title='ĐVT' />,
-      cell: ({ row }) => (
-        <span className='text-muted-foreground'>{row.getValue('unit')}</span>
-      ),
+      cell: ({ row }) => {
+        const val = row.original.unitName || row.original.unit
+        return (
+          <span className='text-muted-foreground'>{val || '—'}</span>
+        )
+      },
     },
     {
       accessorKey: 'purchasePrice',

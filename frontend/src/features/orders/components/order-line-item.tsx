@@ -28,17 +28,17 @@ export function OrderLineItem({ item, onUpdateQuantity, onUpdatePrice, onRemove 
         <Button
           variant='outline'
           size='icon'
-          className='h-9 w-9 shrink-0'
+          className='h-10 w-10 sm:h-8 sm:w-8 shrink-0 touch-manipulation'
           aria-label='Giảm số lượng'
           onClick={() => onUpdateQuantity(item.productId, Math.max(1, item.quantity - 1))}
         >
           <Minus className='h-4 w-4' />
         </Button>
-        <span className='w-10 shrink-0 text-center text-lg font-semibold tabular-nums' aria-live='polite'>{item.quantity}</span>
+        <span className='w-10 shrink-0 text-center text-base sm:text-sm font-semibold tabular-nums' aria-live='polite'>{item.quantity}</span>
         <Button
           variant='outline'
           size='icon'
-          className='h-9 w-9 shrink-0'
+          className='h-10 w-10 sm:h-8 sm:w-8 shrink-0 touch-manipulation'
           aria-label='Tăng số lượng'
           onClick={() => onUpdateQuantity(item.productId, item.quantity + 1)}
         >
@@ -49,7 +49,7 @@ export function OrderLineItem({ item, onUpdateQuantity, onUpdatePrice, onRemove 
           <Button
             variant='ghost'
             size='icon'
-            className='h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive'
+            className='h-10 w-10 sm:h-8 sm:w-8 shrink-0 text-muted-foreground hover:text-destructive'
             aria-label='Xóa mặt hàng'
             onClick={() => onRemove(item.productId)}
           >
@@ -60,7 +60,7 @@ export function OrderLineItem({ item, onUpdateQuantity, onUpdatePrice, onRemove 
         <NumberInput
           value={item.unitPrice}
           onValueChange={(val) => onUpdatePrice(item.productId, val)}
-          className='h-8 w-[90px] shrink-0'
+          className='h-10 sm:h-8 w-[95px] sm:w-[90px] shrink-0 text-sm'
         />
       </div>
     </div>

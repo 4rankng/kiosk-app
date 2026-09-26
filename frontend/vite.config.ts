@@ -21,13 +21,44 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'vendor-react',
+              test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+              priority: 20,
+            },
+            {
+              name: 'vendor-tanstack',
+              test: /[\\/]node_modules[\\/]@tanstack[\\/]/,
+              priority: 20,
+            },
+            {
+              name: 'vendor-xlsx',
+              test: /[\\/]node_modules[\\/]xlsx[\\/]/,
+              priority: 20,
+            },
+            {
+              name: 'vendor-recharts',
+              test: /[\\/]node_modules[\\/](recharts|d3-[^\\/]+)[\\/]/,
+              priority: 20,
+            },
+          ],
+        },
+      },
+    },
+  },
   test: {
     silent: 'passed-only',
     unstubEnvs: true,
+    css: true,
     browser: {
       enabled: true,
       provider: playwright(),
-      instances: [{ browser: 'chromium' }],
+      instances: [{ browser: 'chromium', viewport: { width: 1280, height: 720 } }],
     },
     coverage: {
       // include: ['src/**/*.{js,jsx,ts,tsx}'], // Uncomment to expand the report to all src/**/* so untested modules appear as 0% coverage.

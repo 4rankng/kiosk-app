@@ -35,8 +35,8 @@ function RecentInvoicesSkeleton() {
 
 const statusConfig = {
   cancelled: { icon: XCircle, label: 'Đã hủy', className: 'text-muted-foreground' },
-  pending: { icon: Clock, label: 'Chờ TT', className: 'text-amber-600' },
-  paid: { icon: CheckCircle, label: 'Đã TT', className: 'text-emerald-600' },
+  pending: { icon: Clock, label: 'Chờ TT', className: 'text-warning' },
+  paid: { icon: CheckCircle, label: 'Đã TT', className: 'text-success' },
   unpaid: { icon: AlertCircle, label: 'Chưa TT', className: 'text-destructive' },
 } as const
 

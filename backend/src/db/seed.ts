@@ -7,6 +7,7 @@
  * each other across tables. ON CONFLICT DO NOTHING on every insert.
  */
 import '../config/dotenv.js'
+import { eq } from 'drizzle-orm'
 import { db, pool } from '../config/db.js'
 import {
   users,
@@ -116,35 +117,35 @@ const PLID = {
 
 // Customers
 const CUID = {
-  minh1:      'g0000001-0000-0000-0000-000000000001',
-  minh2:      'g0000002-0000-0000-0000-000000000002',
-  lan1:       'g0000003-0000-0000-0000-000000000003',
-  lan2:       'g0000004-0000-0000-0000-000000000004',
-  hoa1:       'g0000005-0000-0000-0000-000000000005',
-  nam1:       'g0000006-0000-0000-0000-000000000006',
-  nam2:       'g0000007-0000-0000-0000-000000000007',
-  hung1:      'g0000008-0000-0000-0000-000000000008',
+  minh1:      '07000001-0000-0000-0000-000000000001',
+  minh2:      '07000002-0000-0000-0000-000000000002',
+  lan1:       '07000003-0000-0000-0000-000000000003',
+  lan2:       '07000004-0000-0000-0000-000000000004',
+  hoa1:       '07000005-0000-0000-0000-000000000005',
+  nam1:       '07000006-0000-0000-0000-000000000006',
+  nam2:       '07000007-0000-0000-0000-000000000007',
+  hung1:      '07000008-0000-0000-0000-000000000008',
 } as const
 
 // Users
 const USID = {
-  admin: 'h0000000-0000-0000-0000-000000000001',
-  staff: 'h0000000-0000-0000-0000-000000000002',
+  admin: '08000000-0000-0000-0000-000000000001',
+  staff: '08000000-0000-0000-0000-000000000002',
 } as const
 
 // Orders
 const OID = {
-  order1: 'i0000001-0000-0000-0000-000000000001',
-  order2: 'i0000002-0000-0000-0000-000000000002',
-  order3: 'i0000003-0000-0000-0000-000000000003',
-  order4: 'i0000004-0000-0000-0000-000000000004',
-  order5: 'i0000005-0000-0000-0000-000000000005',
+  order1: '09000001-0000-0000-0000-000000000001',
+  order2: '09000002-0000-0000-0000-000000000002',
+  order3: '09000003-0000-0000-0000-000000000003',
+  order4: '09000004-0000-0000-0000-000000000004',
+  order5: '09000005-0000-0000-0000-000000000005',
 }
 const IID = {
-  invoice1: 'j0000001-0000-0000-0000-000000000001',
-  invoice2: 'j0000002-0000-0000-0000-000000000002',
-  invoice4: 'j0000004-0000-0000-0000-000000000004',
-  invoice5: 'j0000005-0000-0000-0000-000000000005',
+  invoice1: '0a000001-0000-0000-0000-000000000001',
+  invoice2: '0a000002-0000-0000-0000-000000000002',
+  invoice4: '0a000004-0000-0000-0000-000000000004',
+  invoice5: '0a000005-0000-0000-0000-000000000005',
 }
 
 const now = new Date()
@@ -285,12 +286,12 @@ export async function seed() {
   // 6. Price Lists (1 general + 5 company) ----------------------------------
   console.log('[6/11] Price Lists ...')
   await safeInsert(priceLists, [
-    { id: PLID.general,    name: 'Bang gia chung',                    companyId: null,              description: 'Bang gia mac dinh cho tat ca khach hang',  isDefault: true,  sortOrder: 0, createdAt: now, updatedAt: now },
-    { id: PLID.huongLy,    name: 'Bang gia - Cua hang Huong Ly',     companyId: COID.huongLy,      description: 'Gia si cho Cua hang Huong Ly',            isDefault: false, sortOrder: 1, createdAt: now, updatedAt: now },
-    { id: PLID.hoaSen,     name: 'Bang gia - Sieu thi Hoa Sen',      companyId: COID.hoaSen,       description: 'Gia si cho Sieu thi Mini Mart Hoa Sen',   isDefault: false, sortOrder: 2, createdAt: now, updatedAt: now },
-    { id: PLID.baGia,      name: 'Bang gia - Tap hoa Ba Gia',        companyId: COID.baGia,        description: 'Gia si cho Tap hoa Ba Gia',               isDefault: false, sortOrder: 3, createdAt: now, updatedAt: now },
-    { id: PLID.thaoNguyen, name: 'Bang gia - Cua hang Thao Nguyen',  companyId: COID.thaoNguyen,   description: 'Gia si cho Cua hang Thao Nguyen',         isDefault: false, sortOrder: 4, createdAt: now, updatedAt: now },
-    { id: PLID.phuongNam,  name: 'Bang gia - Dai ly Phuong Nam',     companyId: COID.phuongNam,    description: 'Gia si cho Dai ly Phuong Nam',            isDefault: false, sortOrder: 5, createdAt: now, updatedAt: now },
+    { id: PLID.general,    name: 'Bang gia chung',                    companyId: null, description: 'Bang gia mac dinh cho tat ca khach hang',  isDefault: true,  sortOrder: 0, createdAt: now, updatedAt: now },
+    { id: PLID.huongLy,    name: 'Bang gia - Cua hang Huong Ly',     companyId: null, description: 'Gia si cho Cua hang Huong Ly',            isDefault: false, sortOrder: 1, createdAt: now, updatedAt: now },
+    { id: PLID.hoaSen,     name: 'Bang gia - Sieu thi Hoa Sen',      companyId: null, description: 'Gia si cho Sieu thi Mini Mart Hoa Sen',   isDefault: false, sortOrder: 2, createdAt: now, updatedAt: now },
+    { id: PLID.baGia,      name: 'Bang gia - Tap hoa Ba Gia',        companyId: null, description: 'Gia si cho Tap hoa Ba Gia',               isDefault: false, sortOrder: 3, createdAt: now, updatedAt: now },
+    { id: PLID.thaoNguyen, name: 'Bang gia - Cua hang Thao Nguyen',  companyId: null, description: 'Gia si cho Cua hang Thao Nguyen',         isDefault: false, sortOrder: 4, createdAt: now, updatedAt: now },
+    { id: PLID.phuongNam,  name: 'Bang gia - Dai ly Phuong Nam',     companyId: null, description: 'Gia si cho Dai ly Phuong Nam',            isDefault: false, sortOrder: 5, createdAt: now, updatedAt: now },
   ], 'price_lists')
 
   // 7. Companies (5) - must come after price lists --------------------------
@@ -302,6 +303,13 @@ export async function seed() {
     { id: COID.thaoNguyen, name: 'Cua hang Thao Nguyen',        priceListId: PLID.thaoNguyen, address: '56 Dang Van Bi, Binh Thanh, TP.HCM', phone: '0945678901', email: 'thaonguyen@email.com', isActive: true, createdAt: now, updatedAt: now },
     { id: COID.phuongNam,  name: 'Dai ly Phuong Nam',           priceListId: PLID.phuongNam,  address: '101 Xa Lo Ha Noi, Thu Duc, TP.HCM',  phone: '0956789012', email: 'phuongnam@email.com', isActive: true, createdAt: now, updatedAt: now },
   ], 'companies')
+
+  // Link price lists back to companies
+  await db.update(priceLists).set({ companyId: COID.huongLy }).where(eq(priceLists.id, PLID.huongLy))
+  await db.update(priceLists).set({ companyId: COID.hoaSen }).where(eq(priceLists.id, PLID.hoaSen))
+  await db.update(priceLists).set({ companyId: COID.baGia }).where(eq(priceLists.id, PLID.baGia))
+  await db.update(priceLists).set({ companyId: COID.thaoNguyen }).where(eq(priceLists.id, PLID.thaoNguyen))
+  await db.update(priceLists).set({ companyId: COID.phuongNam }).where(eq(priceLists.id, PLID.phuongNam))
 
   // 8. Customers (8) --------------------------------------------------------
   console.log('[8/11] Customers ...')
@@ -336,8 +344,8 @@ export async function seed() {
   }
 
   // General price list items - use defaultSalePrice directly
-  const generalItems = allProductCodes.map((code) => ({
-    id: `fa${PID[code as keyof typeof PID]!.slice(2)}`,
+  const generalItems = allProductCodes.map((code, idx) => ({
+    id: `fa${String(idx + 1).padStart(6, '0')}-0000-0000-0000-000000000000`,
     priceListId: PLID.general,
     productId: PID[code as keyof typeof PID]!,
     customPrice: defaultPrices[code]!,
@@ -361,7 +369,7 @@ export async function seed() {
 
   for (const { plId, pct, label } of companyDiscounts) {
     const items = allProductCodes.map((code, idx) => ({
-      id: `${plId.slice(0, 2)}${String(idx + 1).padStart(2, '0')}${PID[code as keyof typeof PID]!.slice(2)}`,
+      id: `${plId.slice(0, 8)}-${String(idx + 1).padStart(4, '0')}-0000-0000-000000000000`,
       priceListId: plId,
       productId: PID[code as keyof typeof PID]!,
       customPrice: discountPrice(defaultPrices[code]!, pct),
@@ -390,12 +398,12 @@ export async function seed() {
     updatedAt: new Date('2026-06-01T08:30:00+07:00'),
   }], 'order DH000001')
   await safeInsert(orderItems, [
-    { id: 'k0000001-0000-0000-0000-000000000001', orderId: OID.order1, productId: PID.SP0002, productName: 'Nuoc ngot Coca Cola 330ml',              unit: 'chai',  quantity: '10', unitPrice: '7500',  totalPrice: '75000',  sortOrder: 1 },
-    { id: 'k0000002-0000-0000-0000-000000000002', orderId: OID.order1, productId: PID.SP0006, productName: 'Mi an lien Omachi (thung 30 goi)',     unit: 'thung', quantity: '2',  unitPrice: '105000', totalPrice: '210000', sortOrder: 2 },
-    { id: 'k0000003-0000-0000-0000-000000000003', orderId: OID.order1, productId: PID.SP0010, productName: 'Nuoc rua chen Sunlight 800ml',         unit: 'chai',  quantity: '5',  unitPrice: '40000',  totalPrice: '200000', sortOrder: 3 },
+    { id: '0b000001-0000-0000-0000-000000000001', orderId: OID.order1, productId: PID.SP0002, productName: 'Nuoc ngot Coca Cola 330ml',              unit: 'chai',  quantity: '10', unitPrice: '7500',  totalPrice: '75000',  sortOrder: 1 },
+    { id: '0b000002-0000-0000-0000-000000000002', orderId: OID.order1, productId: PID.SP0006, productName: 'Mi an lien Omachi (thung 30 goi)',     unit: 'thung', quantity: '2',  unitPrice: '105000', totalPrice: '210000', sortOrder: 2 },
+    { id: '0b000003-0000-0000-0000-000000000003', orderId: OID.order1, productId: PID.SP0010, productName: 'Nuoc rua chen Sunlight 800ml',         unit: 'chai',  quantity: '5',  unitPrice: '40000',  totalPrice: '200000', sortOrder: 3 },
   ], 'order_items DH000001')
   await safeInsert(payments, [{
-    id: 'l0000001-0000-0000-0000-000000000001',
+    id: '0c000001-0000-0000-0000-000000000001',
     orderId: OID.order1,
     amount: '485000',
     method: 'cash',
@@ -419,14 +427,14 @@ export async function seed() {
     updatedAt: new Date('2026-06-03T10:15:00+07:00'),
   }], 'order DH000002')
   await safeInsert(orderItems, [
-    { id: 'k0000004-0000-0000-0000-000000000004', orderId: OID.order2, productId: PID.SP0001, productName: 'Nuoc suoi Aquafina 500ml',       unit: 'chai',  quantity: '50', unitPrice: '4500',  totalPrice: '225000',  sortOrder: 1 },
-    { id: 'k0000005-0000-0000-0000-000000000005', orderId: OID.order2, productId: PID.SP0003, productName: 'Tra xanh Khong Do 500ml',        unit: 'chai',  quantity: '30', unitPrice: '6500',  totalPrice: '195000',  sortOrder: 2 },
-    { id: 'k0000006-0000-0000-0000-000000000006', orderId: OID.order2, productId: PID.SP0005, productName: 'Banh Oishi 500g',                unit: 'hop',   quantity: '10', unitPrice: '35000', totalPrice: '350000',  sortOrder: 3 },
-    { id: 'k0000007-0000-0000-0000-000000000007', orderId: OID.order2, productId: PID.SP0009, productName: 'Nuoc giat OMO 800g',             unit: 'tui',   quantity: '5',  unitPrice: '58000', totalPrice: '290000',  sortOrder: 4 },
-    { id: 'k0000008-0000-0000-0000-000000000008', orderId: OID.order2, productId: PID.SP0017, productName: 'Gao Jasmine 5kg',               unit: 'tui',   quantity: '5',  unitPrice: '88000', totalPrice: '440000',  sortOrder: 5 },
+    { id: '0b000004-0000-0000-0000-000000000004', orderId: OID.order2, productId: PID.SP0001, productName: 'Nuoc suoi Aquafina 500ml',       unit: 'chai',  quantity: '50', unitPrice: '4500',  totalPrice: '225000',  sortOrder: 1 },
+    { id: '0b000005-0000-0000-0000-000000000005', orderId: OID.order2, productId: PID.SP0003, productName: 'Tra xanh Khong Do 500ml',        unit: 'chai',  quantity: '30', unitPrice: '6500',  totalPrice: '195000',  sortOrder: 2 },
+    { id: '0b000006-0000-0000-0000-000000000006', orderId: OID.order2, productId: PID.SP0005, productName: 'Banh Oishi 500g',                unit: 'hop',   quantity: '10', unitPrice: '35000', totalPrice: '350000',  sortOrder: 3 },
+    { id: '0b000007-0000-0000-0000-000000000007', orderId: OID.order2, productId: PID.SP0009, productName: 'Nuoc giat OMO 800g',             unit: 'tui',   quantity: '5',  unitPrice: '58000', totalPrice: '290000',  sortOrder: 4 },
+    { id: '0b000008-0000-0000-0000-000000000008', orderId: OID.order2, productId: PID.SP0017, productName: 'Gao Jasmine 5kg',               unit: 'tui',   quantity: '5',  unitPrice: '88000', totalPrice: '440000',  sortOrder: 5 },
   ], 'order_items DH000002')
   await safeInsert(payments, [{
-    id: 'l0000002-0000-0000-0000-000000000002',
+    id: '0c000002-0000-0000-0000-000000000002',
     orderId: OID.order2,
     amount: '1000000',
     method: 'bank_transfer',
@@ -451,10 +459,10 @@ export async function seed() {
     updatedAt: new Date('2026-06-05T14:00:00+07:00'),
   }], 'order DH000003')
   await safeInsert(orderItems, [
-    { id: 'k0000009-0000-0000-0000-000000000009', orderId: OID.order3, productId: PID.SP0007, productName: 'Nuoc mam Nam Ngu 500ml',     unit: 'chai', quantity: '10', unitPrice: '24000', totalPrice: '240000', sortOrder: 1 },
-    { id: 'k0000010-0000-0000-0000-000000000010', orderId: OID.order3, productId: PID.SP0008, productName: 'Duong TNHH 1kg',             unit: 'tui',  quantity: '5',  unitPrice: '29000', totalPrice: '145000', sortOrder: 2 },
-    { id: 'k0000011-0000-0000-0000-000000000011', orderId: OID.order3, productId: PID.SP0016, productName: 'Nuoc tuong Chinsu 500ml',    unit: 'chai', quantity: '10', unitPrice: '21000', totalPrice: '210000', sortOrder: 3 },
-    { id: 'k0000012-0000-0000-0000-000000000012', orderId: OID.order3, productId: PID.SP0014, productName: 'Banh Cosy biscuit 350g',      unit: 'hop',  quantity: '3',  unitPrice: '28000', totalPrice: '84000',  sortOrder: 4 },
+    { id: '0b000009-0000-0000-0000-000000000009', orderId: OID.order3, productId: PID.SP0007, productName: 'Nuoc mam Nam Ngu 500ml',     unit: 'chai', quantity: '10', unitPrice: '24000', totalPrice: '240000', sortOrder: 1 },
+    { id: '0b000010-0000-0000-0000-000000000010', orderId: OID.order3, productId: PID.SP0008, productName: 'Duong TNHH 1kg',             unit: 'tui',  quantity: '5',  unitPrice: '29000', totalPrice: '145000', sortOrder: 2 },
+    { id: '0b000011-0000-0000-0000-000000000011', orderId: OID.order3, productId: PID.SP0016, productName: 'Nuoc tuong Chinsu 500ml',    unit: 'chai', quantity: '10', unitPrice: '21000', totalPrice: '210000', sortOrder: 3 },
+    { id: '0b000012-0000-0000-0000-000000000012', orderId: OID.order3, productId: PID.SP0014, productName: 'Banh Cosy biscuit 350g',      unit: 'hop',  quantity: '3',  unitPrice: '28000', totalPrice: '84000',  sortOrder: 4 },
   ], 'order_items DH000003')
 
   // Order 4: Cua hang Thao Nguyen - 2 items - completed, fully paid
@@ -473,11 +481,11 @@ export async function seed() {
     updatedAt: new Date('2026-06-07T09:45:00+07:00'),
   }], 'order DH000004')
   await safeInsert(orderItems, [
-    { id: 'k0000013-0000-0000-0000-000000000013', orderId: OID.order4, productId: PID.SP0015, productName: 'Mi Hao Hao (thung 30 goi)', unit: 'thung', quantity: '2', unitPrice: '90000',  totalPrice: '180000', sortOrder: 1 },
-    { id: 'k0000014-0000-0000-0000-000000000014', orderId: OID.order4, productId: PID.SP0004, productName: 'Ca phe sua da Trung Nguyen', unit: 'hop',   quantity: '1', unitPrice: '140000', totalPrice: '140000', sortOrder: 2 },
+    { id: '0b000013-0000-0000-0000-000000000013', orderId: OID.order4, productId: PID.SP0015, productName: 'Mi Hao Hao (thung 30 goi)', unit: 'thung', quantity: '2', unitPrice: '90000',  totalPrice: '180000', sortOrder: 1 },
+    { id: '0b000014-0000-0000-0000-000000000014', orderId: OID.order4, productId: PID.SP0004, productName: 'Ca phe sua da Trung Nguyen', unit: 'hop',   quantity: '1', unitPrice: '140000', totalPrice: '140000', sortOrder: 2 },
   ], 'order_items DH000004')
   await safeInsert(payments, [{
-    id: 'l0000004-0000-0000-0000-000000000004',
+    id: '0c000004-0000-0000-0000-000000000004',
     orderId: OID.order4,
     amount: '300000',
     method: 'cash',
@@ -502,16 +510,16 @@ export async function seed() {
     updatedAt: new Date('2026-06-09T07:30:00+07:00'),
   }], 'order DH000005')
   await safeInsert(orderItems, [
-    { id: 'k0000015-0000-0000-0000-000000000015', orderId: OID.order5, productId: PID.SP0002, productName: 'Nuoc ngot Coca Cola 330ml',           unit: 'chai',  quantity: '20', unitPrice: '7000',  totalPrice: '140000',  sortOrder: 1 },
-    { id: 'k0000016-0000-0000-0000-000000000016', orderId: OID.order5, productId: PID.SP0006, productName: 'Mi an lien Omachi (thung 30 goi)',     unit: 'thung', quantity: '5',  unitPrice: '95000', totalPrice: '475000',  sortOrder: 2 },
-    { id: 'k0000017-0000-0000-0000-000000000017', orderId: OID.order5, productId: PID.SP0011, productName: 'Nuoc suoi Lavie 500ml',                unit: 'chai',  quantity: '30', unitPrice: '4800',  totalPrice: '144000',  sortOrder: 3 },
-    { id: 'k0000018-0000-0000-0000-000000000018', orderId: OID.order5, productId: PID.SP0009, productName: 'Nuoc giat OMO 800g',                   unit: 'tui',   quantity: '10', unitPrice: '54000', totalPrice: '540000',  sortOrder: 4 },
-    { id: 'k0000019-0000-0000-0000-000000000019', orderId: OID.order5, productId: PID.SP0017, productName: 'Gao Jasmine 5kg',                      unit: 'tui',   quantity: '10', unitPrice: '82000', totalPrice: '820000',  sortOrder: 5 },
-    { id: 'k0000020-0000-0000-0000-000000000020', orderId: OID.order5, productId: PID.SP0020, productName: 'Nuoc giat Aba 800g',                   unit: 'tui',   quantity: '5',  unitPrice: '45000', totalPrice: '225000',  sortOrder: 6 },
+    { id: '0b000015-0000-0000-0000-000000000015', orderId: OID.order5, productId: PID.SP0002, productName: 'Nuoc ngot Coca Cola 330ml',           unit: 'chai',  quantity: '20', unitPrice: '7000',  totalPrice: '140000',  sortOrder: 1 },
+    { id: '0b000016-0000-0000-0000-000000000016', orderId: OID.order5, productId: PID.SP0006, productName: 'Mi an lien Omachi (thung 30 goi)',     unit: 'thung', quantity: '5',  unitPrice: '95000', totalPrice: '475000',  sortOrder: 2 },
+    { id: '0b000017-0000-0000-0000-000000000017', orderId: OID.order5, productId: PID.SP0011, productName: 'Nuoc suoi Lavie 500ml',                unit: 'chai',  quantity: '30', unitPrice: '4800',  totalPrice: '144000',  sortOrder: 3 },
+    { id: '0b000018-0000-0000-0000-000000000018', orderId: OID.order5, productId: PID.SP0009, productName: 'Nuoc giat OMO 800g',                   unit: 'tui',   quantity: '10', unitPrice: '54000', totalPrice: '540000',  sortOrder: 4 },
+    { id: '0b000019-0000-0000-0000-000000000019', orderId: OID.order5, productId: PID.SP0017, productName: 'Gao Jasmine 5kg',                      unit: 'tui',   quantity: '10', unitPrice: '82000', totalPrice: '820000',  sortOrder: 5 },
+    { id: '0b000020-0000-0000-0000-000000000020', orderId: OID.order5, productId: PID.SP0020, productName: 'Nuoc giat Aba 800g',                   unit: 'tui',   quantity: '5',  unitPrice: '45000', totalPrice: '225000',  sortOrder: 6 },
   ], 'order_items DH000005')
   await safeInsert(payments, [
     {
-      id: 'l0000051-0000-0000-0000-000000000051',
+      id: '0c000051-0000-0000-0000-000000000051',
       orderId: OID.order5,
       amount: '1000000',
       method: 'bank_transfer',
@@ -520,7 +528,7 @@ export async function seed() {
       createdBy: USID.admin,
     },
     {
-      id: 'l0000052-0000-0000-0000-000000000052',
+      id: '0c000052-0000-0000-0000-000000000052',
       orderId: OID.order5,
       amount: '500000',
       method: 'cash',

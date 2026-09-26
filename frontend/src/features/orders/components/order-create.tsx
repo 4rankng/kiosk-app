@@ -131,41 +131,41 @@ export function OrderCreate() {
         </div>
       </Header>
 
-      <Main className='flex flex-1 flex-col gap-4 pb-24'>
-        {/* Section 1: Customer */}
-        <section className='space-y-2'>
-          <div className='flex items-center gap-2'>
-            <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
-              1
-            </span>
-            <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
-              Thông tin người mua
-            </h3>
-          </div>
-          <div className='rounded-lg border bg-card p-4'>
-            <CustomerSelector
-              selectedCustomer={selectedCustomer}
-              onSelect={(customer, plId) => {
-                setSelectedCustomer(customer)
-                setPriceListId(plId)
-              }}
-            />
-          </div>
-        </section>
+      <Main className='flex flex-1 flex-col gap-4 pb-20'>
+        {isMobile ? (
+          <div className='flex flex-col gap-4'>
+            {/* Section 1: Customer */}
+            <section className='space-y-2'>
+              <div className='flex items-center gap-2'>
+                <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+                  1
+                </span>
+                <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+                  Thông tin người mua
+                </h3>
+              </div>
+              <div className='rounded-lg border bg-card p-4'>
+                <CustomerSelector
+                  selectedCustomer={selectedCustomer}
+                  onSelect={(customer, plId) => {
+                    setSelectedCustomer(customer)
+                    setPriceListId(plId)
+                  }}
+                />
+              </div>
+            </section>
 
-        {/* Section 2: Cart */}
-        <section className='space-y-2'>
-          <div className='flex items-center gap-2'>
-            <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
-              2
-            </span>
-            <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
-              Giỏ hàng
-            </h3>
-          </div>
-          <div className='rounded-lg border bg-card p-4 space-y-3'>
-            {isMobile ? (
-              <>
+            {/* Section 2: Cart */}
+            <section className='space-y-2'>
+              <div className='flex items-center gap-2'>
+                <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+                  2
+                </span>
+                <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+                  Giỏ hàng
+                </h3>
+              </div>
+              <div className='rounded-lg border bg-card p-4 space-y-3'>
                 <ProductSearch
                   priceListId={priceListId}
                   onAddProduct={addItem}
@@ -174,86 +174,119 @@ export function OrderCreate() {
                   priceListId={priceListId}
                   onAddProduct={addItem}
                 />
-              </>
-            ) : (
-              <>
-                <ProductSearch
-                  priceListId={priceListId}
-                  onAddProduct={addItem}
-                />
-                <OrderLineItems
-                  items={items}
-                  onUpdateQuantity={updateItemQuantity}
-                  onUpdatePrice={updateItemPrice}
-                  onRemove={removeItem}
-                />
-              </>
-            )}
+              </div>
+            </section>
           </div>
-        </section>
+        ) : (
+          <div className='grid grid-cols-12 gap-6 items-start'>
+            {/* Left 7-8 cols: Product search & Cart line items */}
+            <div className='col-span-12 lg:col-span-7 xl:col-span-8 space-y-4'>
+              <section className='space-y-2'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-2'>
+                    <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+                      1
+                    </span>
+                    <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+                      Sản phẩm & Giỏ hàng
+                    </h3>
+                  </div>
+                  <span className='text-xs text-muted-foreground'>
+                    {items.length} mặt hàng đã chọn
+                  </span>
+                </div>
+                <div className='rounded-lg border bg-card p-4 space-y-4'>
+                  <ProductSearch
+                    priceListId={priceListId}
+                    onAddProduct={addItem}
+                  />
+                  <OrderLineItems
+                    items={items}
+                    onUpdateQuantity={updateItemQuantity}
+                    onUpdatePrice={updateItemPrice}
+                    onRemove={removeItem}
+                  />
+                </div>
+              </section>
+            </div>
 
-        {/* Section 3: Summary — hidden on mobile (shown in review sheet) */}
-        {!isMobile && (
-          <section className='space-y-2'>
-            <div className='flex items-center gap-2'>
-              <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
-                3
-              </span>
-              <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
-                Tổng kết và thanh toán
-              </h3>
+            {/* Right 4-5 cols: Customer & Summary Checkout Panel */}
+            <div className='col-span-12 lg:col-span-5 xl:col-span-4 space-y-4 lg:sticky lg:top-20'>
+              {/* Customer selection */}
+              <section className='space-y-2'>
+                <div className='flex items-center gap-2'>
+                  <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+                    2
+                  </span>
+                  <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+                    Khách hàng & Bảng giá
+                  </h3>
+                </div>
+                <div className='rounded-lg border bg-card p-4'>
+                  <CustomerSelector
+                    selectedCustomer={selectedCustomer}
+                    onSelect={(customer, plId) => {
+                      setSelectedCustomer(customer)
+                      setPriceListId(plId)
+                    }}
+                  />
+                </div>
+              </section>
+
+              {/* Order Totals & Business Entity */}
+              <section className='space-y-2'>
+                <div className='flex items-center gap-2'>
+                  <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+                    3
+                  </span>
+                  <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+                    Tổng kết & Thanh toán
+                  </h3>
+                </div>
+                <div className='rounded-lg border bg-card p-4 space-y-4'>
+                  <OrderSummary
+                    subtotal={subtotal}
+                    discount={discount}
+                    total={total}
+                    onDiscountChange={setDiscount}
+                  />
+                  <BusinessEntitySelector
+                    selected={businessEntityId}
+                    onSelect={setBusinessEntityId}
+                  />
+                  <Button
+                    size='lg'
+                    onClick={handleSubmit}
+                    disabled={createMutation.isPending}
+                    className='w-full font-semibold shadow-sm'
+                  >
+                    {createMutation.isPending ? 'Đang lưu...' : 'Lưu và tạo hóa đơn'}
+                  </Button>
+                </div>
+              </section>
             </div>
-            <div className='rounded-lg border bg-card p-4 space-y-3'>
-              <OrderSummary
-                subtotal={subtotal}
-                discount={discount}
-                total={total}
-                onDiscountChange={setDiscount}
-              />
-              <BusinessEntitySelector
-                selected={businessEntityId}
-                onSelect={setBusinessEntityId}
-              />
-            </div>
-          </section>
+          </div>
         )}
       </Main>
 
-      {/* Sticky bottom bar */}
-      {isMobile ? (
+      {/* Mobile Sticky bottom bar */}
+      {isMobile && (
         <Button
           type='button'
           variant='ghost'
           onClick={() => setReviewOpen(true)}
-          className='fixed bottom-0 left-0 right-0 z-40 h-auto border-t bg-background/80 backdrop-blur-lg p-4 rounded-none'
+          className='fixed bottom-0 left-0 right-0 z-40 h-auto min-h-[44px] border-t bg-background/80 backdrop-blur-lg px-4 py-3 rounded-none'
         >
           <div className='flex w-full items-center justify-between'>
             <div>
               <span className='text-sm text-muted-foreground'>
                 {items.length} mặt hàng · Khách cần trả:
               </span>
-              <span className='ml-2 text-xl font-bold'>{formatCurrency(total)}</span>
+              <span className='ml-2 text-lg font-bold'>{formatCurrency(total)}</span>
             </div>
             <ChevronUp className='h-5 w-5 text-muted-foreground' />
           </div>
         </Button>
-      ) : (
-        <div className='fixed bottom-0 left-0 right-0 z-40 border-t bg-background/80 backdrop-blur-lg shadow-lg p-4 sm:left-[calc(var(--sidebar-width,0px)+0px)]'>
-          <div className='mx-auto flex max-w-2xl items-center justify-between gap-4'>
-            <div>
-              <span className='text-sm text-muted-foreground'>Khách cần trả:</span>
-              <span className='ml-2 font-heading text-2xl font-semibold'>{formatCurrency(total)}</span>
-            </div>
-            <Button
-              size='lg'
-              onClick={handleSubmit}
-              disabled={createMutation.isPending}
-              className='min-w-[200px]'
-            >
-              {createMutation.isPending ? 'Đang lưu...' : 'Lưu và tạo hóa đơn'}
-            </Button>
-          </div>
-        </div>
       )}
 
       {/* Mobile order review sheet */}

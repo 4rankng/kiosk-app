@@ -100,7 +100,7 @@ export function PriceListTable({ priceList, items: initialItems }: PriceListTabl
                     {item.name}
                     <span className='ml-2 text-xs text-muted-foreground'>({item.unit})</span>
                   </TableCell>
-                  <TableCell className='text-right text-muted-foreground'>
+                  <TableCell className='text-right text-muted-foreground tabular-nums'>
                     {formatCurrency(item.basePrice)}
                   </TableCell>
                   <TableCell className='text-right'>
@@ -193,7 +193,7 @@ function MobilePriceList({
                 {item.code} · {item.unit}
               </p>
             </div>
-            <span className='shrink-0 text-xs text-muted-foreground'>
+            <span className='shrink-0 text-xs text-muted-foreground tabular-nums'>
               Giá gốc: {formatCurrency(item.basePrice)}
             </span>
           </div>

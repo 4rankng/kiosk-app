@@ -26,7 +26,7 @@ function TrendText({ value, suffix, className }: { value: number | string; suffi
   return (
     <p className={cn(
       'mt-1 text-xs',
-      isUp && 'text-emerald-600',
+      isUp && 'text-success',
       isDown && 'text-destructive',
       !isUp && !isDown && 'text-muted-foreground',
       className,
@@ -135,7 +135,7 @@ export function TodayStats() {
               <Icon className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='font-heading text-display font-semibold tabular-nums'>{values[config.key]}</div>
+              <div className='font-heading text-display font-bold tabular-nums'>{values[config.key]}</div>
               {subtitle}
             </CardContent>
           </Card>

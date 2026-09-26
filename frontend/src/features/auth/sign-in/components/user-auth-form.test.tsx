@@ -4,9 +4,8 @@ import { type Locator, userEvent } from 'vitest/browser'
 import { UserAuthForm } from './user-auth-form'
 
 const FORM_MESSAGES = {
-  emailEmpty: 'Please enter your email.',
-  passwordEmpty: 'Please enter your password.',
-  passwordShort: 'Password must be at least 7 characters long.',
+  emailEmpty: 'Email không hợp lệ.',
+  passwordEmpty: 'Vui lòng nhập mật khẩu.',
 } as const
 
 const navigate = vi.fn()
@@ -20,6 +19,21 @@ vi.mock('@/stores/auth-store', () => ({
       setAccessToken: setAccessTokenMock,
     },
   }),
+}))
+
+vi.mock('@/services/auth', () => ({
+  signInWithEmail: vi.fn(() =>
+    Promise.resolve({
+      user: {
+        email: 'a@b.com',
+        accountNo: '0001',
+        role: ['admin'],
+        exp: 1893456000,
+      },
+      accessToken: 'mock-access-token',
+    })
+  ),
+  signInWithGoogle: vi.fn(() => Promise.reject(new Error('not used in test'))),
 }))
 
 vi.mock('@tanstack/react-router', async (importOriginal) => {
@@ -44,6 +58,22 @@ vi.mock('@tanstack/react-router', async (importOriginal) => {
   }
 })
 
+vi.mock('@/services/auth', () => ({
+  signInWithEmail: vi.fn().mockResolvedValue({
+    user: {
+      id: 'mock-user-id',
+      email: 'a@b.com',
+      name: 'Admin User',
+      accountNo: 'ACC001',
+      role: ['admin'],
+      exp: 1234567890,
+    },
+    accessToken: 'mock-access-token',
+    refreshToken: 'mock-refresh-token',
+  }),
+  signInWithGoogle: vi.fn(),
+}))
+
 vi.mock('@/lib/utils', async (orig) => ({
   ...(await orig()),
   sleep: vi.fn(() => Promise.resolve()),
@@ -61,9 +91,9 @@ describe('UserAuthForm', () => {
       vi.clearAllMocks()
       screen = await render(<UserAuthForm />)
       emailInput = screen.getByRole('textbox', { name: /^Email$/i })
-      passwordInput = screen.getByLabelText(/^Password$/i)
-      signInButton = screen.getByRole('button', { name: /^Sign in$/i })
-      forgotPasswordLink = screen.getByText(/^Forgot password\?$/i)
+      passwordInput = screen.getByLabelText(/^Mật khẩu$/)
+      signInButton = screen.getByRole('button', { name: /^Đăng nhập$/ })
+      forgotPasswordLink = screen.getByText(/^Chỉ tài khoản được phê duyệt/)
     })
 
     it('renders fields, submit button, and forgot password link', async () => {
@@ -116,9 +146,9 @@ describe('UserAuthForm', () => {
     )
 
     await userEvent.fill(getByRole('textbox', { name: /Email/i }), 'a@b.com')
-    await userEvent.fill(getByLabelText('Password'), '1234567')
+    await userEvent.fill(getByLabelText('Mật khẩu'), '1234567')
 
-    await userEvent.click(getByRole('button', { name: /Sign in/i }))
+    await userEvent.click(getByRole('button', { name: /^Đăng nhập$/ }))
 
     await vi.waitFor(() => expect(setUserMock).toHaveBeenCalledOnce())
     expect(setAccessTokenMock).toHaveBeenCalledOnce()
