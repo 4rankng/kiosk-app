@@ -1,5 +1,6 @@
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingCart01 } from '@untitledui/icons'
 import type { OrderItem } from '@/types'
+import { EmptyState } from '@/components/empty-state'
 import { OrderLineItem } from './order-line-item'
 
 interface OrderLineItemsProps {
@@ -17,11 +18,12 @@ export function OrderLineItems({
 }: OrderLineItemsProps) {
   if (items.length === 0) {
     return (
-      <div className='flex flex-col items-center justify-center py-8 text-center'>
-        <ShoppingCart className='h-10 w-10 text-muted-foreground/40 mb-2' />
-        <p className='text-sm text-muted-foreground'>Chưa có sản phẩm nào</p>
-        <p className='text-xs text-muted-foreground/60'>Tìm kiếm và thêm hàng hóa ở trên</p>
-      </div>
+      <EmptyState
+        variant='empty'
+        title='Chưa có sản phẩm nào'
+        description='Tìm kiếm và thêm hàng hóa ở trên'
+        icon={<ShoppingCart01 className='size-6 text-fg-quaternary' />}
+      />
     )
   }
 

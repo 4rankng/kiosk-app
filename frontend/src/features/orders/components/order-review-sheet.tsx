@@ -1,8 +1,9 @@
 import type { OrderItem } from '@/types'
 import { formatCurrency } from '@/lib/format'
-import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { ShoppingCart } from 'lucide-react'
+import { Button } from '@/components/base/buttons/button'
+import { SlideoutMenu } from '@/components/application/slideout-menus/slideout-menu'
+import { ShoppingCart01 } from '@untitledui/icons'
+import { EmptyState } from '@/components/empty-state'
 import { OrderLineItem } from './order-line-item'
 import { OrderSummary } from './order-summary'
 import { BusinessEntitySelector } from './business-entity-selector'
@@ -40,26 +41,28 @@ export function OrderReviewSheet({
   isPending,
 }: OrderReviewSheetProps) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side='bottom' className='flex flex-col p-0 [&>button]:hidden'>
-        <SheetHeader className='px-4 pt-4 pb-0'>
-          <SheetTitle className='flex items-center justify-between'>
-            <span className='flex items-center gap-2'>
-              <ShoppingCart className='h-5 w-5' />
-              {items.length} mặt hàng
-            </span>
-            <span>{formatCurrency(total)}</span>
-          </SheetTitle>
-        </SheetHeader>
+    <SlideoutMenu isOpen={open} onOpenChange={onOpenChange}>
+      <SlideoutMenu.Header onClose={() => onOpenChange(false)}>
+        <div className='flex w-full items-center justify-between'>
+          <span className='flex items-center gap-2 text-md font-semibold text-primary'>
+            <ShoppingCart01 className='size-5 text-brand-secondary' />
+            {items.length} mặt hàng
+          </span>
+          <span className='text-md font-semibold text-primary tabular-nums'>
+            {formatCurrency(total)}
+          </span>
+        </div>
+      </SlideoutMenu.Header>
 
-        {/* Scrollable content */}
-        <div className='flex-1 overflow-y-auto px-4 py-4 space-y-4'>
+      <SlideoutMenu.Content className='min-h-0 flex-1'>
+        <div className='space-y-4'>
           {items.length === 0 ? (
-            <div className='flex flex-col items-center justify-center py-12 text-center'>
-              <ShoppingCart className='h-10 w-10 text-muted-foreground/40 mb-2' />
-              <p className='text-sm text-muted-foreground'>Chưa có sản phẩm nào</p>
-              <p className='text-xs text-muted-foreground/60'>Chọn hàng hóa từ danh sách phía dưới</p>
-            </div>
+            <EmptyState
+              variant='empty'
+              title='Chưa có sản phẩm nào'
+              description='Chọn hàng hóa từ danh sách phía dưới'
+              icon={<ShoppingCart01 className='size-6 text-fg-quaternary' />}
+            />
           ) : (
             <>
               {/* Line items — no remove button in review */}
@@ -75,7 +78,7 @@ export function OrderReviewSheet({
               </div>
 
               {/* Summary */}
-              <div className='rounded-lg border bg-card p-4'>
+              <div className='rounded-xl bg-secondary p-4'>
                 <OrderSummary
                   subtotal={subtotal}
                   discount={discount}
@@ -85,7 +88,7 @@ export function OrderReviewSheet({
               </div>
 
               {/* Business entity selector */}
-              <div className='rounded-lg border bg-card p-4'>
+              <div className='rounded-xl bg-secondary p-4'>
                 <BusinessEntitySelector
                   selected={businessEntityId}
                   onSelect={onBusinessEntitySelect}
@@ -94,26 +97,26 @@ export function OrderReviewSheet({
             </>
           )}
         </div>
+      </SlideoutMenu.Content>
 
-        {/* Sticky bottom buttons */}
-        <div className='border-t bg-background px-4 py-3 space-y-2'>
-          <Button
-            size='lg'
-            className='w-full min-h-[44px]'
-            onClick={onSubmit}
-            disabled={isPending}
-          >
-            {isPending ? 'Đang lưu...' : 'Tạo hóa đơn'}
-          </Button>
-          <Button
-            variant='outline'
-            className='w-full h-10'
-            onClick={() => onOpenChange(false)}
-          >
-            Đóng
-          </Button>
-        </div>
-      </SheetContent>
-    </Sheet>
+      <SlideoutMenu.Footer className='space-y-2'>
+        <Button
+          size='lg'
+          className='w-full min-h-11'
+          onPress={onSubmit}
+          isDisabled={isPending}
+        >
+          {isPending ? 'Đang lưu...' : 'Tạo hóa đơn'}
+        </Button>
+        <Button
+          size='lg'
+          color='secondary'
+          className='w-full min-h-11'
+          onPress={() => onOpenChange(false)}
+        >
+          Đóng
+        </Button>
+      </SlideoutMenu.Footer>
+    </SlideoutMenu>
   )
 }

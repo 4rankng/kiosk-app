@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { getProducts } from '@/services/products'
 import { getPriceListById } from '@/services/price-lists'
 import { formatCurrency } from '@/lib/format'
-import { PlusCircle } from 'lucide-react'
+import { Plus } from '@untitledui/icons'
+import { cx } from '@/utils/cx'
 
 interface POSCategoryGridProps {
   priceListId: string
@@ -38,7 +39,7 @@ export function POSCategoryGrid({ priceListId, onAddProduct }: POSCategoryGridPr
   // Set default active category
   const currentCategory = activeCategory || categories[0]?.[0] || ''
 
-  // Filtered products for active category
+  // Filtered products for the active category
   const filteredProducts = useMemo(() => {
     const entry = categories.find(([cat]) => cat === currentCategory)
     return entry?.[1] ?? []
@@ -61,40 +62,42 @@ export function POSCategoryGrid({ priceListId, onAddProduct }: POSCategoryGridPr
 
   return (
     <div className='space-y-3'>
-      {/* Category tabs — horizontal scroll */}
+      {/* Category pills — horizontal scroll */}
       <div className='flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none'>
         {categories.map(([cat]) => (
           <button
             key={cat}
             type='button'
             onClick={() => setActiveCategory(cat)}
-            className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors min-h-[44px] ${
+            className={cx(
+              'min-h-11 shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors',
               cat === currentCategory
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            }`}
+                ? 'bg-brand-solid text-white'
+                : 'bg-secondary text-tertiary hover:bg-secondary_hover'
+            )}
           >
             {cat}
           </button>
         ))}
       </div>
 
-      {/* Product grid */}
+      {/* Product grid — single-line tiles capped at 44px */}
       <div className='grid grid-cols-2 gap-2'>
         {filteredProducts.map((p) => (
           <button
             key={p.id}
             type='button'
             onClick={() => handleAdd({ ...p, unitName: p.unitName ?? null })}
-            className='flex items-center justify-between rounded-lg border bg-card p-3 text-left transition-colors active:bg-accent min-h-[44px]'
+            className='flex min-h-11 items-center justify-between gap-2 rounded-lg bg-primary px-3 py-1.5 text-left ring-1 ring-secondary_alt transition-colors active:bg-secondary'
           >
-            <div className='flex-1 min-w-0'>
-              <div className='text-sm font-medium truncate'>{p.name}</div>
-              <div className='text-xs text-muted-foreground'>
-                {p.unitName ?? ''} · {formatCurrency(getPrice(p.id, p.defaultSalePrice))}
-              </div>
-            </div>
-            <PlusCircle className='ml-2 h-5 w-5 shrink-0 text-muted-foreground' />
+            <span className='min-w-0 truncate text-sm font-medium text-primary'>{p.name}</span>
+            <span className='flex shrink-0 items-center gap-1.5'>
+              <span className='text-xs text-tertiary tabular-nums'>
+                {formatCurrency(getPrice(p.id, p.defaultSalePrice))}
+                {p.unitName ? ` · ${p.unitName}` : ''}
+              </span>
+              <Plus className='size-4 shrink-0 text-fg-quaternary' />
+            </span>
           </button>
         ))}
       </div>
