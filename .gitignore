@@ -168,3 +168,6 @@ templates/
 
 # local DB backups (contain real data)
 plans/backups/
+
+# Local Netlify folder
+.netlify
