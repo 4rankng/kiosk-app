@@ -219,6 +219,12 @@
       "type": "file"
     },
     {
+      "path": "src/styles/theme.css",
+      "accessCount": 13,
+      "lastAccessed": 1790417261668,
+      "type": "file"
+    },
+    {
       "path": "src/features/products/index.tsx",
       "accessCount": 12,
       "lastAccessed": 1783334561173,
@@ -234,6 +240,12 @@
       "path": "src/features/price-lists/index.tsx",
       "accessCount": 11,
       "lastAccessed": 1783339349575,
+      "type": "file"
+    },
+    {
+      "path": "src/styles/index.css",
+      "accessCount": 9,
+      "lastAccessed": 1790416466944,
       "type": "file"
     },
     {
@@ -255,9 +267,9 @@
       "type": "file"
     },
     {
-      "path": "src/styles/theme.css",
+      "path": "vite.config.ts",
       "accessCount": 8,
-      "lastAccessed": 1790415063686,
+      "lastAccessed": 1790417553906,
       "type": "file"
     },
     {
@@ -273,21 +285,9 @@
       "type": "file"
     },
     {
-      "path": "src/styles/index.css",
-      "accessCount": 7,
-      "lastAccessed": 1790415063608,
-      "type": "file"
-    },
-    {
       "path": "src/components/ui/button.tsx",
       "accessCount": 6,
       "lastAccessed": 1790260860523,
-      "type": "file"
-    },
-    {
-      "path": "vite.config.ts",
-      "accessCount": 6,
-      "lastAccessed": 1790299573747,
       "type": "file"
     },
     {

@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import './untitledui.css';
 @import './theme.css';
 
 @layer base {

@@ -25,7 +25,14 @@ const SCAN_DIRS = [
   'src/lib',
   'src/services',
 ]
-const EXEMPT_DIRS = ['src/components/ui']
+// Untitled UI component source (third-party, semantic classes by design) is
+// exempt; everything else in app code stays subject to the contract.
+const EXEMPT_DIRS = [
+  'src/components/ui',
+  'src/components/base',
+  'src/components/application',
+  'src/components/foundations',
+]
 const EXTENSIONS = new Set(['.ts', '.tsx'])
 const SKIP_FILE = /\.test\.(ts|tsx)$/
 
