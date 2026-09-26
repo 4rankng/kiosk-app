@@ -1,33 +1,25 @@
 import { Link } from '@tanstack/react-router'
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from '@/components/ui/sidebar'
+import { useLayout } from '@/context/layout-provider'
+import { useSidebarUI } from './use-sidebar-ui'
 
-export function AppTitle() {
-  const { setOpenMobile } = useSidebar()
+type AppTitleProps = {
+  /** Render the expanded logo row even when the desktop rail is collapsed (mobile drawer). */
+  forceExpanded?: boolean
+}
+
+export function AppTitle({ forceExpanded = false }: AppTitleProps) {
+  const { collapsible } = useLayout()
+  const { collapsed, setOpen } = useSidebarUI()
+  const iconOnly = collapsible === 'icon' && collapsed && !forceExpanded
+
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <SidebarMenuButton
-          size='lg'
-          className='gap-0 py-0 hover:bg-transparent active:bg-transparent'
-          asChild
-        >
-          <div>
-            <Link
-              to='/'
-              onClick={() => setOpenMobile(false)}
-              className='flex flex-1 items-center gap-2'
-            >
-              <img src='/favicon.png' alt='TingTing Kiosk' className='size-8 rounded-md' />
-              <span className='font-bold'>TingTing Kiosk</span>
-            </Link>
-          </div>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    </SidebarMenu>
+    <Link
+      to='/'
+      onClick={() => setOpen(false)}
+      className='flex h-12 shrink-0 items-center gap-2 rounded-md px-2 outline-focus-ring transition duration-100 ease-linear hover:bg-primary_hover focus-visible:outline-2 focus-visible:-outline-offset-2'
+    >
+      <img src='/favicon.png' alt='TingTing Kiosk' className='size-8 shrink-0 rounded-md' />
+      {!iconOnly && <span className='truncate text-sm font-bold text-secondary'>TingTing Kiosk</span>}
+    </Link>
   )
 }

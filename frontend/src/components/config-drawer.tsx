@@ -1,6 +1,13 @@
-import { type SVGProps } from 'react'
-import { Root as Radio, Item } from '@radix-ui/react-radio-group'
-import { CircleCheck, RotateCcw, Settings } from 'lucide-react'
+import { type SVGProps, useState } from 'react'
+import { Check, RefreshCcw02, Settings01 } from '@untitledui/icons'
+import { Dialog, DialogTrigger, Modal, ModalOverlay } from '@/components/application/modals/modal'
+import { Button } from '@/components/base/buttons/button'
+import { ButtonUtility } from '@/components/base/buttons/button-utility'
+import { CloseButton } from '@/components/base/buttons/close-button'
+import { useDirection } from '@/context/direction-provider'
+import { type Collapsible, useLayout } from '@/context/layout-provider'
+import { cn } from '@/lib/utils'
+import { getCookie, setCookie } from '@/lib/cookies'
 import { IconDir } from '@/assets/custom/icon-dir'
 import { IconLayoutCompact } from '@/assets/custom/icon-layout-compact'
 import { IconLayoutDefault } from '@/assets/custom/icon-layout-default'
@@ -8,68 +15,43 @@ import { IconLayoutFull } from '@/assets/custom/icon-layout-full'
 import { IconSidebarFloating } from '@/assets/custom/icon-sidebar-floating'
 import { IconSidebarInset } from '@/assets/custom/icon-sidebar-inset'
 import { IconSidebarSidebar } from '@/assets/custom/icon-sidebar-sidebar'
-import { cn } from '@/lib/utils'
-import { useDirection } from '@/context/direction-provider'
-import { type Collapsible, useLayout } from '@/context/layout-provider'
-import { Button } from '@/components/ui/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
-import { useSidebar } from './ui/sidebar'
+import { useSidebarUI } from './layout/use-sidebar-ui'
 
-export function ConfigDrawer() {
-  const { setOpen } = useSidebar()
-  const { resetDir } = useDirection()
-  const { resetLayout } = useLayout()
+/**
+ * Reads the sidebar UI context when available. Outside the app shell (e.g.
+ * tests) it falls back to local state mirrored with the persisted cookie, so
+ * the drawer stays reactive without SidebarUIProvider.
+ */
+function useOptionalSidebarUI() {
+  // Always call the same hooks (the context read never throws before running),
+  // so hook order stays identical whether the provider exists or not.
+  const [fallbackCollapsed, setFallbackCollapsed] = useState<boolean>(
+    () => getCookie('sidebar_state') === 'false'
+  )
 
-  const handleReset = () => {
-    setOpen(true)
-    resetDir()
-    resetLayout()
+  let sidebarUI: ReturnType<typeof useSidebarUI> | null
+  try {
+    // Stable in practice: useSidebarUI always runs useContext before throwing,
+    // and provider presence is fixed for a mounted instance, so hook order
+    // never changes across renders.
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- optional-context read; see comment above
+    sidebarUI = useSidebarUI()
+  } catch {
+    sidebarUI = null
   }
 
-  return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button
-          size='icon'
-          variant='ghost'
-          aria-label='Mở cài đặt giao diện'
-          className='rounded-full'
-        >
-          <Settings aria-hidden='true' />
-        </Button>
-      </SheetTrigger>
-      <SheetContent className='flex flex-col'>
-        <SheetHeader className='pb-0 text-start'>
-          <SheetTitle>Cài đặt</SheetTitle>
-          <SheetDescription>
-            Tùy chỉnh giao diện và bố cục theo ý bạn.
-          </SheetDescription>
-        </SheetHeader>
-        <div className='space-y-6 overflow-y-auto px-4'>
-          <SidebarConfig />
-          <LayoutConfig />
-          <DirConfig />
-        </div>
-        <SheetFooter className='gap-2'>
-          <Button
-            variant='destructive'
-            onClick={handleReset}
-            aria-label='Đặt lại tất cả cài đặt về mặc định'
-          >
-            Đặt lại
-          </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
-  )
+  if (sidebarUI) return sidebarUI
+
+  const setCollapsed = (v: boolean) => {
+    setFallbackCollapsed(v)
+    setCookie('sidebar_state', String(!v), 60 * 60 * 24 * 7)
+  }
+  return {
+    collapsed: fallbackCollapsed,
+    setCollapsed,
+    open: false,
+    setOpen: () => {},
+  }
 }
 
 function SectionTitle({
@@ -82,83 +64,128 @@ function SectionTitle({
   title: string
   showReset?: boolean
   onReset?: () => void
-  /** Shown on the small per-section reset (RotateCcw) for accessibility and tests. */
+  /** Shown on the small per-section reset (RefreshCcw02) for accessibility and tests. */
   resetAriaLabel?: string
   className?: string
 }) {
   return (
     <div
       className={cn(
-        'mb-2 flex items-center gap-2 text-sm font-semibold text-muted-foreground',
+        'mb-2 flex items-center gap-2 text-sm font-semibold text-tertiary',
         className
       )}
     >
       {title}
       {showReset && onReset && (
-        <Button
-          type='button'
-          size='icon'
-          variant='secondary'
-          className='size-4 rounded-full'
+        <ButtonUtility
+          size='xs'
+          color='secondary'
+          icon={RefreshCcw02}
+          tooltip={resetAriaLabel}
           onClick={onReset}
-          aria-label={resetAriaLabel}
-        >
-          <RotateCcw className='size-3' />
-        </Button>
+        />
       )}
     </div>
   )
 }
 
-function RadioGroupItem({
-  item,
+function RadioCard({
+  value,
+  label,
+  icon: Icon,
+  selected,
+  onSelect,
 }: {
-  item: {
-    value: string
-    label: string
-    icon: (props: SVGProps<SVGSVGElement>) => React.ReactElement
-  }
+  value: string
+  label: string
+  icon: (props: SVGProps<SVGSVGElement>) => React.ReactElement
+  selected: boolean
+  onSelect: (value: string) => void
 }) {
   return (
-    <Item
-      value={item.value}
-      className={cn('group outline-none', 'transition duration-200 ease-in')}
-      aria-label={`Chọn ${item.label.toLowerCase()}`}
-      aria-describedby={`${item.value}-description`}
+    <button
+      type='button'
+      role='radio'
+      aria-checked={selected}
+      aria-label={`Chọn ${label.toLowerCase()}`}
+      aria-describedby={`${value}-description`}
+      data-state={selected ? 'checked' : 'unchecked'}
+      onClick={() => onSelect(value)}
+      className='group/radio rounded-lg outline-focus-ring focus-visible:outline-2 focus-visible:-outline-offset-2'
     >
       <div
         className={cn(
-          'relative rounded-[6px] ring-[1px] ring-border',
-          'group-data-[state=checked]:shadow-2xl group-data-[state=checked]:ring-primary',
-          'group-focus-visible:ring-2'
+          'relative rounded-[6px] transition duration-200 ease-in',
+          selected
+            ? 'shadow-2xl ring-2 ring-brand'
+            : 'ring-1 ring-secondary'
         )}
-        role='img'
-        aria-hidden='false'
-        aria-label={`Xem trước ${item.label.toLowerCase()}`}
       >
-        <CircleCheck
-          className={cn(
-            'size-6 fill-primary stroke-white',
-            'group-data-[state=unchecked]:hidden',
-            'absolute top-0 right-0 translate-x-1/2 -translate-y-1/2'
-          )}
+        {selected && (
+          <span
+            aria-hidden='true'
+            className='absolute top-0 right-0 flex size-5 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand-solid'
+          >
+            <Check aria-hidden='true' className='size-3 stroke-[3] text-white' />
+          </span>
+        )}
+        <Icon
           aria-hidden='true'
-        />
-        <item.icon
           className={cn(
-            'fill-primary stroke-primary group-data-[state=unchecked]:fill-muted-foreground group-data-[state=unchecked]:stroke-muted-foreground'
+            'size-14 fill-brand stroke-brand',
+            !selected && 'fill-fg-quaternary stroke-fg-quaternary'
           )}
-          aria-hidden='true'
         />
       </div>
       <div
-        className='mt-1 text-xs'
-        id={`${item.value}-description`}
+        id={`${value}-description`}
         aria-live='polite'
+        className='mt-1 text-xs text-tertiary'
       >
-        {item.label}
+        {label}
       </div>
-    </Item>
+    </button>
+  )
+}
+
+type RadioCardItem = {
+  value: string
+  label: string
+  icon: (props: SVGProps<SVGSVGElement>) => React.ReactElement
+}
+
+function RadioCardGroup<T extends string>({
+  ariaLabel,
+  describedbyId,
+  value,
+  onChange,
+  items,
+}: {
+  ariaLabel: string
+  describedbyId: string
+  value: T
+  onChange: (value: T) => void
+  items: RadioCardItem[]
+}) {
+  return (
+    <div
+      role='radiogroup'
+      aria-label={ariaLabel}
+      aria-describedby={describedbyId}
+    >
+      <div className='grid w-full max-w-md grid-cols-3 gap-4'>
+        {items.map((item) => (
+          <RadioCard
+            key={item.value}
+            value={item.value}
+            label={item.label}
+            icon={item.icon}
+            selected={value === item.value}
+            onSelect={(v) => onChange(v as T)}
+          />
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -172,33 +199,17 @@ function SidebarConfig() {
         onReset={() => setVariant(defaultVariant)}
         resetAriaLabel='Đặt lại kiểu thanh bên về mặc định'
       />
-      <Radio
+      <RadioCardGroup
+        ariaLabel='Chọn kiểu thanh bên'
+        describedbyId='sidebar-description'
         value={variant}
-        onValueChange={setVariant}
-        className='grid w-full max-w-md grid-cols-3 gap-4'
-        aria-label='Chọn kiểu thanh bên'
-        aria-describedby='sidebar-description'
-      >
-        {[
-          {
-            value: 'inset',
-            label: 'Lồng',
-            icon: IconSidebarInset,
-          },
-          {
-            value: 'floating',
-            label: 'Nổi',
-            icon: IconSidebarFloating,
-          },
-          {
-            value: 'sidebar',
-            label: 'Thanh bên',
-            icon: IconSidebarSidebar,
-          },
-        ].map((item) => (
-          <RadioGroupItem key={item.value} item={item} />
-        ))}
-      </Radio>
+        onChange={setVariant}
+        items={[
+          { value: 'inset', label: 'Lồng', icon: IconSidebarInset },
+          { value: 'floating', label: 'Nổi', icon: IconSidebarFloating },
+          { value: 'sidebar', label: 'Thanh bên', icon: IconSidebarSidebar },
+        ]}
+      />
       <div id='sidebar-description' className='sr-only'>
         Chọn giữa thanh bên lồng, nổi, hoặc dạng chuẩn
       </div>
@@ -207,10 +218,21 @@ function SidebarConfig() {
 }
 
 function LayoutConfig() {
-  const { open, setOpen } = useSidebar()
+  const sidebarUI = useOptionalSidebarUI()
   const { defaultCollapsible, collapsible, setCollapsible } = useLayout()
 
-  const radioState = open ? 'default' : collapsible
+  const radioState =
+    collapsible === 'offcanvas' ? 'offcanvas' : sidebarUI.collapsed ? 'icon' : 'default'
+
+  const handleChange = (v: string) => {
+    if (v === 'default') {
+      setCollapsible('icon')
+      sidebarUI.setCollapsed(false)
+    } else {
+      setCollapsible(v as Collapsible)
+      sidebarUI.setCollapsed(true)
+    }
+  }
 
   return (
     <div className='max-md:hidden'>
@@ -218,45 +240,22 @@ function LayoutConfig() {
         title='Bố cục'
         showReset={radioState !== 'default'}
         onReset={() => {
-          setOpen(true)
           setCollapsible(defaultCollapsible)
+          sidebarUI.setCollapsed(false)
         }}
         resetAriaLabel='Đặt lại bố cục về mặc định'
       />
-      <Radio
+      <RadioCardGroup
+        ariaLabel='Chọn kiểu bố cục'
+        describedbyId='layout-description'
         value={radioState}
-        onValueChange={(v) => {
-          if (v === 'default') {
-            setOpen(true)
-            return
-          }
-          setOpen(false)
-          setCollapsible(v as Collapsible)
-        }}
-        className='grid w-full max-w-md grid-cols-3 gap-4'
-        aria-label='Chọn kiểu bố cục'
-        aria-describedby='layout-description'
-      >
-        {[
-          {
-            value: 'default',
-            label: 'Mặc định',
-            icon: IconLayoutDefault,
-          },
-          {
-            value: 'icon',
-            label: 'Thu gọn',
-            icon: IconLayoutCompact,
-          },
-          {
-            value: 'offcanvas',
-            label: 'Toàn phần',
-            icon: IconLayoutFull,
-          },
-        ].map((item) => (
-          <RadioGroupItem key={item.value} item={item} />
-        ))}
-      </Radio>
+        onChange={handleChange}
+        items={[
+          { value: 'default', label: 'Mặc định', icon: IconLayoutDefault },
+          { value: 'icon', label: 'Thu gọn', icon: IconLayoutCompact },
+          { value: 'offcanvas', label: 'Toàn phần', icon: IconLayoutFull },
+        ]}
+      />
       <div id='layout-description' className='sr-only'>
         Chọn giữa bố cục mở rộng, thu gọn biểu tượng, hoặc toàn phần
       </div>
@@ -274,14 +273,12 @@ function DirConfig() {
         onReset={() => setDir(defaultDir)}
         resetAriaLabel='Đặt lại hướng văn bản về mặc định'
       />
-      <Radio
+      <RadioCardGroup
+        ariaLabel='Chọn hướng trang'
+        describedbyId='direction-description'
         value={dir}
-        onValueChange={setDir}
-        className='grid w-full max-w-md grid-cols-3 gap-4'
-        aria-label='Chọn hướng trang'
-        aria-describedby='direction-description'
-      >
-        {[
+        onChange={setDir}
+        items={[
           {
             value: 'ltr',
             label: 'Trái sang phải',
@@ -296,13 +293,60 @@ function DirConfig() {
               <IconDir dir='rtl' {...props} />
             ),
           },
-        ].map((item) => (
-          <RadioGroupItem key={item.value} item={item} />
-        ))}
-      </Radio>
+        ]}
+      />
       <div id='direction-description' className='sr-only'>
         Chọn hướng trang từ trái sang phải hoặc phải sang trái
       </div>
     </div>
+  )
+}
+
+export function ConfigDrawer() {
+  const sidebarUI = useOptionalSidebarUI()
+  const { resetDir } = useDirection()
+  const { resetLayout } = useLayout()
+
+  const handleReset = () => {
+    sidebarUI.setCollapsed(false)
+    resetDir()
+    resetLayout()
+  }
+
+  return (
+    <DialogTrigger>
+      <ButtonUtility icon={Settings01} tooltip='Mở cài đặt giao diện' color='tertiary' />
+      <ModalOverlay>
+        <Modal className='w-full max-w-sm'>
+          <Dialog aria-label='Cài đặt'>
+            <div className='flex flex-col'>
+              <div className='flex items-start justify-between gap-2 px-6 pt-6 pb-4'>
+                <div className='flex flex-col gap-0.5'>
+                  <h2 className='text-md font-semibold text-secondary'>Cài đặt</h2>
+                  <p className='text-sm text-tertiary'>
+                    Tùy chỉnh giao diện và bố cục theo ý bạn.
+                  </p>
+                </div>
+                <CloseButton size='sm' label='Đóng' />
+              </div>
+              <div className='space-y-6 overflow-y-auto px-6 pb-4'>
+                <SidebarConfig />
+                <LayoutConfig />
+                <DirConfig />
+              </div>
+              <div className='flex justify-end border-t border-secondary px-6 py-4'>
+                <Button
+                  color='primary-destructive'
+                  aria-label='Đặt lại tất cả cài đặt về mặc định'
+                  onClick={handleReset}
+                >
+                  Đặt lại
+                </Button>
+              </div>
+            </div>
+          </Dialog>
+        </Modal>
+      </ModalOverlay>
+    </DialogTrigger>
   )
 }
