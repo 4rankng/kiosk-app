@@ -1,14 +1,14 @@
-import { useMemo } from 'react'
+import { useMemo, type FC } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { CoinsHand, CoinsStacked01, LayersTwo01, Package, Plus } from '@untitledui/icons'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { useDocumentTitle } from '@/hooks/use-document-title'
+import { PageHeader } from '@/components/page-header'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Package, Tags, TrendingUp, Plus } from 'lucide-react'
+import { Button } from '@/components/base/buttons/button'
+import { FeaturedIcon } from '@/components/foundations/featured-icon/featured-icon'
 import { ProductsDialogs } from './components/products-dialogs'
 import { ProductsProvider, useProductsContext } from './components/products-provider'
 import { ProductsTable } from './components/products-table'
@@ -20,15 +20,38 @@ import type { Product } from '@/types'
 function AddProductButton() {
   const { setOpen } = useProductsContext()
   return (
-    <Button onClick={() => setOpen('add')}>
-      <Plus className='mr-2 h-4 w-4' />
+    <Button iconLeading={Plus} onPress={() => setOpen('add')}>
       Thêm
     </Button>
   )
 }
 
+function StatCard({
+  icon,
+  label,
+  value,
+  hint,
+}: {
+  icon: FC<{ className?: string }>
+  label: string
+  value: string
+  hint?: string
+}) {
+  return (
+    <div className='rounded-xl bg-primary shadow-xs ring-1 ring-secondary ring-inset'>
+      <div className='flex items-start justify-between gap-3 p-4'>
+        <div className='min-w-0'>
+          <p className='text-sm font-medium text-tertiary'>{label}</p>
+          <p className='mt-1 font-heading text-display-sm font-semibold tabular-nums text-primary'>{value}</p>
+          {hint && <p className='mt-0.5 text-xs text-quaternary'>{hint}</p>}
+        </div>
+        <FeaturedIcon icon={icon} color='brand' theme='modern' size='sm' />
+      </div>
+    </div>
+  )
+}
+
 function ProductsContent() {
-  useDocumentTitle('Danh mục sản phẩm')
   const { setOpen, setSelectedProduct } = useProductsContext()
   const { data: products = [] } = useQuery({ queryKey: ['products'], queryFn: getProducts })
   const isMobile = useIsMobile()
@@ -65,60 +88,38 @@ function ProductsContent() {
         <ProfileDropdown />
       </Header>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        <div className='flex items-center justify-between gap-3'>
-          <div>
-            <h1 className='font-heading text-h1 font-semibold tracking-tight'>Danh mục sản phẩm</h1>
-            {!isMobile && (
-              <p className='text-muted-foreground'>
-                {stats.total} sản phẩm · {stats.categories} nhóm hàng
-              </p>
-            )}
-          </div>
-          <AddProductButton />
-        </div>
+        <PageHeader
+          title='Danh mục sản phẩm'
+          description={isMobile ? undefined : `${stats.total} sản phẩm · ${stats.categories} nhóm hàng`}
+          actions={<AddProductButton />}
+        />
 
         {/* Summary stats */}
         <div className='grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4'>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>Sản phẩm</CardTitle>
-              <Package className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              <div className='font-heading text-display font-semibold tabular-nums'>{stats.total}</div>
-              {!isMobile && <p className='text-xs text-muted-foreground'>mặt hàng trong kho</p>}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>Nhóm hàng</CardTitle>
-              <Tags className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              <div className='font-heading text-display font-semibold tabular-nums'>{stats.categories}</div>
-              {!isMobile && <p className='text-xs text-muted-foreground'>nhóm đang hoạt động</p>}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>Giá vốn</CardTitle>
-              <TrendingUp className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              <div className='font-heading text-display font-semibold tabular-nums'>{formatCurrency(stats.inventoryValue)}</div>
-              {!isMobile && <p className='text-xs text-muted-foreground'>giá trị vốn hàng</p>}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>Giá TB</CardTitle>
-              <TrendingUp className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              <div className='font-heading text-display font-semibold tabular-nums'>{formatCurrency(stats.avgPrice)}</div>
-              {!isMobile && <p className='text-xs text-muted-foreground'>trên mỗi mặt hàng</p>}
-            </CardContent>
-          </Card>
+          <StatCard
+            icon={Package}
+            label='Sản phẩm'
+            value={String(stats.total)}
+            hint={isMobile ? undefined : 'mặt hàng trong kho'}
+          />
+          <StatCard
+            icon={LayersTwo01}
+            label='Nhóm hàng'
+            value={String(stats.categories)}
+            hint={isMobile ? undefined : 'nhóm đang hoạt động'}
+          />
+          <StatCard
+            icon={CoinsStacked01}
+            label='Giá vốn'
+            value={formatCurrency(stats.inventoryValue)}
+            hint={isMobile ? undefined : 'giá trị vốn hàng'}
+          />
+          <StatCard
+            icon={CoinsHand}
+            label='Giá TB'
+            value={formatCurrency(stats.avgPrice)}
+            hint={isMobile ? undefined : 'trên mỗi mặt hàng'}
+          />
         </div>
 
         <ProductsTable onEdit={handleEdit} onDelete={handleDelete} />

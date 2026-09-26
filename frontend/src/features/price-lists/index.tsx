@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { Tag01 } from '@untitledui/icons'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/page-header'
@@ -10,12 +12,8 @@ import { PriceListTable } from './components/price-list-table'
 import { EmptyState } from '@/components/empty-state'
 import type { PriceList } from '@/types/api'
 import { getPriceListById, getPriceLists } from '@/services/price-lists'
-import { useQuery } from '@tanstack/react-query'
-import { Tag } from 'lucide-react'
-import { useDocumentTitle } from '@/hooks/use-document-title'
 
 export function PriceLists() {
-  useDocumentTitle('Bảng giá tùy chỉnh')
   const [selectedPriceList, setSelectedPriceList] = useState<PriceList | null>(null)
 
   const { data: priceLists = [], isLoading: isListsLoading } = useQuery({
@@ -53,12 +51,8 @@ export function PriceLists() {
           onSelect={setSelectedPriceList}
           priceLists={priceLists}
         />
-        {isListsLoading && (
-          <EmptyState variant='loading' rows={6} />
-        )}
-        {!isListsLoading && effectivePriceList && isItemsLoading && (
-          <EmptyState variant='loading' rows={6} />
-        )}
+        {isListsLoading && <EmptyState variant='loading' rows={6} />}
+        {!isListsLoading && effectivePriceList && isItemsLoading && <EmptyState variant='loading' rows={6} />}
         {!isListsLoading && effectivePriceList && !isItemsLoading && (
           <PriceListTable
             priceList={effectivePriceList}
@@ -66,10 +60,10 @@ export function PriceLists() {
           />
         )}
         {!isListsLoading && !effectivePriceList && (
-          <div className='rounded-lg border border-dashed p-8 bg-card'>
+          <div className='rounded-xl border border-dashed border-secondary bg-primary p-8'>
             <EmptyState
               variant='empty'
-              icon={<Tag className='h-10 w-10 text-muted-foreground/60' />}
+              icon={<Tag01 className='size-10 text-fg-quaternary' />}
               title='Chưa chọn bảng giá'
               description='Chọn một bảng giá từ danh sách trên để xem chi tiết các mặt hàng và cấu hình giá.'
             />

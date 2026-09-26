@@ -2,8 +2,8 @@ import { useState, useCallback } from 'react'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { useDocumentTitle } from '@/hooks/use-document-title'
-import { Button } from '@/components/ui/button'
-import { ShoppingCart, ChevronUp } from 'lucide-react'
+import { Button } from '@/components/base/buttons/button'
+import { ShoppingCart01, ChevronUp } from '@untitledui/icons'
 import { toast } from 'sonner'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatCurrency } from '@/lib/format'
@@ -126,8 +126,10 @@ export function OrderCreate() {
     <>
       <Header fixed>
         <div className='me-auto flex items-center gap-2'>
-          <ShoppingCart className='h-5 w-5' />
-          <h1 className='font-heading text-h1 font-semibold tracking-tight'>Tạo đơn hàng mới</h1>
+          <ShoppingCart01 className='size-5 text-brand-secondary' />
+          <h1 className='font-heading text-display-xs font-semibold tracking-tight text-primary'>
+            Tạo đơn hàng mới
+          </h1>
         </div>
       </Header>
 
@@ -137,14 +139,14 @@ export function OrderCreate() {
             {/* Section 1: Customer */}
             <section className='space-y-2'>
               <div className='flex items-center gap-2'>
-                <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+                <span className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'>
                   1
                 </span>
-                <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+                <h3 className='text-sm font-semibold uppercase tracking-wider text-tertiary'>
                   Thông tin người mua
                 </h3>
               </div>
-              <div className='rounded-lg border bg-card p-4'>
+              <div className='rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
                 <CustomerSelector
                   selectedCustomer={selectedCustomer}
                   onSelect={(customer, plId) => {
@@ -158,14 +160,14 @@ export function OrderCreate() {
             {/* Section 2: Cart */}
             <section className='space-y-2'>
               <div className='flex items-center gap-2'>
-                <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+                <span className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'>
                   2
                 </span>
-                <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+                <h3 className='text-sm font-semibold uppercase tracking-wider text-tertiary'>
                   Giỏ hàng
                 </h3>
               </div>
-              <div className='rounded-lg border bg-card p-4 space-y-3'>
+              <div className='space-y-3 rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
                 <ProductSearch
                   priceListId={priceListId}
                   onAddProduct={addItem}
@@ -178,24 +180,24 @@ export function OrderCreate() {
             </section>
           </div>
         ) : (
-          <div className='grid grid-cols-12 gap-6 items-start'>
+          <div className='grid grid-cols-12 items-start gap-6'>
             {/* Left 7-8 cols: Product search & Cart line items */}
-            <div className='col-span-12 lg:col-span-7 xl:col-span-8 space-y-4'>
+            <div className='col-span-12 space-y-4 lg:col-span-7 xl:col-span-8'>
               <section className='space-y-2'>
                 <div className='flex items-center justify-between'>
                   <div className='flex items-center gap-2'>
-                    <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+                    <span className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'>
                       1
                     </span>
-                    <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+                    <h3 className='text-sm font-semibold uppercase tracking-wider text-tertiary'>
                       Sản phẩm & Giỏ hàng
                     </h3>
                   </div>
-                  <span className='text-xs text-muted-foreground'>
+                  <span className='text-xs text-quaternary'>
                     {items.length} mặt hàng đã chọn
                   </span>
                 </div>
-                <div className='rounded-lg border bg-card p-4 space-y-4'>
+                <div className='space-y-4 rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
                   <ProductSearch
                     priceListId={priceListId}
                     onAddProduct={addItem}
@@ -211,18 +213,18 @@ export function OrderCreate() {
             </div>
 
             {/* Right 4-5 cols: Customer & Summary Checkout Panel */}
-            <div className='col-span-12 lg:col-span-5 xl:col-span-4 space-y-4 lg:sticky lg:top-20'>
+            <div className='col-span-12 space-y-4 lg:sticky lg:top-20 lg:col-span-5 xl:col-span-4'>
               {/* Customer selection */}
               <section className='space-y-2'>
                 <div className='flex items-center gap-2'>
-                  <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+                  <span className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'>
                     2
                   </span>
-                  <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+                  <h3 className='text-sm font-semibold uppercase tracking-wider text-tertiary'>
                     Khách hàng & Bảng giá
                   </h3>
                 </div>
-                <div className='rounded-lg border bg-card p-4'>
+                <div className='rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
                   <CustomerSelector
                     selectedCustomer={selectedCustomer}
                     onSelect={(customer, plId) => {
@@ -236,14 +238,14 @@ export function OrderCreate() {
               {/* Order Totals & Business Entity */}
               <section className='space-y-2'>
                 <div className='flex items-center gap-2'>
-                  <span className='flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold'>
+                  <span className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'>
                     3
                   </span>
-                  <h3 className='text-sm font-semibold uppercase text-muted-foreground tracking-wider'>
+                  <h3 className='text-sm font-semibold uppercase tracking-wider text-tertiary'>
                     Tổng kết & Thanh toán
                   </h3>
                 </div>
-                <div className='rounded-lg border bg-card p-4 space-y-4'>
+                <div className='space-y-4 rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
                   <OrderSummary
                     subtotal={subtotal}
                     discount={discount}
@@ -256,9 +258,9 @@ export function OrderCreate() {
                   />
                   <Button
                     size='lg'
-                    onClick={handleSubmit}
-                    disabled={createMutation.isPending}
-                    className='w-full font-semibold shadow-sm'
+                    onPress={handleSubmit}
+                    isDisabled={createMutation.isPending}
+                    className='w-full min-h-11 font-semibold shadow-xs'
                   >
                     {createMutation.isPending ? 'Đang lưu...' : 'Lưu và tạo hóa đơn'}
                   </Button>
@@ -269,22 +271,24 @@ export function OrderCreate() {
         )}
       </Main>
 
-      {/* Mobile Sticky bottom bar */}
+      {/* Mobile sticky bottom bar */}
       {isMobile && (
         <Button
           type='button'
-          variant='ghost'
-          onClick={() => setReviewOpen(true)}
-          className='fixed bottom-0 left-0 right-0 z-40 h-auto min-h-[44px] border-t bg-background/80 backdrop-blur-lg px-4 py-3 rounded-none'
+          color='tertiary'
+          onPress={() => setReviewOpen(true)}
+          className='fixed bottom-0 left-0 right-0 z-40 min-h-11 rounded-none border-t border-secondary bg-primary px-4 py-3'
         >
           <div className='flex w-full items-center justify-between'>
-            <div>
-              <span className='text-sm text-muted-foreground'>
+            <div className='flex items-baseline gap-2'>
+              <span className='text-sm text-tertiary'>
                 {items.length} mặt hàng · Khách cần trả:
               </span>
-              <span className='ml-2 text-lg font-bold'>{formatCurrency(total)}</span>
+              <span className='text-lg font-bold text-primary tabular-nums'>
+                {formatCurrency(total)}
+              </span>
             </div>
-            <ChevronUp className='h-5 w-5 text-muted-foreground' />
+            <ChevronUp className='size-5 text-quaternary' />
           </div>
         </Button>
       )}

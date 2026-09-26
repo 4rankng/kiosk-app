@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react'
 import { type SortingState, type ColumnFiltersState, type VisibilityState, type RowSelectionState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
 import { useQuery } from '@tanstack/react-query'
 import { getCompanies } from '@/services/companies'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { DataTablePagination } from '@/components/data-table'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileCardView } from '@/components/data-table/mobile-card-view'
@@ -56,33 +55,44 @@ export function CompaniesTable() {
           onToggle={(id) => setExpandedId(expandedId === id ? null : id)}
         />
       ) : (
-        <div className='rounded-md border'>
-          <Table>
-            <TableHeader>
+        <div className='w-full overflow-x-auto rounded-lg bg-primary shadow-xs ring-1 ring-secondary ring-inset'>
+          <table className='w-full caption-bottom text-sm'>
+            <thead className='border-b border-secondary [&_tr]:border-b [&_tr]:border-secondary'>
               {table.getHeaderGroups().map((hg) => (
-                <TableRow key={hg.id}>
+                <tr key={hg.id}>
                   {hg.headers.map((h) => (
-                    <TableHead key={h.id} className='whitespace-nowrap' aria-sort={getColumnAriaSort(h.column)}>
+                    <th
+                      key={h.id}
+                      scope='col'
+                      aria-sort={getColumnAriaSort(h.column)}
+                      className='h-9 px-2 text-start align-middle text-xs font-medium whitespace-nowrap text-tertiary'
+                    >
                       {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
-                    </TableHead>
+                    </th>
                   ))}
-                </TableRow>
+                </tr>
               ))}
-            </TableHeader>
-            <TableBody>
+            </thead>
+            <tbody className='[&_tr:last-child]:border-0'>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
+                  <tr key={row.id} className='border-b border-secondary transition-colors hover:bg-primary_hover'>
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                      <td key={cell.id} className='px-2 py-1.5 align-middle whitespace-nowrap text-secondary'>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
                     ))}
-                  </TableRow>
+                  </tr>
                 ))
               ) : (
-                <TableRow><TableCell colSpan={columns.length} className='h-24 text-center'>Không có dữ liệu.</TableCell></TableRow>
+                <tr>
+                  <td colSpan={columns.length} className='h-24 text-center text-sm text-tertiary'>
+                    Không có dữ liệu.
+                  </td>
+                </tr>
               )}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
       )}
       {!isMobile && <DataTablePagination table={table} />}

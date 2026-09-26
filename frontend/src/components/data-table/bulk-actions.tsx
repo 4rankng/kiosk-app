@@ -1,15 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { X } from '@untitledui/icons'
 import { type Table } from '@tanstack/react-table'
-import { X } from 'lucide-react'
+import { Badge } from '@/components/base/badges/badges'
+import { Button } from '@/components/base/buttons/button'
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
 
 type DataTableBulkActionsProps<TData> = {
   table: Table<TData>
@@ -18,14 +12,10 @@ type DataTableBulkActionsProps<TData> = {
 }
 
 /**
- * A modular toolbar for displaying bulk actions when table rows are selected.
- *
- * @template TData The type of data in the table.
- * @param {object} props The component props.
- * @param {Table<TData>} props.table The react-table instance.
- * @param {string} props.entityName The name of the entity being acted upon (e.g., "task", "user").
- * @param {React.ReactNode} props.children The action buttons to be rendered inside the toolbar.
- * @returns {React.ReactNode | null} The rendered component or null if no rows are selected.
+ * Floating toolbar shown when table rows are selected. Keyboard navigation
+ * (arrow keys / Home / End / Escape) and the screen-reader live region are
+ * preserved from the previous implementation; visuals now use Untitled UI
+ * tokens.
  */
 export function DataTableBulkActions<TData>({
   table,
@@ -40,7 +30,7 @@ export function DataTableBulkActions<TData>({
   // Announce selection changes to screen readers
   useEffect(() => {
     if (selectedCount > 0) {
-      const message = `${selectedCount} ${entityName}${selectedCount > 1 ? 's' : ''} selected. Bulk actions toolbar is available.`
+      const message = `Đã chọn ${selectedCount} ${entityName}. Bảng hành động hàng loạt khả dụng.`
 
       // Use queueMicrotask to defer state update and avoid cascading renders
       queueMicrotask(() => {
@@ -88,30 +78,19 @@ export function DataTableBulkActions<TData>({
         buttons[buttons.length - 1]?.focus()
         break
       case 'Escape': {
-        // Check if the Escape key came from a dropdown trigger or content
-        // We can't check dropdown state because Radix UI closes it before our handler runs
+        // If focus is inside an open dropdown menu (which closes on Escape),
+        // let the menu handle the key and keep the row selection.
         const target = event.target as HTMLElement
         const activeElement = document.activeElement as HTMLElement
 
-        // Check if the event target or currently focused element is a dropdown trigger
-        const isFromDropdownTrigger =
-          target?.getAttribute('data-slot') === 'dropdown-menu-trigger' ||
-          activeElement?.getAttribute('data-slot') ===
-            'dropdown-menu-trigger' ||
-          target?.closest('[data-slot="dropdown-menu-trigger"]') ||
-          activeElement?.closest('[data-slot="dropdown-menu-trigger"]')
+        const isFromDropdown =
+          target?.closest('[role="menu"]') ||
+          activeElement?.closest('[role="menu"]')
 
-        // Check if the focused element is inside dropdown content (which is portaled)
-        const isFromDropdownContent =
-          activeElement?.closest('[data-slot="dropdown-menu-content"]') ||
-          target?.closest('[data-slot="dropdown-menu-content"]')
-
-        if (isFromDropdownTrigger || isFromDropdownContent) {
-          // Escape was meant for the dropdown - don't clear selection
+        if (isFromDropdown) {
           return
         }
 
-        // Escape was meant for the toolbar - clear selection
         event.preventDefault()
         handleClearSelection()
         break
@@ -125,7 +104,6 @@ export function DataTableBulkActions<TData>({
 
   return (
     <>
-      {/* Live region for screen reader announcements */}
       <div
         aria-live='polite'
         aria-atomic='true'
@@ -138,75 +116,38 @@ export function DataTableBulkActions<TData>({
       <div
         ref={toolbarRef}
         role='toolbar'
-        aria-label={`Bulk actions for ${selectedCount} selected ${entityName}${selectedCount > 1 ? 's' : ''}`}
+        aria-label={`Hành động hàng loạt cho ${selectedCount} ${entityName} đã chọn`}
         aria-describedby='bulk-actions-description'
         tabIndex={-1}
         onKeyDown={handleKeyDown}
         className={cn(
-          'fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl',
-          'transition-all delay-100 duration-300 ease-out hover:scale-105',
-          'focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none'
+          'fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-primary p-2 shadow-lg ring-1 ring-secondary_alt',
+          'flex items-center gap-x-2',
+          'transition-all duration-200 ease-out',
+          'focus-visible:ring-2 focus-visible:ring-brand'
         )}
       >
+        <Button
+          color='secondary'
+          iconLeading={X}
+          onPress={handleClearSelection}
+          className='size-9'
+          aria-label='Xóa lựa chọn'
+        />
+        <span className='h-5 w-px bg-border-secondary' aria-hidden='true' />
         <div
-          className={cn(
-            'p-2 shadow-xl',
-            'rounded-xl border',
-            'bg-background/95 backdrop-blur-lg supports-backdrop-filter:bg-background/60',
-            'flex items-center gap-x-2'
-          )}
+          className='flex items-center gap-x-1.5 text-sm'
+          id='bulk-actions-description'
         >
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant='outline'
-                size='icon'
-                onClick={handleClearSelection}
-                className='size-6 rounded-full'
-                aria-label='Clear selection'
-                title='Clear selection (Escape)'
-              >
-                <X />
-                <span className='sr-only'>Clear selection</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Clear selection (Escape)</p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Separator
-            className='h-5'
-            orientation='vertical'
-            aria-hidden='true'
-          />
-
-          <div
-            className='flex items-center gap-x-1 text-sm'
-            id='bulk-actions-description'
-          >
-            <Badge
-              variant='default'
-              className='min-w-8 rounded-lg'
-              aria-label={`${selectedCount} selected`}
-            >
-              {selectedCount}
-            </Badge>{' '}
-            <span className='hidden sm:inline'>
-              {entityName}
-              {selectedCount > 1 ? 's' : ''}
-            </span>{' '}
-            selected
-          </div>
-
-          <Separator
-            className='h-5'
-            orientation='vertical'
-            aria-hidden='true'
-          />
-
-          {children}
+          <Badge type='color' size='sm' color='brand' aria-label={`${selectedCount} đã chọn`}>
+            {selectedCount}
+          </Badge>
+          <span className='hidden sm:inline'>
+            {entityName} đã chọn
+          </span>
         </div>
+        <span className='h-5 w-px bg-border-secondary' aria-hidden='true' />
+        {children}
       </div>
     </>
   )

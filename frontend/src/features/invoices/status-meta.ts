@@ -1,14 +1,15 @@
-import type { ComponentType } from 'react'
-import { CheckCircle2, DollarSign, Clock, XCircle, type LucideProps } from 'lucide-react'
+import type { FC } from 'react'
+import { CheckCircle, Clock, CurrencyDollar, XCircle } from '@untitledui/icons'
+import type { BadgeColor } from '@/components/base/badges/badges'
 import type { InvoiceStatus } from '@/types/api'
 
 export interface InvoiceStatusMeta {
-  /** lucide-react icon component */
-  icon: ComponentType<LucideProps>
+  /** Untitled UI icon component */
+  icon: FC<{ className?: string; strokeWidth?: string | number }>
   /** Vietnamese label */
   label: string
-  /** Tailwind classes for the status pill */
-  className: string
+  /** UUI Badge color semantics for the status pill */
+  badgeColor: BadgeColor<'pill-color'>
   /** Whether this status represents a destructive/error state */
   destructive?: boolean
 }
@@ -16,8 +17,8 @@ export interface InvoiceStatusMeta {
 /**
  * Resolve a semantic status descriptor for an invoice.
  *
- * Completed invoices are split into paid (success) / unpaid (destructive).
- * Partially-paid and pending use the warning (amber) style; cancelled is muted.
+ * Completed invoices are split into paid (success) / unpaid (error).
+ * Partially-paid and pending use the warning style; cancelled is muted.
  */
 export function statusMeta(
   status: InvoiceStatus,
@@ -27,22 +28,22 @@ export function statusMeta(
   if (status === 'completed') {
     if (isPaid) {
       return {
-        icon: CheckCircle2,
+        icon: CheckCircle,
         label: 'Đã thanh toán',
-        className: 'bg-success/10 text-success border border-success/20',
+        badgeColor: 'success',
       }
     }
     if (partiallyPaid) {
       return {
         icon: Clock,
         label: 'Thanh toán 1 phần',
-        className: 'bg-warning/10 text-warning border border-warning/20',
+        badgeColor: 'warning',
       }
     }
     return {
-      icon: DollarSign,
+      icon: CurrencyDollar,
       label: 'Chưa thanh toán',
-      className: 'bg-destructive/10 text-destructive border border-destructive/20',
+      badgeColor: 'error',
       destructive: true,
     }
   }
@@ -50,13 +51,13 @@ export function statusMeta(
     return {
       icon: Clock,
       label: 'Đang xử lý',
-      className: 'bg-warning/10 text-warning border border-warning/20',
+      badgeColor: 'warning',
     }
   }
   return {
     icon: XCircle,
     label: 'Đã hủy',
-    className: 'bg-muted text-muted-foreground border border-border',
+    badgeColor: 'gray',
     destructive: true,
   }
 }

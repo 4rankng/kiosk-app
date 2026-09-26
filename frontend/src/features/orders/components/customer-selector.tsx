@@ -1,12 +1,13 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useId } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getCustomers } from '@/services/customers'
 import { getCompanyById } from '@/services/companies'
 import { getPriceListByCompany } from '@/services/price-lists'
-import { Building2, FileText, Search } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { Building05, Tag01, SearchMd } from '@untitledui/icons'
+import { Button } from '@/components/base/buttons/button'
+import { InputBase } from '@/components/base/input/input'
+import { ModalOverlay, Modal, Dialog } from '@/components/application/modals/modal'
+import { CloseButton } from '@/components/base/buttons/close-button'
 import type { Customer } from '@/types'
 
 interface CustomerSelectorProps {
@@ -19,6 +20,7 @@ export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelecto
   const [focused, setFocused] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
   const blurTimeout = useRef<ReturnType<typeof setTimeout>>(null)
+  const mobileTitleId = useId()
 
   const { data: customersData } = useQuery({
     queryKey: ['customers'],
@@ -77,23 +79,22 @@ export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelecto
     return (
       <div className='space-y-1'>
         <div className='flex items-center gap-2'>
-          <span className='font-medium'>{selectedCustomer.name}</span>
+          <span className='text-sm font-medium text-primary'>{selectedCustomer.name}</span>
           <Button
-            variant='ghost'
+            color='link-gray'
             size='sm'
-            onClick={() => onSelect(null, '')}
-            className='h-auto px-2 py-0.5 text-xs text-muted-foreground hover:text-foreground'
+            onPress={() => onSelect(null, '')}
           >
             Thay đổi
           </Button>
         </div>
-        <div className='rounded-lg border bg-muted/50 p-3 space-y-1'>
-          <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-            <Building2 className='h-4 w-4' />
+        <div className='space-y-1 rounded-lg bg-secondary p-3'>
+          <p className='flex items-center gap-2 text-sm text-tertiary'>
+            <Building05 className='size-4' />
             Phân loại: {company?.name ?? 'Đang tải...'}
           </p>
-          <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-            <FileText className='h-4 w-4' />
+          <p className='flex items-center gap-2 text-sm text-tertiary'>
+            <Tag01 className='size-4' />
             Bảng giá tự động: {priceList?.name ?? 'BẢNG GIÁ CHUNG'}
           </p>
         </div>
@@ -105,84 +106,83 @@ export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelecto
     <>
       {/* Desktop: inline search with dropdown */}
       <div className='hidden sm:block relative'>
-        <div className='relative'>
-          <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-          <Input
-            placeholder='Tìm khách hàng...'
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            className='pl-8'
-          />
-        </div>
+        <InputBase
+          size='sm'
+          icon={SearchMd}
+          placeholder='Tìm khách hàng...'
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+        />
         {focused && filtered.length > 0 && (
-          <div className='absolute top-full z-50 mt-1 max-h-[250px] w-full overflow-auto rounded-md border bg-background shadow-lg'>
+          <div className='absolute top-full z-50 mt-1 max-h-[250px] w-full overflow-auto rounded-lg bg-primary py-1 shadow-lg ring-1 ring-secondary_alt'>
             {filtered.map((c) => (
               <button
                 key={c.id}
-                className='flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-accent transition-colors'
+                className='flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left transition-colors hover:bg-secondary'
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleSelect(c)}
               >
-                <div>
-                  <span className='font-medium'>{c.name}</span>
-                  <span className='ml-2 text-xs text-muted-foreground'>({c.code})</span>
+                <div className='min-w-0'>
+                  <span className='font-medium text-primary'>{c.name}</span>
+                  <span className='ml-2 text-xs text-tertiary'>({c.code})</span>
                 </div>
-                <span className='text-xs text-muted-foreground'>{c.phone}</span>
+                <span className='shrink-0 text-xs text-tertiary tabular-nums'>{c.phone}</span>
               </button>
             ))}
           </div>
         )}
         {focused && query.length >= 1 && filtered.length === 0 && (
-          <div className='absolute top-full z-50 mt-1 w-full rounded-md border bg-background p-3 text-center text-sm text-muted-foreground shadow-lg'>
+          <div className='absolute top-full z-50 mt-1 w-full rounded-lg bg-primary p-3 text-center text-sm text-tertiary shadow-lg ring-1 ring-secondary_alt'>
             Không tìm thấy khách hàng
           </div>
         )}
       </div>
 
-      {/* Mobile: Sheet slide-up */}
+      {/* Mobile: bottom sheet */}
       <div className='sm:hidden'>
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-          <SheetTrigger asChild>
-            <Button variant='outline' className='w-full'>
-              <Search className='mr-2 h-4 w-4' />
-              Chọn khách hàng
-            </Button>
-          </SheetTrigger>
-          <SheetContent side='bottom' className='h-[70vh]'>
-            <SheetHeader>
-              <SheetTitle>Tìm kiếm khách hàng</SheetTitle>
-            </SheetHeader>
-            <div className='mt-4 space-y-2'>
-              <Input
-                placeholder='Gõ tên, mã hoặc số điện thoại...'
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                autoFocus
-              />
-              <div className='max-h-[50vh] overflow-auto space-y-1'>
-                {filtered.map((c) => (
-                  <button
-                    key={c.id}
-                    className='flex w-full items-center justify-between rounded-md px-3 py-3 text-left hover:bg-accent transition-colors'
-                    onClick={() => handleSelect(c)}
-                  >
-                    <div>
-                      <div className='font-medium'>{c.name}</div>
-                      <div className='text-xs text-muted-foreground'>{c.code} · {c.phone}</div>
-                    </div>
-                  </button>
-                ))}
-                {query.length >= 1 && filtered.length === 0 && (
-                  <p className='py-4 text-center text-sm text-muted-foreground'>
-                    Không tìm thấy khách hàng
-                  </p>
-                )}
+        <ModalOverlay isOpen={sheetOpen} onOpenChange={setSheetOpen} isDismissable>
+          <Modal className='w-full'>
+            <Dialog aria-labelledby={mobileTitleId}>
+              <div className='flex flex-col gap-3 p-4'>
+                <div className='flex items-center justify-between'>
+                  <h2 id={mobileTitleId} className='text-md font-semibold text-primary'>
+                    Tìm kiếm khách hàng
+                  </h2>
+                  <CloseButton size='sm' onClick={() => setSheetOpen(false)} />
+                </div>
+                <InputBase
+                  size='sm'
+                  icon={SearchMd}
+                  autoFocus
+                  placeholder='Gõ tên, mã hoặc số điện thoại...'
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                <div className='flex max-h-[50vh] flex-col gap-1 overflow-y-auto'>
+                  {filtered.map((c) => (
+                    <button
+                      key={c.id}
+                      className='flex w-full items-center justify-between gap-2 rounded-md px-3 py-2.5 text-left transition-colors hover:bg-secondary'
+                      onClick={() => handleSelect(c)}
+                    >
+                      <div className='min-w-0'>
+                        <div className='text-sm font-medium text-primary'>{c.name}</div>
+                        <div className='text-xs text-tertiary'>{c.code} · {c.phone}</div>
+                      </div>
+                    </button>
+                  ))}
+                  {query.length >= 1 && filtered.length === 0 && (
+                    <p className='py-4 text-center text-sm text-tertiary'>
+                      Không tìm thấy khách hàng
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+            </Dialog>
+          </Modal>
+        </ModalOverlay>
       </div>
     </>
   )

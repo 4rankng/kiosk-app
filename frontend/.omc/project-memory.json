@@ -189,81 +189,129 @@
   },
   "hotPaths": [
     {
+      "path": "src/components/config-drawer.tsx",
+      "accessCount": 47,
+      "lastAccessed": 1790420925974,
+      "type": "file"
+    },
+    {
       "path": "src/features/dashboard/components/today-stats.tsx",
-      "accessCount": 30,
-      "lastAccessed": 1790260996287,
+      "accessCount": 32,
+      "lastAccessed": 1790421667946,
       "type": "file"
     },
     {
       "path": "src/components/config-drawer.test.tsx",
-      "accessCount": 28,
-      "lastAccessed": 1790299408899,
+      "accessCount": 29,
+      "lastAccessed": 1790418494942,
       "type": "file"
     },
     {
       "path": "src/features/orders/components/order-create.tsx",
-      "accessCount": 20,
-      "lastAccessed": 1790298359834,
+      "accessCount": 29,
+      "lastAccessed": 1790422279201,
       "type": "file"
     },
     {
-      "path": "src/features/dashboard/components/monthly-revenue-chart.tsx",
-      "accessCount": 15,
-      "lastAccessed": 1780862799175,
+      "path": "src/components/command-menu.tsx",
+      "accessCount": 26,
+      "lastAccessed": 1790420525592,
       "type": "file"
     },
     {
       "path": "src/features/dashboard/index.tsx",
-      "accessCount": 13,
-      "lastAccessed": 1783334463551,
+      "accessCount": 19,
+      "lastAccessed": 1790421987712,
+      "type": "file"
+    },
+    {
+      "path": "src/features/dashboard/components/monthly-revenue-chart.tsx",
+      "accessCount": 18,
+      "lastAccessed": 1790421692138,
       "type": "file"
     },
     {
       "path": "src/features/products/index.tsx",
-      "accessCount": 12,
-      "lastAccessed": 1783334561173,
-      "type": "file"
-    },
-    {
-      "path": "src/components/config-drawer.tsx",
-      "accessCount": 12,
-      "lastAccessed": 1790298393332,
-      "type": "file"
-    },
-    {
-      "path": "src/features/price-lists/index.tsx",
-      "accessCount": 11,
-      "lastAccessed": 1783339349575,
-      "type": "file"
-    },
-    {
-      "path": "src/features/auth/sign-in/components/user-auth-form.tsx",
-      "accessCount": 8,
-      "lastAccessed": 1781187160851,
+      "accessCount": 18,
+      "lastAccessed": 1790422271541,
       "type": "file"
     },
     {
       "path": "src/features/invoices/components/invoices-columns.tsx",
-      "accessCount": 8,
-      "lastAccessed": 1781187257026,
+      "accessCount": 17,
+      "lastAccessed": 1790421879694,
       "type": "file"
     },
     {
-      "path": "src/context/search-provider.test.tsx",
-      "accessCount": 8,
-      "lastAccessed": 1790298439606,
+      "path": "src/components/layout/header.tsx",
+      "accessCount": 15,
+      "lastAccessed": 1790420155326,
+      "type": "file"
+    },
+    {
+      "path": "src/features/auth/sign-in/components/user-auth-form.tsx",
+      "accessCount": 15,
+      "lastAccessed": 1790426533662,
       "type": "file"
     },
     {
       "path": "src/styles/theme.css",
-      "accessCount": 8,
-      "lastAccessed": 1790415063686,
+      "accessCount": 14,
+      "lastAccessed": 1790421392383,
       "type": "file"
     },
     {
       "path": "src/features/dashboard/components/top-customers.tsx",
-      "accessCount": 7,
-      "lastAccessed": 1780862820435,
+      "accessCount": 14,
+      "lastAccessed": 1790422355299,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/authenticated-layout.tsx",
+      "accessCount": 12,
+      "lastAccessed": 1790420023455,
+      "type": "file"
+    },
+    {
+      "path": "src/features/price-lists/index.tsx",
+      "accessCount": 12,
+      "lastAccessed": 1790421116669,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/app-sidebar.tsx",
+      "accessCount": 11,
+      "lastAccessed": 1790420017259,
+      "type": "file"
+    },
+    {
+      "path": "src/features/companies/index.tsx",
+      "accessCount": 10,
+      "lastAccessed": 1790421653459,
+      "type": "file"
+    },
+    {
+      "path": "src/styles/index.css",
+      "accessCount": 9,
+      "lastAccessed": 1790416466944,
+      "type": "file"
+    },
+    {
+      "path": "src/context/search-provider.test.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1790418494877,
+      "type": "file"
+    },
+    {
+      "path": "src/features/orders/components/order-success-dialog.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1790422246085,
+      "type": "file"
+    },
+    {
+      "path": "vite.config.ts",
+      "accessCount": 8,
+      "lastAccessed": 1790417553906,
       "type": "file"
     },
     {
@@ -273,9 +321,15 @@
       "type": "file"
     },
     {
-      "path": "src/styles/index.css",
+      "path": "src/features/auth/auth-layout.tsx",
       "accessCount": 7,
-      "lastAccessed": 1790415063608,
+      "lastAccessed": 1790419765999,
+      "type": "file"
+    },
+    {
+      "path": "src/features/customers/index.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1790421483928,
       "type": "file"
     },
     {
@@ -285,39 +339,21 @@
       "type": "file"
     },
     {
-      "path": "vite.config.ts",
-      "accessCount": 6,
-      "lastAccessed": 1790299573747,
+      "path": "src/components/layout/data/sidebar-data.ts",
+      "accessCount": 5,
+      "lastAccessed": 1790418450811,
       "type": "file"
     },
     {
-      "path": "src/features/orders/components/order-success-dialog.tsx",
+      "path": "src/features/auth/sign-in/index.tsx",
       "accessCount": 5,
-      "lastAccessed": 1780823641874,
+      "lastAccessed": 1790419769043,
       "type": "file"
     },
     {
-      "path": "src/components/layout/header.tsx",
+      "path": "src/features/invoices/index.tsx",
       "accessCount": 5,
-      "lastAccessed": 1780858729913,
-      "type": "file"
-    },
-    {
-      "path": "src/features/companies/index.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1783334427693,
-      "type": "file"
-    },
-    {
-      "path": "src/features/auth/auth-layout.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1790261060690,
-      "type": "file"
-    },
-    {
-      "path": "src/components/command-menu.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1790298362595,
+      "lastAccessed": 1790421117944,
       "type": "file"
     },
     {
@@ -330,18 +366,6 @@
       "path": "src/features/auth/sign-in/sign-in-2.tsx",
       "accessCount": 4,
       "lastAccessed": 1780821796240,
-      "type": "file"
-    },
-    {
-      "path": "src/features/customers/index.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1783334425487,
-      "type": "file"
-    },
-    {
-      "path": "src/features/invoices/index.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1783334431157,
       "type": "file"
     },
     {
@@ -360,6 +384,12 @@
       "path": "src/components/ui/badge.tsx",
       "accessCount": 4,
       "lastAccessed": 1790260866951,
+      "type": "file"
+    },
+    {
+      "path": "src/features/invoices/data/data.ts",
+      "accessCount": 4,
+      "lastAccessed": 1790421868656,
       "type": "file"
     },
     {
@@ -384,18 +414,6 @@
       "path": "src/components/ui/dropdown-menu.tsx",
       "accessCount": 3,
       "lastAccessed": 1790260877436,
-      "type": "file"
-    },
-    {
-      "path": "src/features/auth/sign-in/index.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1790261060610,
-      "type": "file"
-    },
-    {
-      "path": "src/features/invoices/data/data.ts",
-      "accessCount": 2,
-      "lastAccessed": 1780820905679,
       "type": "file"
     },
     {
@@ -435,18 +453,6 @@
       "type": "file"
     },
     {
-      "path": "src/components/layout/app-sidebar.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1780824290621,
-      "type": "file"
-    },
-    {
-      "path": "src/components/layout/data/sidebar-data.ts",
-      "accessCount": 2,
-      "lastAccessed": 1780824290673,
-      "type": "file"
-    },
-    {
       "path": "index.html",
       "accessCount": 1,
       "lastAccessed": 1780820610672,
@@ -480,12 +486,6 @@
       "path": "src/components/layout/main.tsx",
       "accessCount": 1,
       "lastAccessed": 1780821870165,
-      "type": "file"
-    },
-    {
-      "path": "src/components/layout/authenticated-layout.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780821870280,
       "type": "file"
     }
   ],

@@ -7,7 +7,21 @@ import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig(
-  { ignores: ['dist', 'src/components/ui'] },
+  // Untitled UI source (base/application/foundations/shared-assets + its hooks)
+  // is third-party vendor code — exempt from app-code lint like src/components/ui.
+  {
+    ignores: [
+      'dist',
+      'src/components/ui',
+      'src/components/base',
+      'src/components/application',
+      'src/components/foundations',
+      'src/components/shared-assets',
+      'src/hooks/use-breakpoint.ts',
+      'src/hooks/use-resize-observer.ts',
+      'src/pages',
+    ],
+  },
   {
     extends: [
       js.configs.recommended,

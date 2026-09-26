@@ -7,7 +7,6 @@ import { getCookie } from '@/lib/cookies'
 import { DirectionProvider } from '@/context/direction-provider'
 import { LayoutProvider } from '@/context/layout-provider'
 import { ThemeProvider } from '@/context/theme-provider'
-import { SidebarProvider } from '@/components/ui/sidebar'
 import { ConfigDrawer } from './config-drawer'
 
 async function renderConfigDrawer({
@@ -19,9 +18,9 @@ async function renderConfigDrawer({
     <DirectionProvider>
       <ThemeProvider>
         <LayoutProvider>
-          <SidebarProvider defaultOpen={sidebarDefaultOpen}>
+          <div data-sidebar-open={String(sidebarDefaultOpen)}>
             <ConfigDrawer />
-          </SidebarProvider>
+          </div>
         </LayoutProvider>
       </ThemeProvider>
     </DirectionProvider>

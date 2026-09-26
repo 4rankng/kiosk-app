@@ -4,8 +4,8 @@ import { PageHeader } from '@/components/page-header'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Button } from '@/components/base/buttons/button'
+import { Plus } from '@untitledui/icons'
 import { CustomersDialogs } from './components/customers-dialogs'
 import { CustomersProvider, useCustomersContext } from './components/customers-provider'
 import { CustomersTable } from './components/customers-table'
@@ -13,8 +13,7 @@ import { CustomersTable } from './components/customers-table'
 function AddCustomerButton() {
   const { setOpen } = useCustomersContext()
   return (
-    <Button onClick={() => setOpen('add')}>
-      <Plus className='mr-2 h-4 w-4' />
+    <Button onPress={() => setOpen('add')} iconLeading={Plus}>
       Thêm
     </Button>
   )

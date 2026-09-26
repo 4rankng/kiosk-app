@@ -12,20 +12,22 @@ export function OrderSummary({ subtotal, discount, total, onDiscountChange }: Or
   return (
     <div className='space-y-2'>
       <div className='flex items-center justify-between'>
-        <span className='text-sm'>Tổng tiền hàng:</span>
-        <span className='font-medium'>{formatCurrency(subtotal)}</span>
+        <span className='text-sm text-secondary'>Tổng tiền hàng:</span>
+        <span className='font-medium text-primary'>{formatCurrency(subtotal)}</span>
       </div>
       <div className='flex items-center justify-between gap-4'>
-        <span className='text-sm'>Chiết khấu thêm:</span>
+        <span className='text-sm text-secondary'>Chiết khấu thêm:</span>
         <NumberInput
           value={discount}
           onValueChange={onDiscountChange}
-          className='h-9 w-full max-w-[150px]'
+          className='w-full max-w-[150px]'
         />
       </div>
-      <div className='flex items-center justify-between border-t pt-2'>
-        <span className='font-semibold'>Khách cần trả:</span>
-        <span className='text-lg font-bold'>{formatCurrency(total)}</span>
+      <div className='flex items-center justify-between border-t border-secondary pt-2'>
+        <span className='text-sm font-semibold text-primary'>Khách cần trả:</span>
+        <span className='text-lg font-bold text-primary tabular-nums'>
+          {formatCurrency(total)}
+        </span>
       </div>
     </div>
   )

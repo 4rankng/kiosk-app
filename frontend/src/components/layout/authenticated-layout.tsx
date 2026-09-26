@@ -1,42 +1,69 @@
 import { Outlet } from '@tanstack/react-router'
-import { getCookie } from '@/lib/cookies'
+import { LayoutProvider, useLayout } from '@/context/layout-provider'
 import { cn } from '@/lib/utils'
-import { LayoutProvider } from '@/context/layout-provider'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/layout/app-sidebar'
+import { AppSidebar, MobileSidebar } from './app-sidebar'
+import { SidebarUIProvider, useSidebarUI } from './use-sidebar-ui'
 import { SkipToMain } from '@/components/skip-to-main'
 
 type AuthenticatedLayoutProps = {
   children?: React.ReactNode
 }
 
+function Shell({
+  children,
+}: {
+  children?: React.ReactNode
+}) {
+  const { variant, collapsible } = useLayout()
+  const { collapsed } = useSidebarUI()
+  const rail = collapsible === 'icon' && collapsed
+
+  const contentPad =
+    collapsible === 'offcanvas'
+      ? undefined
+      : variant === 'floating'
+        ? rail
+          ? 'lg:pl-[calc(4rem+8px)]'
+          : 'lg:pl-[calc(15rem+8px)]'
+        : rail
+          ? 'lg:pl-16'
+          : 'lg:pl-60'
+
+  return (
+    <>
+      <SkipToMain />
+      {collapsible !== 'offcanvas' && <AppSidebar />}
+      <MobileSidebar />
+      <main
+        id='content'
+        className={cn(
+          '@container/content has-data-[layout=fixed]:h-svh min-h-svh transition-[padding] duration-200 ease-linear',
+          contentPad,
+          variant === 'inset' && 'bg-secondary'
+        )}
+      >
+        {variant === 'inset' ? (
+          <div className='min-h-svh p-2 lg:p-3'>
+            <div className='rounded-xl border border-primary bg-primary min-h-svh lg:min-h-[calc(100svh-1.5rem)]'>
+              {children ?? <Outlet />}
+            </div>
+          </div>
+        ) : (
+          children ?? <Outlet />
+        )}
+      </main>
+    </>
+  )
+}
+
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
-  const defaultOpen = getCookie('sidebar_state') !== 'false'
-  // SearchProvider is mounted once at the root route (__root.tsx) so the
-  // Cmd+K command menu and its global keydown listener are registered exactly
-  // once for the whole app. Do not re-wrap it here.
   return (
     <LayoutProvider>
-      <SidebarProvider defaultOpen={defaultOpen}>
-        <SkipToMain />
-        <AppSidebar />
-        <SidebarInset
-          className={cn(
-            // Set content container, so we can use container queries
-            '@container/content',
-
-            // If layout is fixed, set the height
-            // to 100svh to prevent overflow
-            'has-data-[layout=fixed]:h-svh',
-
-            // If layout is fixed and sidebar is inset,
-            // set the height to 100svh - spacing (total margins) to prevent overflow
-            'peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))]'
-          )}
-        >
-          {children ?? <Outlet />}
-        </SidebarInset>
-      </SidebarProvider>
+      <SidebarUIProvider>
+        <Shell>
+          {children}
+        </Shell>
+      </SidebarUIProvider>
     </LayoutProvider>
   )
 }

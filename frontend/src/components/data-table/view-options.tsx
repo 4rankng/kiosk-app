@@ -1,14 +1,8 @@
-import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
-import { MixerHorizontalIcon } from '@radix-ui/react-icons'
+import { Sliders01 } from '@untitledui/icons'
 import { type Table } from '@tanstack/react-table'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
+import type { Selection } from 'react-aria-components'
+import { Button } from '@/components/base/buttons/button'
+import { Dropdown } from '@/components/base/dropdown/dropdown'
 
 type DataTableViewOptionsProps<TData> = {
   table: Table<TData>
@@ -38,41 +32,49 @@ const COLUMN_LABELS: Record<string, string> = {
 export function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
+  const columns = table
+    .getAllColumns()
+    .filter(
+      (column) =>
+        typeof column.accessorFn !== 'undefined' && column.getCanHide()
+    )
+
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant='outline'
-          size='sm'
-          className='ms-auto hidden h-8 lg:flex'
+    <Dropdown.Root>
+      <Button
+        color='secondary'
+        size='sm'
+        iconLeading={Sliders01}
+        className='ms-auto hidden h-8 lg:flex'
+      >
+        Hiển thị
+      </Button>
+      <Dropdown.Popover placement='bottom end'>
+        <Dropdown.Menu
+          selectionMode='multiple'
+          selectedKeys={new Set(columns.filter((c) => c.getIsVisible()).map((c) => c.id))}
+          onSelectionChange={(keys: Selection) => {
+            if (keys === 'all') return
+            columns.forEach((column) => column.toggleVisibility(keys.has(column.id)))
+          }}
         >
-          <MixerHorizontalIcon className='size-4 mr-1.5' />
-          Hiển thị
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align='end' className='w-44'>
-        <DropdownMenuLabel>Bật/tắt cột</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {table
-          .getAllColumns()
-          .filter(
-            (column) =>
-              typeof column.accessorFn !== 'undefined' && column.getCanHide()
-          )
-          .map((column) => {
+          <Dropdown.SectionHeader className='px-2 py-1.5 text-xs font-medium text-tertiary'>
+            Bật/tắt cột
+          </Dropdown.SectionHeader>
+          {columns.map((column) => {
             const label = COLUMN_LABELS[column.id] || column.id
             return (
-              <DropdownMenuCheckboxItem
+              <Dropdown.Item
                 key={column.id}
-                className='capitalize'
-                checked={column.getIsVisible()}
-                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                id={column.id}
+                selectionIndicator='checkbox'
               >
                 {label}
-              </DropdownMenuCheckboxItem>
+              </Dropdown.Item>
             )
           })}
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </Dropdown.Menu>
+      </Dropdown.Popover>
+    </Dropdown.Root>
   )
 }

@@ -1,9 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { deleteCompany } from '@/services/companies'
 import { useCompaniesContext } from './companies-provider'
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 import { toast } from 'sonner'
 
 export function CompanyDeleteDialog() {
@@ -23,21 +21,19 @@ export function CompanyDeleteDialog() {
   })
 
   return (
-    <AlertDialog open={open === 'delete'} onOpenChange={() => setOpen(null)}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
-          <AlertDialogDescription>
-            Bạn có chắc muốn xóa công ty <strong>{selectedCompany?.name}</strong>? Hành động này không thể hoàn tác.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
-          <AlertDialogAction onClick={() => mutation.mutate()} disabled={mutation.isPending}>
-            {mutation.isPending ? 'Đang xóa...' : 'Xóa'}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmDialog
+      open={open === 'delete'}
+      onOpenChange={() => setOpen(null)}
+      title='Xác nhận xóa'
+      desc={
+        <>
+          Bạn có chắc muốn xóa công ty <strong>{selectedCompany?.name}</strong>? Hành động này không thể hoàn tác.
+        </>
+      }
+      confirmText={mutation.isPending ? 'Đang xóa...' : 'Xóa'}
+      destructive
+      isLoading={mutation.isPending}
+      handleConfirm={() => mutation.mutate()}
+    />
   )
 }

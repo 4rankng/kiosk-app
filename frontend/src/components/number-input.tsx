@@ -1,9 +1,9 @@
 import { type InputHTMLAttributes, useCallback } from 'react'
-import { Input } from '@/components/ui/input'
+import { InputBase } from '@/components/base/input/input'
 import { cn } from '@/lib/utils'
 import { formatNumber, parseFormattedNumber } from '@/lib/format'
 
-interface NumberInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onChange'> {
+interface NumberInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size' | 'value' | 'onChange'> {
   /** The numeric value (controlled) */
   value: number
   /** Called with the parsed number on change */
@@ -12,12 +12,15 @@ interface NumberInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, '
 
 /**
  * A text input that displays numbers in X.XXX format (Vietnamese locale)
- * and parses user input back to a plain number.
+ * and parses user input back to a plain number. Built on the Untitled UI
+ * InputBase for styling; number formatting stays in `lib/format` so the
+ * display/parse number contract is unchanged.
  */
 export function NumberInput({
   value,
   onValueChange,
   className,
+  disabled,
   ...props
 }: NumberInputProps) {
   const handleChange = useCallback(
@@ -29,12 +32,14 @@ export function NumberInput({
   )
 
   return (
-    <Input
+    <InputBase
       type='text'
       inputMode='numeric'
+      size='sm'
+      isDisabled={disabled}
       value={formatNumber(value)}
       onChange={handleChange}
-      className={cn('text-right', className)}
+      inputClassName={cn('text-right', className)}
       {...props}
     />
   )

@@ -1,27 +1,14 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Plus } from '@untitledui/icons'
 import { getPriceLists, createPriceList } from '@/services/price-lists'
 import type { PriceList as PriceListType } from '@/types/api'
 import { getCompanies } from '@/services/companies'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Button } from '@/components/base/buttons/button'
+import { Select } from '@/components/base/select/select'
+import { Dialog, Modal, ModalOverlay } from '@/components/application/modals/modal'
+import { InputBase } from '@/components/base/input/input'
+import { Label } from '@/components/base/input/label'
 import { toast } from 'sonner'
 
 interface PriceListSelectorProps {
@@ -65,81 +52,81 @@ export function PriceListSelector({ selectedPriceList, onSelect, priceLists: pri
 
   return (
     <div className='flex flex-wrap items-center gap-3'>
-      <div className='flex items-center gap-2'>
-        <span className='text-sm font-medium'>Chọn bảng giá:</span>
-        <Select
-          value={selectedPriceList?.id ?? ''}
-          onValueChange={(val) => {
-            const pl = priceLists.find((p) => p.id === val)
-            if (pl) onSelect(pl)
-          }}
-        >
-          <SelectTrigger className='w-full sm:w-[300px]'>
-            <SelectValue placeholder='Chọn bảng giá...' />
-          </SelectTrigger>
-          <SelectContent>
+      <div className='flex flex-wrap items-center gap-2'>
+        <span className='text-sm font-medium text-secondary'>Chọn bảng giá:</span>
+        <div className='w-full sm:w-[300px]'>
+          <Select
+            size='sm'
+            aria-label='Chọn bảng giá'
+            placeholder='Chọn bảng giá...'
+            selectedKey={selectedPriceList?.id ?? null}
+            onSelectionChange={(key) => {
+              if (key === null) return
+              const pl = priceLists.find((p) => p.id === key)
+              if (pl) onSelect(pl)
+            }}
+          >
             {priceLists.map((pl) => (
-              <SelectItem key={pl.id} value={pl.id}>
-                {pl.name}
-              </SelectItem>
+              <Select.Item key={pl.id} id={pl.id}>{pl.name}</Select.Item>
             ))}
-          </SelectContent>
-        </Select>
+          </Select>
+        </div>
       </div>
 
-      <Button variant='outline' size='sm' onClick={() => setShowCreate(true)}>
-        <Plus className='mr-1 h-4 w-4' />
+      <Button color='secondary' size='sm' iconLeading={Plus} onPress={() => setShowCreate(true)}>
         Thêm bảng giá mới
       </Button>
 
-      <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Tạo bảng giá mới</DialogTitle>
-            <DialogDescription>Nhập thông tin bảng giá mới.</DialogDescription>
-          </DialogHeader>
-          <form id='price-list-create' onSubmit={(e) => { e.preventDefault(); createMutation.mutate() }} className='grid gap-3 py-4'>
-            <div className='grid grid-cols-2 gap-3'>
-              <div className='grid gap-2'>
-                <Label htmlFor='name'>Tên bảng giá</Label>
-                <Input
-                  id='name'
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder='VD: BẢNG GIÁ CHUỖI ABC'
-                />
-              </div>
-              <div className='grid gap-2'>
-                <Label htmlFor='company'>Công ty</Label>
-                <Select value={newCompanyId} onValueChange={setNewCompanyId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Chọn công ty...' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {companies.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+      <ModalOverlay isOpen={showCreate} onOpenChange={(o) => setShowCreate(o)}>
+      <Modal className='w-full max-w-md'>
+        <Dialog aria-labelledby='price-list-create-title'>
+          <div className='flex flex-col gap-4 p-5 sm:p-6'>
+            <div className='flex flex-col gap-1'>
+              <h2 id='price-list-create-title' className='text-md font-semibold text-primary'>Tạo bảng giá mới</h2>
+              <p className='text-sm text-tertiary'>Nhập thông tin bảng giá mới.</p>
             </div>
-          </form>
-          <DialogFooter>
-            <Button variant='outline' onClick={() => setShowCreate(false)}>
-              Hủy bỏ
-            </Button>
-            <Button
-              type='submit'
-              form='price-list-create'
-              disabled={!newName.trim() || !newCompanyId || createMutation.isPending}
-            >
-              {createMutation.isPending ? 'Đang tạo...' : 'Tạo bảng giá'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <form id='price-list-create' onSubmit={(e) => { e.preventDefault(); createMutation.mutate() }} className='flex flex-col gap-3'>
+              <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+                <div className='flex flex-col gap-1.5'>
+                  <Label htmlFor='name'>Tên bảng giá</Label>
+                  <InputBase
+                    id='name'
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder='VD: BẢNG GIÁ CHUỖI ABC'
+                  />
+                </div>
+                <div className='flex flex-col gap-1.5'>
+                  <Label htmlFor='company'>Công ty</Label>
+                  <Select
+                    size='sm'
+                    aria-label='Công ty'
+                    placeholder='Chọn công ty...'
+                    selectedKey={newCompanyId || null}
+                    onSelectionChange={(key) => setNewCompanyId(key ? String(key) : '')}
+                  >
+                    {companies.map((c) => (
+                      <Select.Item key={c.id} id={c.id}>{c.name}</Select.Item>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+            </form>
+            <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
+              <Button color='secondary' onPress={() => setShowCreate(false)}>Hủy bỏ</Button>
+              <Button
+                type='submit'
+                form='price-list-create'
+                isLoading={createMutation.isPending}
+                isDisabled={!newName.trim() || !newCompanyId}
+              >
+                {createMutation.isPending ? 'Đang tạo...' : 'Tạo bảng giá'}
+              </Button>
+            </div>
+          </div>
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
     </div>
   )
 }

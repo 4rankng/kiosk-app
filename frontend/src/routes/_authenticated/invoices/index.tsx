@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { lazy, Suspense } from 'react'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from '@/components/skeleton'
 
 // Code-split the Invoices feature module so its dependencies
 // (print dialog, invoice HTML generation) stay out of the initial bundle.

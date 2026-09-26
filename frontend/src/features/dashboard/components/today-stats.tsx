@@ -1,53 +1,50 @@
 import { useQuery } from '@tanstack/react-query'
-import { Wallet, Package, CheckCircle, AlertCircle } from 'lucide-react'
+import { ArrowDown, ArrowUp, AlertCircle, CheckCircle, Package, Wallet01 } from '@untitledui/icons'
 import { getDashboardStats } from '@/services/reports'
 import { formatCurrency, formatNumber } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/empty-state'
 
 const statsConfig = [
-  { key: 'revenue', icon: Wallet, label: 'Doanh thu' },
+  { key: 'revenue', icon: Wallet01, label: 'Doanh thu' },
   { key: 'orders', icon: Package, label: 'Đơn hàng' },
   { key: 'paid', icon: CheckCircle, label: 'Đã thanh toán' },
   { key: 'unpaid', icon: AlertCircle, label: 'Còn nợ' },
 ] as const
 
-function TrendText({ value, suffix, className }: { value: number | string; suffix: string; className?: string }) {
+function TrendText({ value, suffix }: { value: number | string; suffix: string }) {
   const num = typeof value === 'string' ? parseFloat(value) : value
   const isUp = num > 0
   const isDown = num < 0
+  const text = `${isUp ? '+' : ''}${value}${suffix}`
+  if (!isUp && !isDown) {
+    return (
+      <p className='mt-1.5 text-xs font-medium text-tertiary'>— {text}</p>
+    )
+  }
   return (
-    <p className={cn(
-      'mt-1 text-xs',
-      isUp && 'text-success',
-      isDown && 'text-destructive',
-      !isUp && !isDown && 'text-muted-foreground',
-      className,
-    )}>
-      {isUp ? '↑' : isDown ? '↓' : '—'} {isUp ? '+' : ''}{value}{suffix}
+    <p
+      className={cn(
+        'mt-1.5 flex items-center gap-0.5 text-xs font-medium',
+        isUp ? 'text-success-primary' : 'text-error-primary',
+      )}
+    >
+      {isUp ? <ArrowUp className='size-3 stroke-[3px]' /> : <ArrowDown className='size-3 stroke-[3px]' />}
+      {text}
     </p>
   )
 }
 
 function StatCardSkeleton() {
   return (
-    <Card>
-      <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-        <Skeleton className='h-4 w-20' />
-        <Skeleton className='h-4 w-4' />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className='h-7 w-24' />
-        <Skeleton className='mt-1 h-3 w-28' />
-      </CardContent>
-    </Card>
+    <div className='rounded-lg border border-primary bg-primary p-4'>
+      <div className='flex items-center justify-between'>
+        <div className='h-3 w-20 animate-pulse rounded bg-secondary' />
+        <div className='size-4 animate-pulse rounded bg-secondary' />
+      </div>
+      <div className='mt-3 h-4 w-24 animate-pulse rounded bg-secondary' />
+      <div className='mt-2 h-3 w-28 animate-pulse rounded bg-secondary' />
+    </div>
   )
 }
 
@@ -120,25 +117,23 @@ export function TodayStats() {
           }
         } else if (config.key === 'paid') {
           if (collectionRate !== null) {
-            subtitle = <p className='mt-1 text-xs text-muted-foreground'>{collectionRate}% tỷ lệ thu</p>
+            subtitle = <p className='mt-1.5 text-xs text-tertiary'>{collectionRate}% tỷ lệ thu</p>
           }
         } else if (config.key === 'unpaid') {
-          subtitle = <p className='mt-1 text-xs text-muted-foreground'>{debtorCount} khách nợ</p>
+          subtitle = <p className='mt-1.5 text-xs text-tertiary'>{debtorCount} khách nợ</p>
         }
 
         return (
-          <Card key={config.key}>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                {config.label}
-              </CardTitle>
-              <Icon className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              <div className='font-heading text-display font-bold tabular-nums'>{values[config.key]}</div>
-              {subtitle}
-            </CardContent>
-          </Card>
+          <div key={config.key} className='rounded-lg border border-primary bg-primary p-4'>
+            <div className='flex items-center justify-between'>
+              <span className='text-sm font-medium text-tertiary'>{config.label}</span>
+              <Icon className='size-4 text-fg-quaternary' />
+            </div>
+            <div className='mt-2 font-heading text-display-md font-semibold tabular-nums text-primary'>
+              {values[config.key]}
+            </div>
+            {subtitle}
+          </div>
         )
       })}
     </div>

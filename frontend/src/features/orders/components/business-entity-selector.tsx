@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getBusinessEntities } from '@/services/business-entities'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { RadioGroup, Radio } from 'react-aria-components'
+import { cx } from '@/utils/cx'
 
 interface BusinessEntitySelectorProps {
   selected: string
@@ -23,28 +24,41 @@ export function BusinessEntitySelector({ selected, onSelect }: BusinessEntitySel
 
   return (
     <div className='space-y-2 pt-2'>
-      <p className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
+      <p className='text-xs font-semibold uppercase tracking-wider text-tertiary'>
         Cơ sở xuất phiếu in:
       </p>
-      <RadioGroup value={selected} onValueChange={onSelect} className='flex flex-wrap gap-2'>
-        {entities.map((entity) => {
-          const isSelected = selected === entity.id
-          return (
-            <label
-              key={entity.id}
-              htmlFor={entity.id}
-              className={`flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-medium cursor-pointer transition-colors ${
-                isSelected
-                  ? 'border-primary bg-primary/5 text-primary'
-                  : 'border-border bg-background hover:bg-muted/50 text-foreground'
-              }`}
-            >
-              <RadioGroupItem value={entity.id} id={entity.id} className='sr-only' />
-              <span className={`h-2 w-2 rounded-full ${isSelected ? 'bg-primary' : 'bg-muted-foreground/40'}`} />
-              <span>Cơ sở {entity.name.replace('Hộ kinh doanh ', '')}</span>
-            </label>
-          )
-        })}
+      <RadioGroup
+        value={selected}
+        onChange={onSelect}
+        aria-label='Cơ sở xuất phiếu in'
+        className='flex flex-wrap gap-2'
+      >
+        {entities.map((entity) => (
+          <Radio
+            key={entity.id}
+            value={entity.id}
+            className={(state) =>
+              cx(
+                'flex min-h-9 cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors outline-brand focus-visible:outline-2 focus-visible:outline-offset-2',
+                state.isSelected
+                  ? 'border-brand bg-brand-secondary/50 text-brand-secondary'
+                  : 'border-secondary bg-primary text-secondary hover:bg-secondary'
+              )
+            }
+          >
+            {({ isSelected }) => (
+              <>
+                <span
+                  className={cx(
+                    'size-2 rounded-full',
+                    isSelected ? 'bg-brand-solid' : 'bg-quaternary'
+                  )}
+                />
+                <span>Cơ sở {entity.name.replace('Hộ kinh doanh ', '')}</span>
+              </>
+            )}
+          </Radio>
+        ))}
       </RadioGroup>
     </div>
   )

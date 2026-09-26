@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { Plus, Check, X } from 'lucide-react'
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { useMemo, useState } from 'react'
+import { Check, X } from '@untitledui/icons'
+import { Button } from '@/components/base/buttons/button'
+import { InputBase } from '@/components/base/input/input'
+import { ComboBox } from '@/components/base/select/combobox'
+import { SelectItem } from '@/components/base/select/select-item'
+import type { SelectItemType } from '@/components/base/select/select-shared'
 
 interface InlineAddComboboxProps {
   options: { value: string; label: string }[]
@@ -14,6 +14,9 @@ interface InlineAddComboboxProps {
   placeholder?: string
   emptyMessage?: string
 }
+
+/** Pseudo-item id for the "create new" action row inside the dropdown. */
+const CREATE_ITEM_ID = '__create__'
 
 export function InlineAddCombobox({
   options,
@@ -25,7 +28,27 @@ export function InlineAddCombobox({
 }: InlineAddComboboxProps) {
   const [isAdding, setIsAdding] = useState(false)
   const [inputValue, setInputValue] = useState('')
+  const [filterText, setFilterText] = useState('')
   const [isCreating, setIsCreating] = useState(false)
+
+  const comboItems: SelectItemType[] = useMemo(
+    () => [
+      ...options.map((opt) => ({ id: opt.value, label: opt.label })),
+      ...(options.length === 0
+        ? [{ id: '__empty__', label: emptyMessage, isDisabled: true } satisfies SelectItemType]
+        : []),
+      { id: CREATE_ITEM_ID, label: 'Thêm mới...' },
+    ],
+    [options, emptyMessage]
+  )
+
+  const filteredItems = useMemo(
+    () =>
+      filterText
+        ? comboItems.filter((item) => item.label?.toLowerCase().includes(filterText.toLowerCase()))
+        : comboItems
+    , [comboItems, filterText]
+  )
 
   async function handleCreate() {
     const trimmed = inputValue.trim()
@@ -44,47 +67,65 @@ export function InlineAddCombobox({
   if (isAdding) {
     return (
       <div className='flex items-center gap-1'>
-        <Input
+        <InputBase
+          size='sm'
+          autoFocus
+          wrapperClassName='h-9'
+          placeholder='Nhập tên mới...'
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          placeholder='Nhập tên mới...'
-          className='h-9'
-          autoFocus
           onKeyDown={(e) => {
             if (e.key === 'Enter') { e.preventDefault(); handleCreate() }
             if (e.key === 'Escape') { setIsAdding(false); setInputValue('') }
           }}
         />
-        <Button type='button' variant='ghost' size='icon' className='h-8 w-8 shrink-0' aria-label='Xác nhận thêm mới' onClick={handleCreate} disabled={isCreating}>
-          <Check className='h-4 w-4' />
-        </Button>
-        <Button type='button' variant='ghost' size='icon' className='h-8 w-8 shrink-0' aria-label='Hủy bỏ' onClick={() => { setIsAdding(false); setInputValue('') }}>
-          <X className='h-4 w-4' />
-        </Button>
+        <Button
+          color='tertiary'
+          iconLeading={Check}
+          className='size-9 shrink-0'
+          aria-label='Xác nhận thêm mới'
+          onPress={handleCreate}
+          isDisabled={isCreating}
+        />
+        <Button
+          color='tertiary'
+          iconLeading={X}
+          className='size-9 shrink-0'
+          aria-label='Hủy bỏ'
+          onPress={() => { setIsAdding(false); setInputValue('') }}
+        />
       </div>
     )
   }
 
   return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className='h-9 w-full'>
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
-      <SelectContent>
-        {options.length === 0 && (
-          <div className='px-2 py-1.5 text-sm text-muted-foreground'>{emptyMessage}</div>
-        )}
-        {options.map((opt) => (
-          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-        ))}
-        <div
-          className='flex cursor-pointer items-center px-2 py-1.5 text-sm text-primary hover:bg-accent'
-          onClick={() => setIsAdding(true)}
-        >
-          <Plus className='mr-1 h-3 w-3' />
-          Thêm mới...
-        </div>
-      </SelectContent>
-    </Select>
+    <ComboBox
+      size='sm'
+      shortcut={false}
+      placeholder={placeholder}
+      aria-label={placeholder}
+      items={filteredItems}
+      selectedKey={value || null}
+      onSelectionChange={(key) => {
+        if (key === null) return
+        if (key === CREATE_ITEM_ID) {
+          setIsAdding(true)
+          setFilterText('')
+          return
+        }
+        onChange(String(key))
+      }}
+      onInputChange={setFilterText}
+    >
+      {(item) =>
+        item.id === CREATE_ITEM_ID ? (
+          <SelectItem id={item.id} onAction={() => setIsAdding(true)}>
+            {item.label}
+          </SelectItem>
+        ) : (
+          <SelectItem id={item.id}>{item.label}</SelectItem>
+        )
+      }
+    </ComboBox>
   )
 }

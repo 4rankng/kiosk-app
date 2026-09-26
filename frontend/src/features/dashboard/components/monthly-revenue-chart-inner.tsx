@@ -10,19 +10,21 @@ interface MonthlyRevenueChartInnerProps {
 export default function MonthlyRevenueChartInner({ data }: MonthlyRevenueChartInnerProps) {
   return (
     <BarChart data={data} accessibilityLayer>
-      <CartesianGrid vertical={false} />
+      <CartesianGrid vertical={false} stroke='var(--color-border-primary)' />
       <XAxis
         dataKey='name'
         tickLine={false}
         axisLine={false}
         tickMargin={8}
         fontSize={12}
+        tick={{ fill: 'var(--color-text-quaternary)' }}
       />
       <YAxis
         tickLine={false}
         axisLine={false}
         fontSize={12}
         tickMargin={8}
+        tick={{ fill: 'var(--color-text-quaternary)' }}
         tickFormatter={(value: number) => {
           if (value >= 1000000) return `${(value / 1000000).toFixed(1)}tr`
           if (value >= 1000) return `${(value / 1000).toFixed(0)}k`

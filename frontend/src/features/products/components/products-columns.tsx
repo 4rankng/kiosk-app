@@ -1,17 +1,10 @@
 import { type ColumnDef } from '@tanstack/react-table'
+import { Pencil01, Trash01 } from '@untitledui/icons'
 import type { Product } from '@/types'
 import { formatCurrency } from '@/lib/format'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { Badge } from '@/components/base/badges/badges'
+import { Dropdown } from '@/components/base/dropdown/dropdown'
 
 export function getProductsColumns(
   onEdit: (product: Product) => void,
@@ -39,11 +32,11 @@ export function getProductsColumns(
       cell: ({ row }) => {
         const val = row.original.categoryName || row.original.category
         return val ? (
-          <Badge variant='secondary' className='font-normal'>
+          <Badge type='color' size='sm' color='gray'>
             {val}
           </Badge>
         ) : (
-          <span className='text-muted-foreground'>—</span>
+          <span className='text-tertiary'>—</span>
         )
       },
     },
@@ -54,7 +47,7 @@ export function getProductsColumns(
       cell: ({ row }) => {
         const val = row.original.unitName || row.original.unit
         return (
-          <span className='text-muted-foreground'>{val || '—'}</span>
+          <span className='text-tertiary'>{val || '—'}</span>
         )
       },
     },
@@ -64,7 +57,7 @@ export function getProductsColumns(
         <DataTableColumnHeader column={column} title='Giá nhập' />
       ),
       cell: ({ row }) => (
-        <span className='tabular-nums text-muted-foreground'>
+        <span className='tabular-nums text-tertiary'>
           {formatCurrency(row.getValue('purchasePrice'))}
         </span>
       ),
@@ -84,28 +77,29 @@ export function getProductsColumns(
       id: 'actions',
       header: () => <span className='sr-only'>Thao tác</span>,
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
-              <MoreHorizontal className='h-4 w-4' />
-              <span className='sr-only'>Mở menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end' className='w-40'>
-            <DropdownMenuItem onClick={() => onEdit(row.original)}>
-              <Pencil className='mr-2 h-4 w-4' />
-              Chỉnh sửa
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className='text-destructive'
-              onClick={() => onDelete(row.original)}
+        <Dropdown.Root>
+          <Dropdown.DotsButton className='size-8' />
+          <Dropdown.Popover>
+            <Dropdown.Menu
+              onAction={(key) => {
+                if (key === 'edit') onEdit(row.original)
+                if (key === 'delete') onDelete(row.original)
+              }}
             >
-              <Trash2 className='mr-2 h-4 w-4' />
-              Xóa
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <Dropdown.Item id='edit' icon={Pencil01}>
+                Chỉnh sửa
+              </Dropdown.Item>
+              <Dropdown.Separator />
+              <Dropdown.Item
+                id='delete'
+                icon={Trash01}
+                className='[&_span]:text-error-primary [&_svg]:text-error-primary'
+              >
+                Xóa
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown.Popover>
+        </Dropdown.Root>
       ),
     },
   ]

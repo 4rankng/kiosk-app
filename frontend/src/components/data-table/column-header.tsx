@@ -1,19 +1,8 @@
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  CaretSortIcon,
-  EyeNoneIcon,
-} from '@radix-ui/react-icons'
+import { ArrowDown, ArrowUp, ArrowsDown, EyeOff } from '@untitledui/icons'
 import { type Column } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/base/buttons/button'
+import { Dropdown } from '@/components/base/dropdown/dropdown'
 
 type DataTableColumnHeaderProps<TData, TValue> =
   React.HTMLAttributes<HTMLDivElement> & {
@@ -30,45 +19,36 @@ export function DataTableColumnHeader<TData, TValue>({
     return <div className={cn(className)}>{title}</div>
   }
 
+  const isSorted = column.getIsSorted()
+
   return (
-    <div className={cn('flex items-center space-x-2', className)}>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant='ghost'
-            size='sm'
-            className='h-8 data-[state=open]:bg-accent'
-          >
-            <span>{title}</span>
-            {column.getIsSorted() === 'desc' ? (
-              <ArrowDownIcon className='ms-2 h-4 w-4' />
-            ) : column.getIsSorted() === 'asc' ? (
-              <ArrowUpIcon className='ms-2 h-4 w-4' />
-            ) : (
-              <CaretSortIcon className='ms-2 h-4 w-4' />
+    <div className={cn('flex items-center', className)}>
+      <Dropdown.Root>
+        <Button
+          color='tertiary'
+          size='sm'
+          className='-ml-1.5'
+          iconTrailing={isSorted === 'desc' ? ArrowDown : isSorted === 'asc' ? ArrowUp : ArrowsDown}
+        >
+          {title}
+        </Button>
+        <Dropdown.Popover placement='bottom start'>
+          <Dropdown.Menu onAction={(key) => {
+            if (key === 'asc') column.toggleSorting(false)
+            if (key === 'desc') column.toggleSorting(true)
+            if (key === 'hide') column.toggleVisibility(false)
+          }}>
+            <Dropdown.Item id='asc' icon={ArrowUp}>Tăng dần</Dropdown.Item>
+            <Dropdown.Item id='desc' icon={ArrowDown}>Giảm dần</Dropdown.Item>
+            {column.getCanHide() && (
+              <>
+                <Dropdown.Separator />
+                <Dropdown.Item id='hide' icon={EyeOff}>Ẩn cột</Dropdown.Item>
+              </>
             )}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='start'>
-          <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-            <ArrowUpIcon className='size-3.5 text-muted-foreground/70' />
-            Asc
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-            <ArrowDownIcon className='size-3.5 text-muted-foreground/70' />
-            Desc
-          </DropdownMenuItem>
-          {column.getCanHide() && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-                <EyeNoneIcon className='size-3.5 text-muted-foreground/70' />
-                Hide
-              </DropdownMenuItem>
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </Dropdown.Menu>
+        </Dropdown.Popover>
+      </Dropdown.Root>
     </div>
   )
 }

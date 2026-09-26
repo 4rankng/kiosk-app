@@ -1,30 +1,35 @@
-import { useSearch } from '@tanstack/react-router'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ArrowLeft } from '@untitledui/icons'
+import { Button } from '@/components/base/buttons/button'
 import { AuthLayout } from '../auth-layout'
 import { UserAuthForm } from './components/user-auth-form'
 
 export function SignIn() {
   const { redirect } = useSearch({ from: '/(auth)/sign-in' })
+  const navigate = useNavigate()
 
   return (
     <AuthLayout>
-      <Card className='w-full max-w-sm gap-4'>
-        <CardHeader className='text-center'>
-          <CardTitle className='text-display tracking-tight'>Đăng nhập</CardTitle>
-          <CardDescription>
+      <div className='space-y-6'>
+        <div className='space-y-2 text-center'>
+          <h1 className='font-heading text-display-xs font-semibold tracking-tight'>
+            Đăng nhập
+          </h1>
+          <p className='text-sm text-tertiary'>
             Đăng nhập bằng tài khoản đã được phê duyệt để truy cập hệ thống.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <UserAuthForm redirectTo={redirect} />
-        </CardContent>
-      </Card>
+          </p>
+        </div>
+        <UserAuthForm redirectTo={redirect} />
+        <div className='flex justify-center'>
+          <Button
+            color='link-gray'
+            iconLeading={ArrowLeft}
+            onClick={() => navigate({ to: '/' })}
+          >
+            Trở về trang chủ
+          </Button>
+        </div>
+      </div>
     </AuthLayout>
   )
 }

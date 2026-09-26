@@ -18,7 +18,7 @@ export function CustomerReportMobile({ data }: { data: CustomerReportRow[] }) {
 
   if (data.length === 0) {
     return (
-      <div className='flex h-24 items-center justify-center text-muted-foreground'>
+      <div className='flex h-24 items-center justify-center text-tertiary'>
         Không có dữ liệu.
       </div>
     )
@@ -33,7 +33,7 @@ export function CustomerReportMobile({ data }: { data: CustomerReportRow[] }) {
             revenue: acc.revenue + r.totalRevenue,
             unpaid: acc.unpaid + r.unpaidAmount,
           }),
-          { revenue: 0, unpaid: 0 }
+          { revenue: 0, unpaid: 0 },
         )
         const isExpanded = expandedCompanyId === companyId
 
@@ -44,7 +44,7 @@ export function CustomerReportMobile({ data }: { data: CustomerReportRow[] }) {
             metric={
               <span className='flex gap-3 tabular-nums'>
                 <span>Doanh thu: {formatCurrency(totals.revenue)}</span>
-                <span className='text-warning'>Công nợ: {formatCurrency(totals.unpaid)}</span>
+                <span className='text-warning-primary'>Công nợ: {formatCurrency(totals.unpaid)}</span>
               </span>
             }
             expanded={isExpanded}
@@ -54,16 +54,16 @@ export function CustomerReportMobile({ data }: { data: CustomerReportRow[] }) {
               {rows.map((row) => (
                 <div
                   key={row.customerId}
-                  className='flex items-center justify-between rounded-md bg-muted/40 px-3 py-2'
+                  className='flex items-center justify-between rounded-md bg-secondary px-3 py-2'
                 >
                   <div className='min-w-0 flex-1'>
-                    <p className='truncate text-sm font-medium'>{row.customerName}</p>
-                    <p className='text-xs text-muted-foreground'>{row.customerCode}</p>
+                    <p className='truncate text-sm font-medium text-primary'>{row.customerName}</p>
+                    <p className='text-xs text-tertiary'>{row.customerCode}</p>
                   </div>
                   <div className='shrink-0 text-right tabular-nums'>
-                    <p className='text-sm font-medium'>{formatCurrency(row.totalRevenue)}</p>
+                    <p className='text-sm font-medium text-primary'>{formatCurrency(row.totalRevenue)}</p>
                     {row.unpaidAmount > 0 && (
-                      <p className='text-xs text-warning'>
+                      <p className='text-xs text-warning-primary'>
                         Chưa thu: {formatCurrency(row.unpaidAmount)}
                       </p>
                     )}

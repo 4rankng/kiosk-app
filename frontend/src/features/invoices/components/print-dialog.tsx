@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 import { getBusinessEntities } from '@/services/business-entities'
 import { getInvoiceById } from '@/services/invoices'
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
+import { useId } from 'react'
+import { RefreshCw01 } from '@untitledui/icons'
+import { ModalOverlay, Modal, Dialog } from '@/components/application/modals/modal'
+import { Button } from '@/components/base/buttons/button'
 import { useInvoicesContext } from './invoices-provider'
 import { generateInvoiceHTML } from './invoice-print-document'
 
 export function PrintDialog() {
   const { open, setOpen, selectedInvoice } = useInvoicesContext()
+  const titleId = useId()
   const { data: entities = [] } = useQuery({
     queryKey: ['business-entities'],
     queryFn: () => getBusinessEntities(),
@@ -60,41 +60,49 @@ export function PrintDialog() {
   }
 
   return (
-    <Dialog open={open === 'print'} onOpenChange={(isOpen) => { if (!isOpen) setOpen(null) }}>
-      <DialogContent className='sm:max-w-[425px]'>
-        <DialogHeader>
-          <DialogTitle>Tùy chọn mẫu phiếu in của hộ kinh doanh</DialogTitle>
-          <DialogDescription>
-            Vui lòng chọn cơ sở kinh doanh làm phần đầu biểu mẫu:
-          </DialogDescription>
-        </DialogHeader>
-        <div className='grid gap-3 py-4'>
-          {entities.map((entity) => (
-            <Button
-              key={entity.id}
-              variant='outline'
-              className='h-auto py-3 text-left justify-start'
-              onClick={() => handlePrint(entity.id)}
-            >
-              <div>
-                <div className='font-medium'>{entity.name}</div>
-                <div className='text-xs text-muted-foreground mt-1'>{entity.address}</div>
+    <ModalOverlay isOpen={open === 'print'} onOpenChange={(isOpen) => { if (!isOpen) setOpen(null) }}>
+      <Modal className='w-full max-w-md'>
+        <Dialog aria-labelledby={titleId}>
+          {({ close }) => (
+            <div className='flex flex-col gap-5 p-5 sm:p-6'>
+              <div className='flex flex-col gap-1 text-start'>
+                <h2 id={titleId} className='text-md font-semibold text-primary'>
+                  Tùy chọn mẫu phiếu in của hộ kinh doanh
+                </h2>
+                <p className='text-sm text-tertiary'>
+                  Vui lòng chọn cơ sở kinh doanh làm phần đầu biểu mẫu:
+                </p>
               </div>
-            </Button>
-          ))}
-          {entities.length === 0 && (
-            <div className='flex items-center justify-center py-4 text-muted-foreground'>
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              Đang tải...
+              <div className='grid gap-3'>
+                {entities.map((entity) => (
+                  <Button
+                    key={entity.id}
+                    color='secondary'
+                    className='w-full py-2.5'
+                    onPress={() => handlePrint(entity.id)}
+                  >
+                    <span className='flex flex-col items-start gap-0.5 text-start'>
+                      <span className='font-medium text-primary'>{entity.name}</span>
+                      <span className='text-xs text-tertiary'>{entity.address}</span>
+                    </span>
+                  </Button>
+                ))}
+                {entities.length === 0 && (
+                  <div className='flex items-center justify-center gap-2 py-4 text-tertiary'>
+                    <RefreshCw01 className='size-4 animate-spin' />
+                    Đang tải...
+                  </div>
+                )}
+              </div>
+              <div className='flex flex-col-reverse gap-x-2 gap-y-2 sm:flex-row sm:justify-end'>
+                <Button color='secondary' onPress={close}>
+                  Hủy bỏ
+                </Button>
+              </div>
             </div>
           )}
-        </div>
-        <DialogFooter>
-          <Button variant='outline' onClick={() => setOpen(null)}>
-            Hủy bỏ
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
   )
 }

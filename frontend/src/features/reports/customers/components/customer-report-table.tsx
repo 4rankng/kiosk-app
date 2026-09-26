@@ -1,6 +1,6 @@
 import { useMemo, Fragment } from 'react'
 import { formatCurrency } from '@/lib/format'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/features/reports/components/table'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { CustomerReportMobile } from './customer-report-mobile'
 import type { CustomerReportRow } from '@/services/reports'
@@ -23,7 +23,7 @@ export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
   }
 
   return (
-    <div className='rounded-md border'>
+    <div className='rounded-lg border border-primary bg-primary'>
       <Table>
         <TableHeader>
           <TableRow>
@@ -35,7 +35,10 @@ export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
         </TableHeader>
         <TableBody>
           {Object.entries(grouped).map(([companyId, rows]) => {
-            const totals = rows.reduce((acc, r) => ({ revenue: acc.revenue + r.totalRevenue, unpaid: acc.unpaid + r.unpaidAmount }), { revenue: 0, unpaid: 0 })
+            const totals = rows.reduce(
+              (acc, r) => ({ revenue: acc.revenue + r.totalRevenue, unpaid: acc.unpaid + r.unpaidAmount }),
+              { revenue: 0, unpaid: 0 },
+            )
             return (
               <Fragment key={companyId}>
                 {rows.map((row) => (
@@ -43,19 +46,27 @@ export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
                     <TableCell className='font-mono text-sm'>{row.customerCode}</TableCell>
                     <TableCell className='font-medium'>{row.customerName}</TableCell>
                     <TableCell className='text-right tabular-nums'>{formatCurrency(row.totalRevenue)}</TableCell>
-                    <TableCell className='text-right tabular-nums font-medium text-warning'>{formatCurrency(row.unpaidAmount)}</TableCell>
+                    <TableCell className='text-right tabular-nums font-medium text-warning-primary'>
+                      {formatCurrency(row.unpaidAmount)}
+                    </TableCell>
                   </TableRow>
                 ))}
-                <TableRow key={`summary-${companyId}`} className='bg-muted/40 font-bold'>
+                <TableRow className='bg-secondary font-bold hover:bg-secondary'>
                   <TableCell colSpan={2}>Tổng cộng công nợ {rows[0].companyName}:</TableCell>
                   <TableCell className='text-right font-bold tabular-nums'>{formatCurrency(totals.revenue)}</TableCell>
-                  <TableCell className='text-right font-bold tabular-nums text-warning'>{formatCurrency(totals.unpaid)}</TableCell>
+                  <TableCell className='text-right font-bold tabular-nums text-warning-primary'>
+                    {formatCurrency(totals.unpaid)}
+                  </TableCell>
                 </TableRow>
               </Fragment>
             )
           })}
           {data.length === 0 && (
-            <TableRow><TableCell colSpan={4} className='h-24 text-center'>Không có dữ liệu.</TableCell></TableRow>
+            <TableRow>
+              <TableCell colSpan={4} className='h-24 text-center'>
+                Không có dữ liệu.
+              </TableCell>
+            </TableRow>
           )}
         </TableBody>
       </Table>

@@ -2,14 +2,10 @@ import { type ColumnDef } from '@tanstack/react-table'
 import type { Invoice } from '@/types'
 import { formatCurrency, formatDateTime } from '@/lib/format'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
-import { Button } from '@/components/ui/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
-import { Printer, DollarSign } from 'lucide-react'
+import { Button } from '@/components/base/buttons/button'
+import { BadgeWithIcon } from '@/components/base/badges/badges'
+import { Tooltip } from '@/components/base/tooltip/tooltip'
+import { CoinsHand, Printer } from '@untitledui/icons'
 import { useInvoicesContext } from './invoices-provider'
 import { statusMeta } from '../status-meta'
 
@@ -19,7 +15,7 @@ export function getInvoicesColumns(): ColumnDef<Invoice, unknown>[] {
       accessorKey: 'code',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Mã Hóa Đơn' />,
       cell: ({ row }) => (
-        <span className='bg-muted px-1.5 py-0.5 rounded font-mono text-sm font-medium'>
+        <span className='rounded bg-secondary px-1.5 py-0.5 font-mono text-sm font-medium text-secondary'>
           {row.getValue('code')}
         </span>
       ),
@@ -48,12 +44,10 @@ export function getInvoicesColumns(): ColumnDef<Invoice, unknown>[] {
         const isPaid = typeof invoice.isPaid === 'boolean' ? invoice.isPaid : (paidAmount >= total && total > 0)
         const partiallyPaid = !isPaid && paidAmount > 0 && paidAmount < total
         const meta = statusMeta(invoice.status, isPaid, partiallyPaid)
-        const Icon = meta.icon
         return (
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${meta.className}`}>
-            <Icon className='h-3.5 w-3.5 shrink-0' />
-            <span>{meta.label}</span>
-          </span>
+          <BadgeWithIcon type='pill-color' size='md' color={meta.badgeColor} iconLeading={meta.icon}>
+            {meta.label}
+          </BadgeWithIcon>
         )
       },
       filterFn: (row, _columnId, filterValue) => {
@@ -71,46 +65,34 @@ export function getInvoicesColumns(): ColumnDef<Invoice, unknown>[] {
         const paidAmount = Number(invoice.paidAmount || 0)
         const isPaid = typeof invoice.isPaid === 'boolean' ? invoice.isPaid : (paidAmount >= total && total > 0)
         return (
-          <TooltipProvider>
-            <div className='flex items-center gap-1'>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className='h-8 w-8'
-                    aria-label='In hóa đơn'
-                    onClick={() => {
-                      setSelectedInvoice(row.original)
-                      setOpen('print')
-                    }}
-                  >
-                    <Printer className='h-4 w-4' />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>In hóa đơn</TooltipContent>
+          <div className='flex items-center gap-1'>
+            <Tooltip title='In hóa đơn'>
+              <Button
+                color='tertiary'
+                size='xs'
+                aria-label='In hóa đơn'
+                iconLeading={Printer}
+                onPress={() => {
+                  setSelectedInvoice(row.original)
+                  setOpen('print')
+                }}
+              />
+            </Tooltip>
+            {!isPaid && invoice.status !== 'cancelled' && (
+              <Tooltip title='Thu tiền'>
+                <Button
+                  color='tertiary'
+                  size='xs'
+                  aria-label='Thu tiền'
+                  iconLeading={CoinsHand}
+                  onPress={() => {
+                    setSelectedInvoice(row.original)
+                    setOpen('payment')
+                  }}
+                />
               </Tooltip>
-              {!isPaid && invoice.status !== 'cancelled' && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant='ghost'
-                      size='icon'
-                      className='h-8 w-8 text-warning hover:bg-warning/10'
-                      aria-label='Thu tiền'
-                      onClick={() => {
-                        setSelectedInvoice(row.original)
-                        setOpen('payment')
-                      }}
-                    >
-                      <DollarSign className='h-4 w-4' />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Thu tiền</TooltipContent>
-                </Tooltip>
-              )}
-            </div>
-          </TooltipProvider>
+            )}
+          </div>
         )
       },
     },

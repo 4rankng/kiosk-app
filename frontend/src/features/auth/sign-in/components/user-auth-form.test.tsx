@@ -33,7 +33,6 @@ vi.mock('@/services/auth', () => ({
       accessToken: 'mock-access-token',
     })
   ),
-  signInWithGoogle: vi.fn(() => Promise.reject(new Error('not used in test'))),
 }))
 
 vi.mock('@tanstack/react-router', async (importOriginal) => {
@@ -71,7 +70,6 @@ vi.mock('@/services/auth', () => ({
     accessToken: 'mock-access-token',
     refreshToken: 'mock-refresh-token',
   }),
-  signInWithGoogle: vi.fn(),
 }))
 
 vi.mock('@/lib/utils', async (orig) => ({
@@ -90,8 +88,8 @@ describe('UserAuthForm', () => {
     beforeEach(async () => {
       vi.clearAllMocks()
       screen = await render(<UserAuthForm />)
-      emailInput = screen.getByRole('textbox', { name: /^Email$/i })
-      passwordInput = screen.getByLabelText(/^Mật khẩu$/)
+      emailInput = screen.getByRole('textbox', { name: /Email/i })
+      passwordInput = screen.getByLabelText(/Mật khẩu/)
       signInButton = screen.getByRole('button', { name: /^Đăng nhập$/ })
       forgotPasswordLink = screen.getByText(/^Chỉ tài khoản được phê duyệt/)
     })

@@ -1,14 +1,8 @@
+import { useId } from 'react'
+import { ModalOverlay, Modal, Dialog } from '@/components/application/modals/modal'
+import { Button } from '@/components/base/buttons/button'
+import { CheckCircle } from '@untitledui/icons'
 import { formatCurrency } from '@/lib/format'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { CheckCircle2 } from 'lucide-react'
 
 interface OrderSuccessDialogProps {
   open: boolean
@@ -25,38 +19,46 @@ export function OrderSuccessDialog({
   customerName,
   total,
 }: OrderSuccessDialogProps) {
+  const titleId = useId()
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted'>
-            <CheckCircle2 className='h-10 w-10 text-primary' />
-          </div>
-          <DialogTitle className='text-center text-lg'>
-            Tạo đơn hàng thành công!
-          </DialogTitle>
-          <DialogDescription className='text-center'>
-            Đơn hàng đã được lưu vào hệ thống.
-          </DialogDescription>
-        </DialogHeader>
-        <div className='space-y-2 rounded-xl bg-muted/50 p-4'>
-          <div className='flex justify-between text-sm'>
-            <span className='text-muted-foreground'>Mã đơn hàng:</span>
-            <span className='font-mono font-medium'>{orderCode}</span>
-          </div>
-          <div className='flex justify-between text-sm'>
-            <span className='text-muted-foreground'>Khách hàng:</span>
-            <span className='font-medium'>{customerName}</span>
-          </div>
-          <div className='flex justify-between border-t pt-2'>
-            <span className='text-muted-foreground'>Tổng tiền:</span>
-            <span className='text-lg font-bold'>{formatCurrency(total)}</span>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button onClick={() => onOpenChange(false)}>Đóng</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <ModalOverlay isOpen={open} onOpenChange={onOpenChange}>
+      <Modal className='w-full max-w-md'>
+        <Dialog aria-labelledby={titleId}>
+          {() => (
+            <div className='flex flex-col items-center gap-5 p-5 text-center sm:p-6'>
+              <div className='flex size-16 items-center justify-center rounded-full bg-success-secondary'>
+                <CheckCircle className='size-8 text-fg-success-primary' />
+              </div>
+              <div className='flex flex-col gap-1'>
+                <h2 id={titleId} className='text-md font-semibold text-primary'>
+                  Tạo đơn hàng thành công!
+                </h2>
+                <p className='text-sm text-tertiary'>
+                  Đơn hàng đã được lưu vào hệ thống.
+                </p>
+              </div>
+              <div className='w-full space-y-2 rounded-xl bg-secondary p-4'>
+                <div className='flex justify-between text-sm'>
+                  <span className='text-tertiary'>Mã đơn hàng:</span>
+                  <span className='font-mono font-medium text-primary'>{orderCode}</span>
+                </div>
+                <div className='flex justify-between text-sm'>
+                  <span className='text-tertiary'>Khách hàng:</span>
+                  <span className='font-medium text-primary'>{customerName}</span>
+                </div>
+                <div className='flex justify-between border-t border-secondary pt-2'>
+                  <span className='text-tertiary'>Tổng tiền:</span>
+                  <span className='text-lg font-bold text-primary tabular-nums'>
+                    {formatCurrency(total)}
+                  </span>
+                </div>
+              </div>
+              <Button onPress={() => onOpenChange(false)}>Đóng</Button>
+            </div>
+          )}
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
   )
 }

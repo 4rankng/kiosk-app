@@ -1,95 +1,77 @@
-import { useForm } from 'react-hook-form'
+import { useForm, type UseFormRegisterReturn } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 import { render } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from '@/components/ui/form'
 import { PasswordInput } from './password-input'
 
-describe('PasswordInput', () => {
+describe('PasswordInput', () =>
+{
+  const TOGGLE_NAME = 'Toggle password visibility'
+
   it('renders the password input correctly', async () => {
     const { getByPlaceholder, getByRole } = await render(
       <PasswordInput placeholder='password' />
     )
 
     const passwordInput = getByPlaceholder('password')
-    const showPasswordButton = getByRole('button', { name: /show password/i })
+    const toggleButton = getByRole('button', { name: TOGGLE_NAME })
 
     await expect.element(passwordInput).toBeInTheDocument()
     await expect.element(passwordInput).toHaveAttribute('type', 'password')
-    await expect.element(showPasswordButton).toBeVisible()
+    await expect.element(toggleButton).toBeVisible()
   })
 
-  it('toggles the password visibility when the show password button is clicked', async () => {
+  it('toggles the password visibility when the toggle button is clicked', async () => {
     const { getByPlaceholder, getByRole } = await render(
       <PasswordInput placeholder='password' />
     )
 
     const passwordInput = getByPlaceholder('password')
-    const showPasswordButton = getByRole('button', { name: /show password/i })
+    const toggleButton = getByRole('button', { name: TOGGLE_NAME })
 
     await expect.element(passwordInput).toHaveAttribute('type', 'password')
-    await expect.element(showPasswordButton).toBeInTheDocument()
 
-    await userEvent.click(showPasswordButton)
+    await userEvent.click(toggleButton)
 
     await expect.element(passwordInput).toHaveAttribute('type', 'text')
-    const hidePasswordButton = getByRole('button', { name: /hide password/i })
-    await expect.element(hidePasswordButton).toBeInTheDocument()
 
-    await userEvent.click(hidePasswordButton)
+    await userEvent.click(toggleButton)
 
     await expect.element(passwordInput).toHaveAttribute('type', 'password')
-    await expect
-      .element(getByRole('button', { name: /show password/i }))
-      .toBeInTheDocument()
   })
 
-  it('disables the show password button when the password input is disabled', async () => {
+  it('disables the input and toggle when the input is disabled', async () => {
     const { getByPlaceholder, getByRole } = await render(
       <PasswordInput placeholder='password' disabled />
     )
 
     const passwordInput = getByPlaceholder('password')
-    const showPasswordButton = getByRole('button', { name: /show password/i })
-    await expect.element(showPasswordButton).toBeDisabled()
+    const toggleButton = getByRole('button', { name: TOGGLE_NAME })
+    await expect.element(toggleButton).toBeDisabled()
     await expect.element(passwordInput).toBeDisabled()
   })
 
-  it('works with FormLabel and react-hook-form field spread', async () => {
-    function PasswordInLabeledForm() {
-      const form = useForm<{ password: string }>({
-        defaultValues: { password: '' },
-      })
-
+  it('works with react-hook-form register spread', async () => {
+    function PasswordInRegisteredForm({ field }: { field: UseFormRegisterReturn<'password'> }) {
       return (
-        <Form {...form}>
-          <form>
-            <FormField
-              control={form.control}
-              name='password'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <PasswordInput {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
+        <form>
+          <label htmlFor='password-field'>Mật khẩu</label>
+          <PasswordInput id='password-field' {...field} />
+        </form>
       )
     }
 
-    const { getByLabelText } = await render(<PasswordInLabeledForm />)
+    function Wrapper() {
+      const { register } = useForm<{ password: string }>({
+        defaultValues: { password: '' },
+      })
 
-    const password = getByLabelText(/^Password$/i)
+      return <PasswordInRegisteredForm field={register('password')} />
+    }
+
+    const { getByLabelText } = await render(<Wrapper />)
+
+    const password = getByLabelText('Mật khẩu')
     await expect.element(password).toHaveAttribute('type', 'password')
 
     await userEvent.type(password, 'secret-value')
