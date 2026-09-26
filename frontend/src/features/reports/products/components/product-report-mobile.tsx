@@ -8,7 +8,7 @@ export function ProductReportMobile({ data }: { data: ProductReportRow[] }) {
 
   if (data.length === 0) {
     return (
-      <div className='flex h-24 items-center justify-center text-muted-foreground'>
+      <div className='flex h-24 items-center justify-center text-tertiary'>
         Không có dữ liệu.
       </div>
     )
@@ -24,7 +24,7 @@ export function ProductReportMobile({ data }: { data: ProductReportRow[] }) {
             key={product.productId}
             title={product.productName}
             status={
-              <span className='rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground'>
+              <span className='rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-tertiary'>
                 {product.productCode}
               </span>
             }
@@ -41,22 +41,22 @@ export function ProductReportMobile({ data }: { data: ProductReportRow[] }) {
               {product.details.map((d, i) => (
                 <div
                   key={`${d.invoiceCode}-${i}`}
-                  className='rounded-md bg-muted/40 px-3 py-2 text-sm'
+                  className='rounded-md bg-secondary px-3 py-2 text-sm'
                 >
                   <div className='flex items-center justify-between'>
-                    <span className='font-mono text-xs text-muted-foreground'>
+                    <span className='font-mono text-xs text-tertiary'>
                       {d.invoiceCode}
                     </span>
-                    <span className='text-xs text-muted-foreground tabular-nums'>
+                    <span className='text-xs text-tertiary tabular-nums'>
                       {formatDateTime(d.date)}
                     </span>
                   </div>
-                  <p className='mt-0.5 truncate font-medium'>{d.customerName}</p>
-                  <div className='mt-1 flex items-center justify-between text-xs text-muted-foreground tabular-nums'>
+                  <p className='mt-0.5 truncate font-medium text-primary'>{d.customerName}</p>
+                  <div className='mt-1 flex items-center justify-between text-xs text-tertiary tabular-nums'>
                     <span>
                       {formatNumber(d.quantity)} x {formatCurrency(d.unitPrice)}
                     </span>
-                    <span className='font-medium text-foreground'>
+                    <span className='font-medium text-primary'>
                       {formatCurrency(d.total)}
                     </span>
                   </div>

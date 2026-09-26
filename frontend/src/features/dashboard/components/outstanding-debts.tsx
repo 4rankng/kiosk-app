@@ -1,36 +1,26 @@
 import { useQuery } from '@tanstack/react-query'
+import { CoinsHand } from '@untitledui/icons'
 import { getDashboardStats } from '@/services/reports'
 import { formatCurrency } from '@/lib/format'
-import {
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Separator } from '@/components/ui/separator'
-import { HandCoins } from 'lucide-react'
 import { EmptyState } from '@/components/empty-state'
+import { WidgetCard } from './widget-card'
+
+const TITLE = 'Công nợ'
+const DESCRIPTION = 'Khách hàng còn nợ'
 
 function OutstandingDebtsSkeleton() {
   return (
-    <>
-      <CardHeader>
-        <Skeleton className='h-5 w-24' />
-        <Skeleton className='h-4 w-32' />
-      </CardHeader>
-      <CardContent>
-        <div className='space-y-4'>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className='flex items-center gap-4'>
-              <Skeleton className='h-8 w-8 shrink-0 rounded-full' />
-              <Skeleton className='h-4 flex-1' />
-              <Skeleton className='h-4 w-16' />
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </>
+    <WidgetCard title={TITLE} description={DESCRIPTION}>
+      <div className='space-y-4'>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className='flex items-center gap-3'>
+            <div className='size-7 shrink-0 animate-pulse rounded-full bg-secondary' />
+            <div className='h-3 flex-1 animate-pulse rounded bg-secondary' />
+            <div className='h-3 w-16 animate-pulse rounded bg-secondary' />
+          </div>
+        ))}
+      </div>
+    </WidgetCard>
   )
 }
 
@@ -41,17 +31,9 @@ export function OutstandingDebts() {
 
   if (isError) {
     return (
-      <>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
-            <HandCoins className='h-4 w-4' /> Công nợ
-          </CardTitle>
-          <CardDescription>Khách hàng còn nợ</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <EmptyState variant='error' onRetry={() => refetch()} description='Không tải được danh sách công nợ.' />
-        </CardContent>
-      </>
+      <WidgetCard title={TITLE} description={DESCRIPTION}>
+        <EmptyState variant='error' onRetry={() => refetch()} description='Không tải được danh sách công nợ.' />
+      </WidgetCard>
     )
   }
 
@@ -59,54 +41,43 @@ export function OutstandingDebts() {
 
   if (debts.length === 0) {
     return (
-      <>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
-            <HandCoins className='h-4 w-4' /> Công nợ
-          </CardTitle>
-          <CardDescription>Khách hàng còn nợ</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className='flex flex-col items-center justify-center gap-2 py-8 text-muted-foreground'>
-            <HandCoins className='h-10 w-10' strokeWidth={1.5} />
-            <p className='text-sm font-medium'>Không có công nợ</p>
-            <p className='text-xs'>Tất cả hóa đơn đã thanh toán</p>
-          </div>
-        </CardContent>
-      </>
+      <WidgetCard title={TITLE} description={DESCRIPTION}>
+        <EmptyState
+          variant='empty'
+          icon={<CoinsHand className='size-10 text-fg-quaternary' />}
+          title='Không có công nợ'
+          description='Tất cả hóa đơn đã thanh toán'
+        />
+      </WidgetCard>
     )
   }
 
   const totalDebt = debts.reduce((s, d) => s + d.amount, 0)
 
   return (
-    <>
-      <CardHeader>
-        <CardTitle className='flex items-center gap-2'>
-          <HandCoins className='h-4 w-4' /> Công nợ
-        </CardTitle>
-        <CardDescription>Khách hàng còn nợ</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className='space-y-3'>
-          {debts.map((d, i) => (
-            <div key={d.customerName} className='flex items-center gap-3'>
-              <span className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold'>
-                {i + 1}
-              </span>
-              <div className='min-w-0 flex-1'>
-                <p className='text-sm font-medium leading-none'>{d.customerName}</p>
-              </div>
-              <div className='font-medium tabular-nums text-warning'>{formatCurrency(d.amount)}</div>
-            </div>
-          ))}
-        </div>
-        <Separator className='my-3' />
-        <div className='flex items-center justify-between rounded-md bg-muted/50 px-3 py-2'>
-          <span className='text-sm font-medium'>Tổng công nợ</span>
-          <span className='text-sm font-bold tabular-nums text-warning'>{formatCurrency(totalDebt)}</span>
-        </div>
-      </CardContent>
-    </>
+    <WidgetCard title={TITLE} description={DESCRIPTION}>
+      <div className='space-y-3'>
+        {debts.map((d, i) => (
+          <div key={d.customerName} className='flex items-center gap-3'>
+            <span className='flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold text-secondary'>
+              {i + 1}
+            </span>
+            <p className='min-w-0 flex-1 truncate text-sm font-medium leading-none text-primary'>
+              {d.customerName}
+            </p>
+            <span className='shrink-0 text-sm font-medium text-warning-primary tabular-nums'>
+              {formatCurrency(d.amount)}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div className='my-3 h-px w-full bg-border-secondary' />
+      <div className='flex items-center justify-between rounded-md bg-secondary px-3 py-2'>
+        <span className='text-sm font-medium text-primary'>Tổng công nợ</span>
+        <span className='text-sm font-semibold text-warning-primary tabular-nums'>
+          {formatCurrency(totalDebt)}
+        </span>
+      </div>
+    </WidgetCard>
   )
 }

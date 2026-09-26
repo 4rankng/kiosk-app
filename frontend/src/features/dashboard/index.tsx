@@ -1,19 +1,18 @@
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { useDocumentTitle } from '@/hooks/use-document-title'
+import { PageHeader } from '@/components/page-header'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { TodayStats } from './components/today-stats'
 import { MonthlyRevenueChart } from './components/monthly-revenue-chart'
 import { TopCustomers } from './components/top-customers'
 import { TopProducts } from './components/top-products'
 import { OutstandingDebts } from './components/outstanding-debts'
 import { RecentInvoices } from './components/recent-invoices'
+import { WidgetCard } from './components/widget-card'
 
 export function Dashboard() {
-  useDocumentTitle('Tổng quan')
   return (
     <>
       <Header fixed>
@@ -22,43 +21,35 @@ export function Dashboard() {
         <ProfileDropdown />
       </Header>
       <Main>
-        <div className='mb-4 flex items-end justify-between gap-4'>
-          <div className='space-y-1'>
-            <h1 className='font-heading text-h1 font-semibold tracking-tight'>Tổng quan</h1>
-            <p className='text-sm text-muted-foreground'>Tình hình kinh doanh hôm nay.</p>
-          </div>
-        </div>
+        <PageHeader title='Tổng quan' description='Tình hình kinh doanh hôm nay.' />
 
         <div className='space-y-4'>
           <TodayStats />
 
           <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
-            <Card className='lg:col-span-4'>
-              <CardHeader className='pb-2'>
-                <CardTitle>Doanh thu theo tháng</CardTitle>
-                <CardDescription>So sánh doanh thu các tuần trong tháng</CardDescription>
-              </CardHeader>
-              <CardContent className='ps-2 pt-0'>
-                <MonthlyRevenueChart />
-              </CardContent>
-            </Card>
-            <Card className='lg:col-span-3'>
+            <WidgetCard
+              title='Doanh thu theo tháng'
+              description='So sánh doanh thu các tuần trong tháng'
+              className='lg:col-span-4'
+              contentClassName='ps-2 pt-0'
+            >
+              <MonthlyRevenueChart />
+            </WidgetCard>
+            <div className='lg:col-span-3'>
               <TopCustomers />
-            </Card>
+            </div>
           </div>
 
           <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
-            <Card className='lg:col-span-4'>
+            <div className='lg:col-span-4'>
               <TopProducts />
-            </Card>
-            <Card className='lg:col-span-3'>
+            </div>
+            <div className='lg:col-span-3'>
               <OutstandingDebts />
-            </Card>
+            </div>
           </div>
 
-          <Card>
-            <RecentInvoices />
-          </Card>
+          <RecentInvoices />
         </div>
       </Main>
     </>

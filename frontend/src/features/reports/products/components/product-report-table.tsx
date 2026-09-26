@@ -3,10 +3,10 @@ import {
   type SortingState, flexRender, getCoreRowModel, getExpandedRowModel,
   getSortedRowModel, useReactTable, type ColumnDef,
 } from '@tanstack/react-table'
+import { ChevronDown, ChevronRight, SearchMd } from '@untitledui/icons'
 import { formatCurrency, formatDateTime, formatNumber } from '@/lib/format'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { ChevronRight, ChevronDown, Search } from 'lucide-react'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/features/reports/components/table'
+import { Button } from '@/components/base/buttons/button'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { ProductReportMobile } from './product-report-mobile'
 import type { ProductReportRow } from '@/services/reports'
@@ -30,7 +30,9 @@ const columns: ColumnDef<ProductReportRow>[] = [
   {
     accessorKey: 'totalRevenue',
     header: 'Tổng Doanh Thu',
-    cell: ({ getValue }) => <span className='tabular-nums font-medium text-success'>{formatCurrency(getValue() as number)}</span>,
+    cell: ({ getValue }) => (
+      <span className='tabular-nums font-medium text-success-primary'>{formatCurrency(getValue() as number)}</span>
+    ),
   },
 ]
 
@@ -49,7 +51,7 @@ export function ProductReportTable({ data }: { data: ProductReportRow[] }) {
   }
 
   return (
-    <div className='rounded-md border'>
+    <div className='rounded-lg border border-primary bg-primary'>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((hg) => (
@@ -66,19 +68,17 @@ export function ProductReportTable({ data }: { data: ProductReportRow[] }) {
         <TableBody>
           {table.getRowModel().rows.map((row) => (
             <React.Fragment key={row.id}>
-              <TableRow key={row.id} className='cursor-pointer' onClick={() => row.toggleExpanded()}>
+              <TableRow className='cursor-pointer' onClick={() => row.toggleExpanded()}>
                 <TableCell className='w-10 p-2'>
-                  <Button variant='ghost' size='icon' className='h-7 w-7 p-0'>
-                    {row.getIsExpanded() ? <ChevronDown className='h-4 w-4' /> : <ChevronRight className='h-4 w-4' />}
-                  </Button>
+                  <Button color='tertiary' size='xs' iconLeading={row.getIsExpanded() ? ChevronDown : ChevronRight} />
                 </TableCell>
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                 ))}
               </TableRow>
               {row.getIsExpanded() && (
-                <TableRow key={`${row.id}-detail`}>
-                  <TableCell colSpan={row.getVisibleCells().length + 1} className='bg-muted/30 p-0'>
+                <TableRow className='hover:bg-transparent'>
+                  <TableCell colSpan={row.getVisibleCells().length + 1} className='bg-secondary p-0'>
                     <DetailTable details={row.original.details} />
                   </TableCell>
                 </TableRow>
@@ -86,7 +86,11 @@ export function ProductReportTable({ data }: { data: ProductReportRow[] }) {
             </React.Fragment>
           ))}
           {table.getRowModel().rows.length === 0 && (
-            <TableRow><TableCell colSpan={5} className='h-24 text-center'>Không có dữ liệu.</TableCell></TableRow>
+            <TableRow>
+              <TableCell colSpan={5} className='h-24 text-center'>
+                Không có dữ liệu.
+              </TableCell>
+            </TableRow>
           )}
         </TableBody>
       </Table>
@@ -98,7 +102,8 @@ function DetailTable({ details }: { details: ProductReportRow['details'] }) {
   return (
     <div className='mx-4 mb-2'>
       <p className='flex items-center gap-1.5 py-2 text-sm font-semibold'>
-        <Search className='h-4 w-4' /> Chi tiết lịch sử tiêu thụ
+        <SearchMd className='size-4 text-fg-quaternary' />
+        Chi tiết lịch sử tiêu thụ
       </p>
       <Table>
         <TableHeader>
@@ -115,11 +120,11 @@ function DetailTable({ details }: { details: ProductReportRow['details'] }) {
           {details.map((d, i) => (
             <TableRow key={`${d.invoiceCode}-${i}`}>
               <TableCell className='font-mono text-sm'>{d.invoiceCode}</TableCell>
-              <TableCell className='text-muted-foreground text-xs tabular-nums'>{formatDateTime(d.date)}</TableCell>
+              <TableCell className='text-xs text-tertiary tabular-nums'>{formatDateTime(d.date)}</TableCell>
               <TableCell className='font-medium'>{d.customerName}</TableCell>
               <TableCell className='text-right tabular-nums'>{formatNumber(d.quantity)}</TableCell>
-              <TableCell className='text-right tabular-nums text-muted-foreground'>{formatCurrency(d.unitPrice)}</TableCell>
-              <TableCell className='text-right tabular-nums font-semibold'>{formatCurrency(d.total)}</TableCell>
+              <TableCell className='text-right text-tertiary tabular-nums'>{formatCurrency(d.unitPrice)}</TableCell>
+              <TableCell className='text-right font-semibold tabular-nums'>{formatCurrency(d.total)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

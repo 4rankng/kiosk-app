@@ -1,15 +1,9 @@
-import { useState } from 'react'
-import { Download, Printer } from 'lucide-react'
+import { Download01, Printer } from '@untitledui/icons'
 import type { CustomerReportRow } from '@/services/reports'
 import { formatCurrency } from '@/lib/format'
 import { exportToXlsx } from '@/lib/export'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/base/buttons/button'
+import { Dropdown } from '@/components/base/dropdown/dropdown'
 
 interface ExportActionsProps {
   data: CustomerReportRow[]
@@ -25,8 +19,6 @@ const HEADERS = [
 ]
 
 export function ExportActions({ data, companyName }: ExportActionsProps) {
-  const [open, setOpen] = useState(false)
-
   const handleExportSpreadsheet = async () => {
     const rows = data.map((row) => ({
       ...row,
@@ -41,23 +33,28 @@ export function ExportActions({ data, companyName }: ExportActionsProps) {
   }
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button variant='outline' size='sm'>
-          <Download className='mr-2 h-4 w-4' />
-          Xuất file
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
-        <DropdownMenuItem onClick={handleExportSpreadsheet}>
-          <Download className='mr-2 h-4 w-4' />
-          Xuất tập tin bảng tính để gửi đối tác
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handlePrint}>
-          <Printer className='mr-2 h-4 w-4' />
-          Xuất tập tin tài liệu in
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Dropdown.Root>
+      <Button color='secondary' size='sm' iconLeading={Download01}>
+        Xuất file
+      </Button>
+      <Dropdown.Popover placement='bottom end'>
+        <Dropdown.Menu
+          onAction={(key) => {
+            if (key === 'xlsx') {
+              void handleExportSpreadsheet()
+            } else {
+              handlePrint()
+            }
+          }}
+        >
+          <Dropdown.Item id='xlsx' icon={Download01}>
+            Xuất tập tin bảng tính để gửi đối tác
+          </Dropdown.Item>
+          <Dropdown.Item id='print' icon={Printer}>
+            Xuất tập tin tài liệu in
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown.Popover>
+    </Dropdown.Root>
   )
 }

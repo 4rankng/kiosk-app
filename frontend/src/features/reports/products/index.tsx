@@ -5,17 +5,21 @@ import { PageHeader } from '@/components/page-header'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useQuery } from '@tanstack/react-query'
+import { Package, TrendUp01, ShoppingBag02, File02 } from '@untitledui/icons'
 import { getProductReport } from '@/services/reports'
+import { Button } from '@/components/base/buttons/button'
+import { Label } from '@/components/base/input/label'
 import { ProductReportTable } from './components/product-report-table'
 import { EmptyState } from '@/components/empty-state'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { formatCurrency } from '@/lib/format'
-import { Package, TrendingUp, ShoppingBag, FileText } from 'lucide-react'
+
+const DATE_INPUT_CLASS = [
+  'h-9 w-full rounded-lg bg-primary px-3 text-sm text-primary shadow-xs',
+  'ring-1 ring-primary ring-inset outline-hidden transition duration-100 ease-linear',
+  'placeholder:text-placeholder focus:ring-2 focus:ring-brand',
+].join(' ')
 
 export function ProductReport() {
   useDocumentTitle('Báo cáo bán hàng theo sản phẩm')
@@ -37,7 +41,7 @@ export function ProductReport() {
         quantity: acc.quantity + r.totalQuantity,
         products: acc.products + 1,
       }),
-      { revenue: 0, quantity: 0, products: 0 }
+      { revenue: 0, quantity: 0, products: 0 },
     )
   }, [reportData])
 
@@ -55,19 +59,29 @@ export function ProductReport() {
       </Header>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <PageHeader title='Báo cáo tổng hợp theo mặt hàng' description='Thống kê doanh thu và số lượng bán ra theo từng sản phẩm.' />
-        
+
         {/* Filters */}
         <div className='flex flex-wrap items-end gap-3'>
-          <div className='space-y-1'>
-            <Label className='text-sm font-medium'>Từ ngày</Label>
-            <Input type='date' value={startDate} onChange={(e) => setStartDate(e.target.value)} className='h-9' />
+          <div className='flex w-full flex-col gap-1.5 sm:w-40'>
+            <Label>Từ ngày</Label>
+            <input
+              type='date'
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className={DATE_INPUT_CLASS}
+            />
           </div>
-          <div className='space-y-1'>
-            <Label className='text-sm font-medium'>Đến ngày</Label>
-            <Input type='date' value={endDate} onChange={(e) => setEndDate(e.target.value)} className='h-9' />
+          <div className='flex w-full flex-col gap-1.5 sm:w-40'>
+            <Label>Đến ngày</Label>
+            <input
+              type='date'
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className={DATE_INPUT_CLASS}
+            />
           </div>
-          <Button onClick={handleFilter} disabled={isLoading} className='h-9'>
-            {isLoading ? 'Đang tải...' : 'Lọc báo cáo'}
+          <Button onPress={handleFilter} isDisabled={isLoading} isLoading={isLoading}>
+            Lọc báo cáo
           </Button>
         </div>
 
@@ -76,10 +90,10 @@ export function ProductReport() {
 
         {/* Empty */}
         {!isLoading && reportData.length === 0 && (
-          <div className='rounded-lg border border-dashed p-8 bg-card'>
+          <div className='rounded-lg border border-dashed border-primary bg-primary p-8'>
             <EmptyState
               variant='empty'
-              icon={<FileText className='h-10 w-10 text-muted-foreground/60' />}
+              icon={<File02 className='size-10 text-fg-quaternary' />}
               title='Không có dữ liệu mặt hàng'
               description='Không tìm thấy đơn hàng nào có sản phẩm bán ra trong khoảng thời gian đã chọn.'
             />
@@ -90,38 +104,38 @@ export function ProductReport() {
         {!isLoading && reportData.length > 0 && (
           <div className='space-y-4'>
             <div className='grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4'>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                  <CardTitle className='text-sm font-medium text-muted-foreground'>Số mặt hàng bán ra</CardTitle>
-                  <Package className='h-4 w-4 text-muted-foreground' />
-                </CardHeader>
-                <CardContent>
-                  <div className='text-display font-bold tabular-nums'>{summary.products}</div>
-                  <p className='text-xs text-muted-foreground'>mặt hàng phát sinh đơn</p>
-                </CardContent>
-              </Card>
+              <div className='rounded-lg border border-primary bg-primary p-4'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-sm font-medium text-tertiary'>Số mặt hàng bán ra</span>
+                  <Package className='size-4 text-fg-quaternary' />
+                </div>
+                <div className='mt-2 font-heading text-display-md font-semibold tabular-nums text-primary'>
+                  {summary.products}
+                </div>
+                <p className='mt-1 text-xs text-tertiary'>mặt hàng phát sinh đơn</p>
+              </div>
 
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                  <CardTitle className='text-sm font-medium text-muted-foreground'>Tổng số lượng đã bán</CardTitle>
-                  <ShoppingBag className='h-4 w-4 text-muted-foreground' />
-                </CardHeader>
-                <CardContent>
-                  <div className='text-display font-bold tabular-nums'>{summary.quantity.toLocaleString('vi-VN')}</div>
-                  <p className='text-xs text-muted-foreground'>sản phẩm / đơn vị</p>
-                </CardContent>
-              </Card>
+              <div className='rounded-lg border border-primary bg-primary p-4'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-sm font-medium text-tertiary'>Tổng số lượng đã bán</span>
+                  <ShoppingBag02 className='size-4 text-fg-quaternary' />
+                </div>
+                <div className='mt-2 font-heading text-display-md font-semibold tabular-nums text-primary'>
+                  {summary.quantity.toLocaleString('vi-VN')}
+                </div>
+                <p className='mt-1 text-xs text-tertiary'>sản phẩm / đơn vị</p>
+              </div>
 
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                  <CardTitle className='text-sm font-medium text-success'>Tổng doanh thu</CardTitle>
-                  <TrendingUp className='h-4 w-4 text-success' />
-                </CardHeader>
-                <CardContent>
-                  <div className='text-display font-bold tabular-nums text-success'>{formatCurrency(summary.revenue)}</div>
-                  <p className='text-xs text-muted-foreground'>doanh thu tích lũy</p>
-                </CardContent>
-              </Card>
+              <div className='rounded-lg border border-primary bg-primary p-4'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-sm font-medium text-success-primary'>Tổng doanh thu</span>
+                  <TrendUp01 className='size-4 text-fg-success-secondary' />
+                </div>
+                <div className='mt-2 font-heading text-display-md font-semibold text-success-primary tabular-nums'>
+                  {formatCurrency(summary.revenue)}
+                </div>
+                <p className='mt-1 text-xs text-tertiary'>doanh thu tích lũy</p>
+              </div>
             </div>
 
             <ProductReportTable data={reportData} />

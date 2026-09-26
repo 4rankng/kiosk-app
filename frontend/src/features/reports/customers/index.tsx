@@ -5,20 +5,25 @@ import { PageHeader } from '@/components/page-header'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { useQuery } from '@tanstack/react-query'
+import { Users01, CurrencyDollar, AlertCircle, File02 } from '@untitledui/icons'
 import { getCustomerReport } from '@/services/reports'
 import { getCompanies } from '@/services/companies'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/base/buttons/button'
+import { Label } from '@/components/base/input/label'
+import { Select } from '@/components/base/select/select'
+import { SelectItem } from '@/components/base/select/select-item'
 import { CustomerReportTable } from './components/customer-report-table'
-import { EmptyState } from '@/components/empty-state'
 import { ExportActions } from './components/export-actions'
+import { EmptyState } from '@/components/empty-state'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { formatCurrency } from '@/lib/format'
-import { Users, DollarSign, AlertCircle, FileText } from 'lucide-react'
+
+const DATE_INPUT_CLASS = [
+  'h-9 w-full rounded-lg bg-primary px-3 text-sm text-primary shadow-xs',
+  'ring-1 ring-primary ring-inset outline-hidden transition duration-100 ease-linear',
+  'placeholder:text-placeholder focus:ring-2 focus:ring-brand',
+].join(' ')
 
 export function CustomerReport() {
   useDocumentTitle('Báo cáo công nợ khách hàng')
@@ -44,7 +49,7 @@ export function CustomerReport() {
         unpaid: acc.unpaid + r.unpaidAmount,
         customers: acc.customers + 1,
       }),
-      { revenue: 0, unpaid: 0, customers: 0 }
+      { revenue: 0, unpaid: 0, customers: 0 },
     )
   }, [reportData])
 
@@ -64,29 +69,42 @@ export function CustomerReport() {
       </Header>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <PageHeader title='Báo cáo doanh thu & đối chiếu công nợ' description='Thống kê doanh thu và công nợ theo từng khách hàng và đối tác.' />
-        
+
         {/* Filters */}
         <div className='flex flex-wrap items-end gap-3'>
-          <div className='space-y-1'>
-            <Label className='text-sm font-medium'>Từ ngày</Label>
-            <Input type='date' value={startDate} onChange={(e) => setStartDate(e.target.value)} className='h-9' />
+          <div className='flex w-full flex-col gap-1.5 sm:w-40'>
+            <Label>Từ ngày</Label>
+            <input
+              type='date'
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className={DATE_INPUT_CLASS}
+            />
           </div>
-          <div className='space-y-1'>
-            <Label className='text-sm font-medium'>Đến ngày</Label>
-            <Input type='date' value={endDate} onChange={(e) => setEndDate(e.target.value)} className='h-9' />
+          <div className='flex w-full flex-col gap-1.5 sm:w-40'>
+            <Label>Đến ngày</Label>
+            <input
+              type='date'
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className={DATE_INPUT_CLASS}
+            />
           </div>
-          <div className='space-y-1'>
-            <Label className='text-sm font-medium'>Công ty/Chuỗi</Label>
-            <Select value={companyId} onValueChange={setCompanyId}>
-              <SelectTrigger className='h-9 w-full sm:w-[200px]'><SelectValue placeholder='Tất cả công ty' /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value='all'>Tất cả công ty</SelectItem>
-                {companies.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-              </SelectContent>
+          <div className='w-full sm:w-[200px]'>
+            <Select
+              label='Công ty/Chuỗi'
+              placeholder='Tất cả công ty'
+              selectedKey={companyId}
+              onSelectionChange={(key) => setCompanyId(key === null ? 'all' : String(key))}
+            >
+              <SelectItem id='all'>Tất cả công ty</SelectItem>
+              {companies.map((c) => (
+                <SelectItem key={c.id} id={c.id}>{c.name}</SelectItem>
+              ))}
             </Select>
           </div>
-          <Button onClick={handleFilter} disabled={isLoading} className='h-9'>
-            {isLoading ? 'Đang tải...' : 'Lọc báo cáo'}
+          <Button onPress={handleFilter} isDisabled={isLoading} isLoading={isLoading}>
+            Lọc báo cáo
           </Button>
         </div>
 
@@ -97,10 +115,10 @@ export function CustomerReport() {
 
         {/* Empty */}
         {!isLoading && reportData.length === 0 && (
-          <div className='rounded-lg border border-dashed p-8 bg-card'>
+          <div className='rounded-lg border border-dashed border-primary bg-primary p-8'>
             <EmptyState
               variant='empty'
-              icon={<FileText className='h-10 w-10 text-muted-foreground/60' />}
+              icon={<File02 className='size-10 text-fg-quaternary' />}
               title='Không có dữ liệu phát sinh'
               description='Không tìm thấy đơn hàng hoặc hóa đơn trong khoảng thời gian đã chọn. Hãy thử nới rộng khoảng thời gian lọc.'
             />
@@ -111,38 +129,38 @@ export function CustomerReport() {
         {!isLoading && reportData.length > 0 && (
           <div className='space-y-4'>
             <div className='grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4'>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                  <CardTitle className='text-sm font-medium text-muted-foreground'>Khách hàng giao dịch</CardTitle>
-                  <Users className='h-4 w-4 text-muted-foreground' />
-                </CardHeader>
-                <CardContent>
-                  <div className='text-display font-bold tabular-nums'>{summary.customers}</div>
-                  <p className='text-xs text-muted-foreground'>đối tác trong kỳ</p>
-                </CardContent>
-              </Card>
+              <div className='rounded-lg border border-primary bg-primary p-4'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-sm font-medium text-tertiary'>Khách hàng giao dịch</span>
+                  <Users01 className='size-4 text-fg-quaternary' />
+                </div>
+                <div className='mt-2 font-heading text-display-md font-semibold tabular-nums text-primary'>
+                  {summary.customers}
+                </div>
+                <p className='mt-1 text-xs text-tertiary'>đối tác trong kỳ</p>
+              </div>
 
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                  <CardTitle className='text-sm font-medium text-muted-foreground'>Tổng tiền hàng</CardTitle>
-                  <DollarSign className='h-4 w-4 text-muted-foreground' />
-                </CardHeader>
-                <CardContent>
-                  <div className='text-display font-bold tabular-nums'>{formatCurrency(summary.revenue)}</div>
-                  <p className='text-xs text-muted-foreground'>tổng doanh thu phát sinh</p>
-                </CardContent>
-              </Card>
+              <div className='rounded-lg border border-primary bg-primary p-4'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-sm font-medium text-tertiary'>Tổng tiền hàng</span>
+                  <CurrencyDollar className='size-4 text-fg-quaternary' />
+                </div>
+                <div className='mt-2 font-heading text-display-md font-semibold tabular-nums text-primary'>
+                  {formatCurrency(summary.revenue)}
+                </div>
+                <p className='mt-1 text-xs text-tertiary'>tổng doanh thu phát sinh</p>
+              </div>
 
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                  <CardTitle className='text-sm font-medium text-warning'>Tiền chưa thu (Công nợ)</CardTitle>
-                  <AlertCircle className='h-4 w-4 text-warning' />
-                </CardHeader>
-                <CardContent>
-                  <div className='text-display font-bold tabular-nums text-warning'>{formatCurrency(summary.unpaid)}</div>
-                  <p className='text-xs text-muted-foreground'>cần đối chiếu thu nợ</p>
-                </CardContent>
-              </Card>
+              <div className='rounded-lg border border-primary bg-primary p-4'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-sm font-medium text-warning-primary'>Tiền chưa thu (Công nợ)</span>
+                  <AlertCircle className='size-4 text-fg-warning-secondary' />
+                </div>
+                <div className='mt-2 font-heading text-display-md font-semibold text-warning-primary tabular-nums'>
+                  {formatCurrency(summary.unpaid)}
+                </div>
+                <p className='mt-1 text-xs text-tertiary'>cần đối chiếu thu nợ</p>
+              </div>
             </div>
 
             <ExportActions data={reportData} companyName={activeCompanyName} />

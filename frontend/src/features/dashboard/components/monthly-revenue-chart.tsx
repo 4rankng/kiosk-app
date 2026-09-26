@@ -2,7 +2,6 @@ import { lazy, Suspense } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getDashboardStats } from '@/services/reports'
 import { ChartContainer, type ChartConfig } from '@/components/ui/chart'
-import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/empty-state'
 
 // Lazy-load recharts to keep it out of the initial bundle.
@@ -11,7 +10,7 @@ const ChartInner = lazy(() => import('./monthly-revenue-chart-inner'))
 const chartConfig = {
   total: {
     label: 'Doanh thu',
-    color: 'hsl(var(--chart-1))',
+    color: 'var(--color-brand-500)',
   },
 } satisfies ChartConfig
 
@@ -26,16 +25,11 @@ export function MonthlyRevenueChart() {
     )
   }
 
-  const chartData = (data?.monthlyRevenue ?? []).map((item) => ({
-    name: item.week,
-    total: item.revenue,
-  }))
+  const chartData = (data?.monthlyRevenue ?? []).map((item) => ({ name: item.week, total: item.revenue }))
 
   return (
     <ChartContainer config={chartConfig} className='h-[250px] w-full'>
-      <Suspense
-        fallback={<Skeleton className='h-[250px] w-full' />}
-      >
+      <Suspense fallback={<div className='h-[250px] w-full animate-pulse rounded bg-secondary' />}>
         <ChartInner data={chartData} />
       </Suspense>
     </ChartContainer>
