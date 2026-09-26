@@ -90,8 +90,8 @@ describe('UserAuthForm', () => {
     beforeEach(async () => {
       vi.clearAllMocks()
       screen = await render(<UserAuthForm />)
-      emailInput = screen.getByRole('textbox', { name: /^Email$/i })
-      passwordInput = screen.getByLabelText(/^Mật khẩu$/)
+      emailInput = screen.getByRole('textbox', { name: /Email/i })
+      passwordInput = screen.getByLabelText(/Mật khẩu/)
       signInButton = screen.getByRole('button', { name: /^Đăng nhập$/ })
       forgotPasswordLink = screen.getByText(/^Chỉ tài khoản được phê duyệt/)
     })
