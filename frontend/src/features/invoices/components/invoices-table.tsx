@@ -16,11 +16,10 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { getInvoices } from '@/services/invoices'
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table'
-import { DataTablePagination, DataTableFacetedFilter, DataTableViewOptions } from '@/components/data-table'
-import { Input } from '@/components/ui/input'
-import { CheckCircle2, Clock, XCircle, DollarSign } from 'lucide-react'
+  DataTablePagination, DataTableFacetedFilter, DataTableViewOptions,
+} from '@/components/data-table'
+import { InputBase } from '@/components/base/input/input'
+import { CheckCircle, Clock, XCircle, CurrencyDollar, SearchMd } from '@untitledui/icons'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { MobileCardView } from '@/components/data-table/mobile-card-view'
 import { EmptyState } from '@/components/empty-state'
@@ -77,11 +76,13 @@ export function InvoicesTable() {
   return (
     <div className='space-y-4'>
       <div className='flex flex-wrap items-center gap-2'>
-        <Input
+        <InputBase
+          size='sm'
+          icon={SearchMd}
           placeholder='Tìm mã hóa đơn, khách hàng...'
           value={(table.getColumn('customerName')?.getFilterValue() as string) ?? ''}
           onChange={(e) => table.getColumn('customerName')?.setFilterValue(e.target.value)}
-          className={isMobile ? 'h-8 w-full' : 'h-8 w-[250px]'}
+          wrapperClassName={isMobile ? 'w-full' : 'w-[250px]'}
         />
         {!isMobile && table.getColumn('status') && (
           <DataTableFacetedFilter
@@ -93,11 +94,11 @@ export function InvoicesTable() {
         {!isMobile && <DataTableViewOptions table={table} />}
       </div>
 
-      <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground'>
-        <span className='flex items-center gap-1'><CheckCircle2 className='h-3 w-3 text-success' />Đã TT</span>
-        <span className='flex items-center gap-1'><DollarSign className='h-3 w-3 text-destructive' />Chưa TT</span>
-        <span className='flex items-center gap-1'><Clock className='h-3 w-3 text-warning' />Đang xử lý</span>
-        <span className='flex items-center gap-1'><XCircle className='h-3 w-3 text-destructive' />Đã hủy</span>
+      <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-tertiary'>
+        <span className='flex items-center gap-1'><CheckCircle className='size-3 text-fg-success-primary' />Đã TT</span>
+        <span className='flex items-center gap-1'><CurrencyDollar className='size-3 text-fg-error-primary' />Chưa TT</span>
+        <span className='flex items-center gap-1'><Clock className='size-3 text-fg-warning-primary' />Đang xử lý</span>
+        <span className='flex items-center gap-1'><XCircle className='size-3 text-fg-quaternary' />Đã hủy</span>
       </div>
 
       {isMobile ? (
@@ -109,41 +110,46 @@ export function InvoicesTable() {
           onToggle={(id) => setExpandedId(expandedId === id ? null : id)}
         />
       ) : (
-        <div className='rounded-md border'>
-          <Table>
-            <TableHeader>
+        <div className='overflow-x-auto rounded-lg bg-primary ring-1 ring-secondary ring-inset'>
+          <table className='w-full caption-bottom text-sm'>
+            <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
+                <tr key={headerGroup.id} className='border-b border-secondary bg-secondary'>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className='whitespace-nowrap' aria-sort={getColumnAriaSort(header.column)}>
+                    <th
+                      key={header.id}
+                      scope='col'
+                      className='h-9 px-3 text-start align-middle text-xs font-medium whitespace-nowrap text-tertiary'
+                      aria-sort={getColumnAriaSort(header.column)}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
+                    </th>
                   ))}
-                </TableRow>
+                </tr>
               ))}
-            </TableHeader>
-            <TableBody>
+            </thead>
+            <tbody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
+                  <tr key={row.id} className='border-b border-secondary transition-colors last:border-0 hover:bg-secondary/60'>
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                      <td key={cell.id} className='px-3 py-2 align-middle whitespace-nowrap text-primary'>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
+                      </td>
                     ))}
-                  </TableRow>
+                  </tr>
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className='h-24 text-center'>
+                <tr>
+                  <td colSpan={columns.length} className='h-24 text-center text-tertiary'>
                     Không có dữ liệu.
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               )}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
       )}
 
