@@ -63,6 +63,9 @@ export default defineConfig({
       enabled: true,
       provider: playwright(),
       instances: [{ browser: 'chromium', viewport: { width: 1280, height: 720 } }],
+      // 63315 is vitest's default and collides with other projects' browser
+      // test servers on this machine — override per run via env when needed.
+      api: { port: Number(process.env.VITEST_BROWSER_API_PORT) || 63315 },
     },
     coverage: {
       // include: ['src/**/*.{js,jsx,ts,tsx}'], // Uncomment to expand the report to all src/**/* so untested modules appear as 0% coverage.
