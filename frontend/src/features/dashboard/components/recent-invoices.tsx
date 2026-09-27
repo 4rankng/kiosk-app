@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { AlertCircle, CheckCircle, Clock, File02, XCircle } from '@untitledui/icons'
-import { getDashboardStats } from '@/services/reports'
+import { getDashboardStats, type DashboardStats } from '@/services/reports'
 import { formatCurrency } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { BadgeWithIcon } from '@/components/base/badges/badges'
@@ -15,6 +15,7 @@ const statusConfig = {
 } as const
 
 type StatusKey = keyof typeof statusConfig
+type RecentInvoice = DashboardStats['recentInvoices'][number]
 
 function StatusBadge({ status, isPaid }: { status: string; isPaid: boolean }) {
   const key: StatusKey = status === 'cancelled'
@@ -35,6 +36,38 @@ function StatusBadge({ status, isPaid }: { status: string; isPaid: boolean }) {
     >
       {config.label}
     </BadgeWithIcon>
+  )
+}
+
+function formatInvoiceTime(date: string): string {
+  return new Date(date).toLocaleTimeString('vi-VN', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function RecentInvoiceRow({ invoice }: { invoice: RecentInvoice }) {
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-3 py-2.5 first:pt-0 last:pb-0',
+        invoice.status === 'cancelled' && 'opacity-50',
+      )}
+    >
+      <span className='shrink-0 font-mono text-xs text-tertiary tabular-nums'>
+        {invoice.code}
+      </span>
+      <span className='min-w-0 flex-1 truncate text-sm text-primary'>
+        {invoice.customerName}
+      </span>
+      <span className='shrink-0 text-sm font-medium text-primary tabular-nums'>
+        {formatCurrency(invoice.total)}
+      </span>
+      <StatusBadge status={invoice.status} isPaid={invoice.isPaid} />
+      <span className='shrink-0 text-xs text-tertiary tabular-nums'>
+        {formatInvoiceTime(invoice.date)}
+      </span>
+    </div>
   )
 }
 
@@ -81,35 +114,9 @@ export function RecentInvoices() {
   return (
     <WidgetCard title='Hóa đơn gần đây'>
       <div className='divide-y divide-primary'>
-        {invoices.map((inv) => {
-          const time = new Date(inv.date).toLocaleTimeString('vi-VN', {
-            hour: '2-digit',
-            minute: '2-digit',
-          })
-          return (
-            <div
-              key={inv.code}
-              className={cn(
-                'flex items-center gap-3 py-2.5 first:pt-0 last:pb-0',
-                inv.status === 'cancelled' && 'opacity-50',
-              )}
-            >
-              <span className='shrink-0 font-mono text-xs text-tertiary tabular-nums'>
-                {inv.code}
-              </span>
-              <span className='min-w-0 flex-1 truncate text-sm text-primary'>
-                {inv.customerName}
-              </span>
-              <span className='shrink-0 text-sm font-medium text-primary tabular-nums'>
-                {formatCurrency(inv.total)}
-              </span>
-              <StatusBadge status={inv.status} isPaid={inv.isPaid} />
-              <span className='shrink-0 text-xs text-tertiary tabular-nums'>
-                {time}
-              </span>
-            </div>
-          )
-        })}
+        {invoices.map((inv) => (
+          <RecentInvoiceRow key={inv.code} invoice={inv} />
+        ))}
       </div>
     </WidgetCard>
   )

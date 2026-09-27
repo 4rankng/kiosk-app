@@ -7,7 +7,7 @@ import { Search } from '@/components/search'
 import { NotificationBell } from '@/components/notification-bell'
 import { useQuery } from '@tanstack/react-query'
 import { Users01, CurrencyDollar, AlertCircle, File02 } from '@untitledui/icons'
-import { getCustomerReport } from '@/services/reports'
+import { getCustomerReport, type CustomerReportRow } from '@/services/reports'
 import { getCompanies } from '@/services/companies'
 import { Button } from '@/components/base/buttons/button'
 import { Label } from '@/components/base/input/label'
@@ -19,12 +19,58 @@ import { ExportActions } from './components/export-actions'
 import { EmptyState } from '@/components/empty-state'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { formatCurrency } from '@/lib/format'
+import { ReportKpiCard } from '@/features/reports/components/report-kpi-card'
 
 const DATE_INPUT_CLASS = [
   'h-9 w-full rounded-lg bg-primary px-3 text-sm text-primary shadow-xs',
   'ring-1 ring-primary ring-inset outline-hidden transition duration-100 ease-linear',
   'placeholder:text-placeholder focus:ring-2 focus:ring-brand',
 ].join(' ')
+
+/** Roll the report rows up into the three summary KPI values. */
+function summarizeCustomerReport(rows: CustomerReportRow[]) {
+  return rows.reduce(
+    (acc, r) => ({
+      revenue: acc.revenue + r.totalRevenue,
+      unpaid: acc.unpaid + r.unpaidAmount,
+      customers: acc.customers + 1,
+    }),
+    { revenue: 0, unpaid: 0, customers: 0 },
+  )
+}
+
+/** The three summary KPI cards above the report table. */
+function CustomerReportKpis({
+  summary,
+}: {
+  summary: ReturnType<typeof summarizeCustomerReport>
+}) {
+  return (
+    <div className='grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4'>
+      <ReportKpiCard
+        icon={Users01}
+        label='Khách hàng giao dịch'
+        value={summary.customers}
+        hint='đối tác trong kỳ'
+      />
+      <ReportKpiCard
+        icon={CurrencyDollar}
+        label='Tổng tiền hàng'
+        value={formatCurrency(summary.revenue)}
+        hint='tổng doanh thu phát sinh'
+      />
+      <ReportKpiCard
+        icon={AlertCircle}
+        label='Tiền chưa thu (Công nợ)'
+        value={formatCurrency(summary.unpaid)}
+        hint='cần đối chiếu thu nợ'
+        labelClassName='text-warning-primary'
+        valueClassName='text-warning-primary'
+        iconClassName='text-fg-warning-secondary'
+      />
+    </div>
+  )
+}
 
 export function CustomerReport() {
   useDocumentTitle('Báo cáo công nợ khách hàng')
@@ -43,16 +89,7 @@ export function CustomerReport() {
     queryFn: () => getCustomerReport(startDate, endDate, companyId === 'all' ? undefined : companyId),
   })
 
-  const summary = useMemo(() => {
-    return reportData.reduce(
-      (acc, r) => ({
-        revenue: acc.revenue + r.totalRevenue,
-        unpaid: acc.unpaid + r.unpaidAmount,
-        customers: acc.customers + 1,
-      }),
-      { revenue: 0, unpaid: 0, customers: 0 },
-    )
-  }, [reportData])
+  const summary = useMemo(() => summarizeCustomerReport(reportData), [reportData])
 
   const activeCompanyName = companyId === 'all' ? 'tat-ca' : companies.find((c) => c.id === companyId)?.name ?? 'tat-ca'
 
@@ -135,40 +172,7 @@ export function CustomerReport() {
         {/* Content with summary KPIs */}
         {!isLoading && reportData.length > 0 && (
           <div className='space-y-4'>
-            <div className='grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4'>
-              <div className='rounded-lg border border-primary bg-primary p-4'>
-                <div className='flex items-center justify-between'>
-                  <span className='text-sm font-medium text-tertiary'>Khách hàng giao dịch</span>
-                  <Users01 className='size-4 text-fg-quaternary' />
-                </div>
-                <div className='mt-2 font-heading text-display-md font-semibold tabular-nums text-primary'>
-                  {summary.customers}
-                </div>
-                <p className='mt-1 text-xs text-tertiary'>đối tác trong kỳ</p>
-              </div>
-
-              <div className='rounded-lg border border-primary bg-primary p-4'>
-                <div className='flex items-center justify-between'>
-                  <span className='text-sm font-medium text-tertiary'>Tổng tiền hàng</span>
-                  <CurrencyDollar className='size-4 text-fg-quaternary' />
-                </div>
-                <div className='mt-2 font-heading text-display-md font-semibold tabular-nums text-primary'>
-                  {formatCurrency(summary.revenue)}
-                </div>
-                <p className='mt-1 text-xs text-tertiary'>tổng doanh thu phát sinh</p>
-              </div>
-
-              <div className='rounded-lg border border-primary bg-primary p-4'>
-                <div className='flex items-center justify-between'>
-                  <span className='text-sm font-medium text-warning-primary'>Tiền chưa thu (Công nợ)</span>
-                  <AlertCircle className='size-4 text-fg-warning-secondary' />
-                </div>
-                <div className='mt-2 font-heading text-display-md font-semibold text-warning-primary tabular-nums'>
-                  {formatCurrency(summary.unpaid)}
-                </div>
-                <p className='mt-1 text-xs text-tertiary'>cần đối chiếu thu nợ</p>
-              </div>
-            </div>
+            <CustomerReportKpis summary={summary} />
 
             <ExportActions data={reportData} companyName={activeCompanyName} />
             <CustomerReportTable data={reportData} />

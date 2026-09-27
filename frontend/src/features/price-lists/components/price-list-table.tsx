@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Save01, SearchMd } from '@untitledui/icons'
 import { bulkUpsertPriceListItems } from '@/services/price-lists'
@@ -9,10 +9,61 @@ import { NumberInput } from '@/components/number-input'
 import { Button } from '@/components/base/buttons/button'
 import { toast } from 'sonner'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { PriceListMobile } from './price-list-mobile'
 
 interface PriceListTableProps {
   priceList: PriceList
   items: PriceListItem[]
+}
+
+/** Desktop editable table of price list items. */
+function PriceListDesktopTable({
+  items,
+  onUpdatePrice,
+}: {
+  items: PriceListItem[]
+  onUpdatePrice: (productId: string, price: number) => void
+}) {
+  return (
+    <div className='overflow-hidden rounded-xl bg-primary shadow-xs ring-1 ring-secondary ring-inset'>
+      <table className='w-full text-sm'>
+        <thead>
+          <tr className='bg-secondary'>
+            <th scope='col' className='w-[100px] px-3 py-2.5 text-start text-xs font-medium text-tertiary'>Mã hàng</th>
+            <th scope='col' className='px-3 py-2.5 text-start text-xs font-medium text-tertiary'>Tên mặt hàng</th>
+            <th scope='col' className='w-[130px] px-3 py-2.5 text-end text-xs font-medium text-tertiary'>Giá gốc</th>
+            <th scope='col' className='w-[160px] px-3 py-2.5 text-end text-xs font-medium text-tertiary'>Giá tùy chỉnh</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => (
+            <tr key={item.productId} className='border-b border-secondary transition-colors last:border-b-0 hover:bg-primary_hover'>
+              <td className='px-3 py-2.5 font-mono text-sm'>{item.code}</td>
+              <td className='px-3 py-2.5'>
+                {item.name}
+                <span className='ml-2 text-xs text-tertiary'>({item.unit})</span>
+              </td>
+              <td className='px-3 py-2.5 text-end text-tertiary tabular-nums'>{formatCurrency(item.basePrice)}</td>
+              <td className='px-3 py-2.5 text-end'>
+                <div className='flex justify-end'>
+                  <NumberInput
+                    value={item.customPrice}
+                    onValueChange={(val) => onUpdatePrice(item.productId, val)}
+                    className='w-[130px]'
+                  />
+                </div>
+              </td>
+            </tr>
+          ))}
+          {items.length === 0 && (
+            <tr>
+              <td colSpan={4} className='h-24 text-center text-tertiary'>Không tìm thấy mặt hàng.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  )
 }
 
 export function PriceListTable({ priceList, items: initialItems }: PriceListTableProps) {
@@ -78,49 +129,15 @@ export function PriceListTable({ priceList, items: initialItems }: PriceListTabl
       </div>
 
       {isMobile ? (
-        <MobilePriceList
+        <PriceListMobile
           items={filteredItems}
           onUpdatePrice={updateCustomPrice}
         />
       ) : (
-        <div className='overflow-hidden rounded-xl bg-primary shadow-xs ring-1 ring-secondary ring-inset'>
-          <table className='w-full text-sm'>
-            <thead>
-              <tr className='bg-secondary'>
-                <th scope='col' className='w-[100px] px-3 py-2.5 text-start text-xs font-medium text-tertiary'>Mã hàng</th>
-                <th scope='col' className='px-3 py-2.5 text-start text-xs font-medium text-tertiary'>Tên mặt hàng</th>
-                <th scope='col' className='w-[130px] px-3 py-2.5 text-end text-xs font-medium text-tertiary'>Giá gốc</th>
-                <th scope='col' className='w-[160px] px-3 py-2.5 text-end text-xs font-medium text-tertiary'>Giá tùy chỉnh</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredItems.map((item) => (
-                <tr key={item.productId} className='border-b border-secondary transition-colors last:border-b-0 hover:bg-primary_hover'>
-                  <td className='px-3 py-2.5 font-mono text-sm'>{item.code}</td>
-                  <td className='px-3 py-2.5'>
-                    {item.name}
-                    <span className='ml-2 text-xs text-tertiary'>({item.unit})</span>
-                  </td>
-                  <td className='px-3 py-2.5 text-end text-tertiary tabular-nums'>{formatCurrency(item.basePrice)}</td>
-                  <td className='px-3 py-2.5 text-end'>
-                    <div className='flex justify-end'>
-                      <NumberInput
-                        value={item.customPrice}
-                        onValueChange={(val) => updateCustomPrice(item.productId, val)}
-                        className='w-[130px]'
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filteredItems.length === 0 && (
-                <tr>
-                  <td colSpan={4} className='h-24 text-center text-tertiary'>Không tìm thấy mặt hàng.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <PriceListDesktopTable
+          items={filteredItems}
+          onUpdatePrice={updateCustomPrice}
+        />
       )}
 
       <div className='flex justify-end'>
@@ -128,88 +145,6 @@ export function PriceListTable({ priceList, items: initialItems }: PriceListTabl
           {saveMutation.isPending ? 'Đang lưu...' : 'Lưu bảng giá'}
         </Button>
       </div>
-    </div>
-  )
-}
-
-/** Mobile card list for price list items — each card shows product info + editable price */
-function MobilePriceList({
-  items,
-  onUpdatePrice,
-}: {
-  items: PriceListItem[]
-  onUpdatePrice: (productId: string, price: number) => void
-}) {
-  const batchSize = 20
-  const [visibleCount, setVisibleCount] = useState(batchSize)
-  const [prevLength, setPrevLength] = useState(items.length)
-  const sentinelRef = useRef<HTMLDivElement>(null)
-
-  // Reset visible count when the dataset changes (adjusting state during render
-  // avoids a cascading setState-in-effect render).
-  if (items.length !== prevLength) {
-    setPrevLength(items.length)
-    setVisibleCount(batchSize)
-  }
-
-  // Infinite scroll observer
-  useEffect(() => {
-    if (!sentinelRef.current) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisibleCount((prev) => Math.min(prev + batchSize, items.length))
-        }
-      },
-      { rootMargin: '200px' }
-    )
-    observer.observe(sentinelRef.current)
-    return () => observer.disconnect()
-  }, [items.length])
-
-  const visibleItems = items.slice(0, visibleCount)
-
-  if (items.length === 0) {
-    return (
-      <div className='flex h-24 items-center justify-center text-sm text-tertiary'>
-        Không tìm thấy mặt hàng.
-      </div>
-    )
-  }
-
-  return (
-    <div className='space-y-2'>
-      {visibleItems.map((item) => (
-        <div
-          key={item.productId}
-          className='rounded-xl bg-primary shadow-xs ring-1 ring-secondary ring-inset p-3 space-y-2'
-        >
-          <div className='flex items-start justify-between gap-2'>
-            <div className='min-w-0 flex-1'>
-              <p className='truncate text-sm font-medium'>{item.name}</p>
-              <p className='text-xs text-tertiary'>
-                {item.code} · {item.unit}
-              </p>
-            </div>
-            <span className='shrink-0 text-xs text-tertiary tabular-nums'>
-              Giá gốc: {formatCurrency(item.basePrice)}
-            </span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <span className='shrink-0 text-xs text-tertiary'>Giá bán:</span>
-            <NumberInput
-              value={item.customPrice}
-              onValueChange={(val) => onUpdatePrice(item.productId, val)}
-              className='flex-1'
-            />
-          </div>
-        </div>
-      ))}
-      {visibleCount < items.length && (
-        <div ref={sentinelRef} className='flex justify-center py-4'>
-          <span className='text-sm text-tertiary'>Đang tải...</span>
-        </div>
-      )}
     </div>
   )
 }

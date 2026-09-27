@@ -11,18 +11,25 @@ interface OrderLineItemProps {
   onRemove?: (productId: string) => void
 }
 
+/** Header row of a line item: product name (unit) on the left, line total on the right. */
+function LineItemHeader({ item }: { item: OrderItem }) {
+  return (
+    <div className='flex items-center justify-between gap-2'>
+      <span className='truncate text-sm font-medium text-primary'>
+        {item.productName}
+        <span className='ml-1 text-xs text-tertiary'>({item.unit})</span>
+      </span>
+      <span className='whitespace-nowrap text-sm font-semibold text-brand-secondary tabular-nums'>
+        {formatCurrency(item.total)}
+      </span>
+    </div>
+  )
+}
+
 export function OrderLineItem({ item, onUpdateQuantity, onUpdatePrice, onRemove }: OrderLineItemProps) {
   return (
     <div className='space-y-2 overflow-hidden rounded-xl bg-primary p-3 ring-1 ring-secondary_alt'>
-      <div className='flex items-center justify-between gap-2'>
-        <span className='truncate text-sm font-medium text-primary'>
-          {item.productName}
-          <span className='ml-1 text-xs text-tertiary'>({item.unit})</span>
-        </span>
-        <span className='whitespace-nowrap text-sm font-semibold text-brand-secondary tabular-nums'>
-          {formatCurrency(item.total)}
-        </span>
-      </div>
+      <LineItemHeader item={item} />
 
       <div className='flex items-center gap-1.5'>
         <Button

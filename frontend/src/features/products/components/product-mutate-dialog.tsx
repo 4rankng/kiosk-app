@@ -9,12 +9,60 @@ import { productSchema, type ProductSchema } from '../data/schema'
 import { useProductsContext } from './products-provider'
 import { Dialog, Modal, ModalOverlay } from '@/components/application/modals/modal'
 import { Button } from '@/components/base/buttons/button'
-import { InputBase } from '@/components/base/input/input'
-import { Label } from '@/components/base/input/label'
-import { TextAreaBase } from '@/components/base/textarea/textarea'
-import { InlineAddCombobox } from '@/components/inline-add-combobox'
-import { NumberInput } from '@/components/number-input'
 import { toast } from 'sonner'
+import { ProductFormFields } from './product-form-fields'
+
+/** Default (empty or selected-product) values for the product form. */
+function getProductFormDefaults(
+  isEdit: boolean,
+  selectedProduct: {
+    code?: string
+    name?: string
+    categoryName?: string | null
+    unitName?: string | null
+    description?: string | null
+    purchasePrice?: number
+    defaultSalePrice: number
+  } | null
+): ProductSchema {
+  if (isEdit && selectedProduct) {
+    return {
+      code: selectedProduct.code ?? '',
+      name: selectedProduct.name ?? '',
+      category: selectedProduct.categoryName ?? '',
+      unit: selectedProduct.unitName ?? '',
+      description: selectedProduct.description ?? '',
+      purchasePrice: selectedProduct.purchasePrice ?? 0,
+      defaultSalePrice: selectedProduct.defaultSalePrice ?? 0,
+    }
+  }
+  return {
+    code: '',
+    name: '',
+    category: '',
+    unit: '',
+    description: '',
+    purchasePrice: 0,
+    defaultSalePrice: 0,
+  }
+}
+
+/** Map form values onto the API payload, resolving category/unit names to IDs. */
+function buildProductPayload(
+  values: ProductSchema,
+  categories: Array<{ id: string; name: string }>,
+  units: Array<{ id: string; name: string }>
+) {
+  return {
+    code: values.code,
+    name: values.name,
+    description: values.description,
+    categoryId: categories.find((c) => c.name === values.category)?.id ?? null,
+    unitId: units.find((u) => u.name === values.unit)?.id ?? null,
+    purchasePrice: values.purchasePrice,
+    defaultSalePrice: values.defaultSalePrice,
+  }
+}
 
 export function ProductMutateDialog() {
   const { open, setOpen, selectedProduct } = useProductsContext()
@@ -31,42 +79,20 @@ export function ProductMutateDialog() {
 
   const form = useForm<ProductSchema>({
     resolver: zodResolver(productSchema),
-    defaultValues: isEdit
-      ? { code: selectedProduct?.code ?? '', name: selectedProduct?.name ?? '', category: selectedProduct?.categoryName ?? '', unit: selectedProduct?.unitName ?? '', description: selectedProduct?.description ?? '', purchasePrice: selectedProduct?.purchasePrice ?? 0, defaultSalePrice: selectedProduct?.defaultSalePrice ?? 0 }
-      : { code: '', name: '', category: '', unit: '', description: '', purchasePrice: 0, defaultSalePrice: 0 },
+    defaultValues: getProductFormDefaults(isEdit, selectedProduct),
   })
 
   // Reset form when dialog opens with new product data
   useEffect(() => {
-    if (open === 'edit' && selectedProduct) {
-      form.reset({
-        code: selectedProduct.code ?? '',
-        name: selectedProduct.name ?? '',
-        category: selectedProduct.categoryName ?? '',
-        unit: selectedProduct.unitName ?? '',
-        description: selectedProduct.description ?? '',
-        purchasePrice: selectedProduct.purchasePrice ?? 0,
-        defaultSalePrice: selectedProduct.defaultSalePrice ?? 0,
-      })
-    } else if (open === 'add') {
-      form.reset({ code: '', name: '', category: '', unit: '', description: '', purchasePrice: 0, defaultSalePrice: 0 })
+    if (open === 'edit' || open === 'add') {
+      form.reset(getProductFormDefaults(isEdit, selectedProduct))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, selectedProduct])
 
   const mutation = useMutation({
     mutationFn: (values: ProductSchema) => {
-      // Resolve category/unit names to IDs
-      const categoryId = categories.find((c) => c.name === values.category)?.id ?? null
-      const unitId = units.find((u) => u.name === values.unit)?.id ?? null
-      const payload = {
-        code: values.code,
-        name: values.name,
-        description: values.description,
-        categoryId,
-        unitId,
-        purchasePrice: values.purchasePrice,
-        defaultSalePrice: values.defaultSalePrice,
-      }
+      const payload = buildProductPayload(values, categories, units)
       return isEdit && selectedProduct
         ? updateProduct(selectedProduct.id, payload)
         : createProduct(payload)
@@ -96,66 +122,13 @@ export function ProductMutateDialog() {
   const submitLabel = isEdit ? 'Cập nhật' : 'Tạo mới'
 
   const formFields = (
-    <>
-      <div className='flex flex-col gap-4'>
-        <div className='flex flex-col gap-1.5'>
-          <Label htmlFor='code'>Mã hàng</Label>
-          <InputBase id='code' {...form.register('code')} isInvalid={!!form.formState.errors.code} />
-          {form.formState.errors.code && (
-            <p className='text-xs text-error-primary'>{form.formState.errors.code.message}</p>
-          )}
-        </div>
-        <div className='flex flex-col gap-1.5'>
-          <Label htmlFor='name'>Tên sản phẩm</Label>
-          <InputBase id='name' {...form.register('name')} isInvalid={!!form.formState.errors.name} />
-          {form.formState.errors.name && (
-            <p className='text-xs text-error-primary'>{form.formState.errors.name.message}</p>
-          )}
-        </div>
-      </div>
-      <div className='grid grid-cols-1 gap-3'>
-        <div className='flex flex-col gap-1.5'>
-          <Label>Nhóm hàng</Label>
-          <InlineAddCombobox
-            options={categoryOptions}
-            value={form.watch('category')}
-            onChange={(val) => form.setValue('category', val, { shouldValidate: true })}
-            onCreate={handleCreateCategory}
-            placeholder='Chọn nhóm...'
-          />
-          {form.formState.errors.category && (
-            <p className='text-xs text-error-primary'>{form.formState.errors.category.message}</p>
-          )}
-        </div>
-        <div className='flex flex-col gap-1.5'>
-          <Label>Đơn vị</Label>
-          <InlineAddCombobox
-            options={unitOptions}
-            value={form.watch('unit')}
-            onChange={(val) => form.setValue('unit', val, { shouldValidate: true })}
-            onCreate={handleCreateUnit}
-            placeholder='Chọn ĐVT...'
-          />
-          {form.formState.errors.unit && (
-            <p className='text-xs text-error-primary'>{form.formState.errors.unit.message}</p>
-          )}
-        </div>
-      </div>
-      <div className='flex flex-col gap-1.5'>
-        <Label htmlFor='description'>Mô tả</Label>
-        <TextAreaBase id='description' {...form.register('description')} placeholder='Mô tả sản phẩm...' />
-      </div>
-      <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
-        <div className='flex flex-col gap-1.5'>
-          <Label htmlFor='purchasePrice'>Giá nhập</Label>
-          <NumberInput id='purchasePrice' value={form.watch('purchasePrice') ?? 0} onValueChange={(v) => form.setValue('purchasePrice', v, { shouldValidate: true })} />
-        </div>
-        <div className='flex flex-col gap-1.5'>
-          <Label htmlFor='defaultSalePrice'>Giá bán</Label>
-          <NumberInput id='defaultSalePrice' value={form.watch('defaultSalePrice') ?? 0} onValueChange={(v) => form.setValue('defaultSalePrice', v, { shouldValidate: true })} />
-        </div>
-      </div>
-    </>
+    <ProductFormFields
+      form={form}
+      categoryOptions={categoryOptions}
+      unitOptions={unitOptions}
+      onCreateCategory={handleCreateCategory}
+      onCreateUnit={handleCreateUnit}
+    />
   )
 
   return (
