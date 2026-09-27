@@ -92,6 +92,130 @@ async function queryOne<R = Record<string, unknown>>(queryStr: ReturnType<typeof
 }
 
 // ---------------------------------------------------------------------------
+//  Dashboard aggregate queries — one per getDashboard fetch
+// ---------------------------------------------------------------------------
+async function fetchTodayAgg(from: Date, to: Date) {
+  return queryOne<TodayAgg>(sql`
+    SELECT COALESCE(SUM(total), 0)::float AS revenue,
+           COUNT(*)::int AS orders,
+           COALESCE(SUM(CASE WHEN paid_amount >= total THEN total ELSE paid_amount END), 0)::float AS paid,
+           COALESCE(SUM(CASE WHEN paid_amount < total THEN total - paid_amount ELSE 0 END), 0)::float AS unpaid
+    FROM invoices
+    WHERE status = 'completed' AND issued_at BETWEEN ${from.toISOString()} AND ${to.toISOString()}
+  `)
+}
+
+async function fetchYesterdayAgg(from: Date, to: Date) {
+  return queryOne<DayAgg>(sql`
+    SELECT COALESCE(SUM(total), 0)::float AS revenue,
+           COUNT(*)::int AS orders
+    FROM invoices
+    WHERE status = 'completed' AND issued_at BETWEEN ${from.toISOString()} AND ${to.toISOString()}
+  `)
+}
+
+async function fetchPendingOrdersCount(from: Date, to: Date) {
+  return queryOne<CountAgg>(sql`
+    SELECT COUNT(*)::int AS count
+    FROM orders
+    WHERE status = 'draft' AND created_at BETWEEN ${from.toISOString()} AND ${to.toISOString()}
+  `)
+}
+
+async function fetchMonthRevenueAgg(monthStart: Date) {
+  return queryOne<SumAgg>(sql`
+    SELECT COALESCE(SUM(total), 0)::float AS revenue
+    FROM invoices
+    WHERE status = 'completed' AND issued_at >= ${monthStart.toISOString()}
+  `)
+}
+
+async function fetchWeekRevenueRows(monthStart: Date) {
+  return query<WeekRow>(sql`
+    SELECT date_trunc('week', issued_at) AS week,
+           COALESCE(SUM(total), 0)::float AS revenue
+    FROM invoices
+    WHERE status = 'completed' AND issued_at >= ${monthStart.toISOString()}
+    GROUP BY 1
+    ORDER BY 1
+  `)
+}
+
+async function fetchTopCustomers(monthStart: Date) {
+  return query<TopCustomerRow>(sql`
+    SELECT c.name,
+           COALESCE(SUM(i.total), 0)::float AS revenue
+    FROM invoices i
+    JOIN customers c ON c.id = i.customer_id
+    WHERE i.status = 'completed' AND i.issued_at >= ${monthStart.toISOString()}
+    GROUP BY c.name
+    ORDER BY revenue DESC
+    LIMIT 10
+  `)
+}
+
+async function fetchTopProducts(monthStart: Date) {
+  return query<TopProductRow>(sql`
+    SELECT p.name, u.name AS unit,
+           COALESCE(SUM(oi.quantity::numeric), 0)::float AS quantity,
+           COALESCE(SUM(oi.total_price), 0)::float AS revenue
+    FROM order_items oi
+    JOIN orders o ON o.id = oi.order_id
+    JOIN invoices i ON i.order_id = o.id
+    JOIN products p ON p.id = oi.product_id
+    LEFT JOIN units u ON u.id = p.unit_id
+    WHERE i.status = 'completed' AND i.issued_at >= ${monthStart.toISOString()}
+    GROUP BY p.name, u.name
+    ORDER BY quantity DESC
+    LIMIT 5
+  `)
+}
+
+async function fetchOutstandingDebts() {
+  return query<DebtRow>(sql`
+    SELECT c.name AS customer_name,
+           COALESCE(SUM(i.total - i.paid_amount), 0)::float AS amount
+    FROM invoices i
+    JOIN customers c ON c.id = i.customer_id
+    WHERE i.status = 'completed' AND i.paid_amount < i.total
+    GROUP BY c.name
+    ORDER BY amount DESC
+    LIMIT 5
+  `)
+}
+
+async function fetchRecentInvoices() {
+  return query<RecentInvoiceRow>(sql`
+    SELECT i.code, c.name AS customer_name, i.total, i.status, i.paid_amount,
+           (i.paid_amount >= i.total) AS is_paid,
+           i.issued_at
+    FROM invoices i
+    JOIN customers c ON c.id = i.customer_id
+    ORDER BY i.issued_at DESC
+    LIMIT 5
+  `)
+}
+
+/** Bucket a month's weekly revenue rows into 4 labeled week buckets. */
+function buildWeekBuckets(weekRows: WeekRow[], today: Date) {
+  const year = today.getFullYear()
+  const month = today.getMonth() + 1
+  const daysInMonth = new Date(year, month, 0).getDate()
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  const weekLabels = [1, 8, 15, 22].map((s) => {
+    const e = Math.min(s + 6, daysInMonth)
+    return `${pad(s)}/${pad(month)}-${pad(e)}/${pad(month)}`
+  })
+  const weekBuckets = [0, 0, 0, 0]
+  for (const row of weekRows) {
+    const day = new Date(row.week).getDate()
+    const idx = Math.min(Math.floor((day - 1) / 7), 3)
+    weekBuckets[idx] = (weekBuckets[idx] ?? 0) + Number(row.revenue)
+  }
+  return weekBuckets.map((revenue, i) => ({ week: weekLabels[i]!, revenue }))
+}
+
+// ---------------------------------------------------------------------------
 //  Cache keys + TTLs
 // ---------------------------------------------------------------------------
 const DASHBOARD_CACHE_KEY = 'cache:dashboard'
@@ -122,97 +246,16 @@ export const reportService = {
 
     const [todayAgg, yesterdayAgg, pendingAgg, , weekRows, topCustomers, topProducts, outstandingRows, recentInvoices] =
       await Promise.all([
-        queryOne<TodayAgg>(sql`
-          SELECT COALESCE(SUM(total), 0)::float AS revenue,
-                 COUNT(*)::int AS orders,
-                 COALESCE(SUM(CASE WHEN paid_amount >= total THEN total ELSE paid_amount END), 0)::float AS paid,
-                 COALESCE(SUM(CASE WHEN paid_amount < total THEN total - paid_amount ELSE 0 END), 0)::float AS unpaid
-          FROM invoices
-          WHERE status = 'completed' AND issued_at BETWEEN ${today.toISOString()} AND ${todayEnd.toISOString()}
-        `),
-        queryOne<DayAgg>(sql`
-          SELECT COALESCE(SUM(total), 0)::float AS revenue,
-                 COUNT(*)::int AS orders
-          FROM invoices
-          WHERE status = 'completed' AND issued_at BETWEEN ${yesterday.toISOString()} AND ${yesterdayEnd.toISOString()}
-        `),
-        queryOne<CountAgg>(sql`
-          SELECT COUNT(*)::int AS count
-          FROM orders
-          WHERE status = 'draft' AND created_at BETWEEN ${today.toISOString()} AND ${todayEnd.toISOString()}
-        `),
-        queryOne<SumAgg>(sql`
-          SELECT COALESCE(SUM(total), 0)::float AS revenue
-          FROM invoices
-          WHERE status = 'completed' AND issued_at >= ${monthStart.toISOString()}
-        `),
-        query<WeekRow>(sql`
-          SELECT date_trunc('week', issued_at) AS week,
-                 COALESCE(SUM(total), 0)::float AS revenue
-          FROM invoices
-          WHERE status = 'completed' AND issued_at >= ${monthStart.toISOString()}
-          GROUP BY 1
-          ORDER BY 1
-        `),
-        query<TopCustomerRow>(sql`
-          SELECT c.name,
-                 COALESCE(SUM(i.total), 0)::float AS revenue
-          FROM invoices i
-          JOIN customers c ON c.id = i.customer_id
-          WHERE i.status = 'completed' AND i.issued_at >= ${monthStart.toISOString()}
-          GROUP BY c.name
-          ORDER BY revenue DESC
-          LIMIT 10
-        `),
-        query<TopProductRow>(sql`
-          SELECT p.name, u.name AS unit,
-                 COALESCE(SUM(oi.quantity::numeric), 0)::float AS quantity,
-                 COALESCE(SUM(oi.total_price), 0)::float AS revenue
-          FROM order_items oi
-          JOIN orders o ON o.id = oi.order_id
-          JOIN invoices i ON i.order_id = o.id
-          JOIN products p ON p.id = oi.product_id
-          LEFT JOIN units u ON u.id = p.unit_id
-          WHERE i.status = 'completed' AND i.issued_at >= ${monthStart.toISOString()}
-          GROUP BY p.name, u.name
-          ORDER BY quantity DESC
-          LIMIT 5
-        `),
-        query<DebtRow>(sql`
-          SELECT c.name AS customer_name,
-                 COALESCE(SUM(i.total - i.paid_amount), 0)::float AS amount
-          FROM invoices i
-          JOIN customers c ON c.id = i.customer_id
-          WHERE i.status = 'completed' AND i.paid_amount < i.total
-          GROUP BY c.name
-          ORDER BY amount DESC
-          LIMIT 5
-        `),
-        query<RecentInvoiceRow>(sql`
-          SELECT i.code, c.name AS customer_name, i.total, i.status, i.paid_amount,
-                 (i.paid_amount >= i.total) AS is_paid,
-                 i.issued_at
-          FROM invoices i
-          JOIN customers c ON c.id = i.customer_id
-          ORDER BY i.issued_at DESC
-          LIMIT 5
-        `),
+        fetchTodayAgg(today, todayEnd),
+        fetchYesterdayAgg(yesterday, yesterdayEnd),
+        fetchPendingOrdersCount(today, todayEnd),
+        fetchMonthRevenueAgg(monthStart),
+        fetchWeekRevenueRows(monthStart),
+        fetchTopCustomers(monthStart),
+        fetchTopProducts(monthStart),
+        fetchOutstandingDebts(),
+        fetchRecentInvoices(),
       ])
-
-    const year = today.getFullYear()
-    const month = today.getMonth() + 1
-    const daysInMonth = new Date(year, month, 0).getDate()
-    const pad = (n: number) => n.toString().padStart(2, '0')
-    const weekLabels = [1, 8, 15, 22].map((s) => {
-      const e = Math.min(s + 6, daysInMonth)
-      return `${pad(s)}/${pad(month)}-${pad(e)}/${pad(month)}`
-    })
-    const weekBuckets = [0, 0, 0, 0]
-    for (const row of weekRows) {
-      const day = new Date(row.week).getDate()
-      const idx = Math.min(Math.floor((day - 1) / 7), 3)
-      weekBuckets[idx] = (weekBuckets[idx] ?? 0) + Number(row.revenue)
-    }
 
     const result = {
       todayRevenue: Number(todayAgg?.revenue) || 0,
@@ -222,7 +265,7 @@ export const reportService = {
       todayUnpaid: Number(todayAgg?.unpaid) || 0,
       yesterdayRevenue: Number(yesterdayAgg?.revenue) || 0,
       yesterdayOrders: Number(yesterdayAgg?.orders) || 0,
-      monthlyRevenue: weekBuckets.map((revenue, i) => ({ week: weekLabels[i]!, revenue })),
+      monthlyRevenue: buildWeekBuckets(weekRows, today),
       topCustomers: topCustomers.map((c, i) => ({ rank: i + 1, name: c.name, revenue: Number(c.revenue) })),
       topProducts: topProducts.map((p, i) => ({
         rank: i + 1,

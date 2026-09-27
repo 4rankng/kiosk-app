@@ -18,9 +18,9 @@ import { db, pool } from '../config/db.js'
 import { users } from '../db/schema/users.js'
 import { hashPassword } from '../lib/password.js'
 
-function parseArgs(): { email: string; password: string; name: string; role: 'admin' | 'staff' } {
-  const argv = process.argv.slice(2)
-  const fromArgs = Object.fromEntries(
+/** Parse `--key=value` CLI flags into a record (missing values become ''). */
+function parseFlags(argv: string[]): Record<string, string> {
+  return Object.fromEntries(
     argv
       .filter((a) => a.startsWith('--'))
       .map((a) => {
@@ -28,17 +28,27 @@ function parseArgs(): { email: string; password: string; name: string; role: 'ad
         return [k, v ?? '']
       })
   )
+}
+
+/** Validation rules for the bootstrap inputs; returns human-readable errors. */
+function collectArgErrors(args: { email: string; password: string; name: string; role: string }): string[] {
+  const errors: string[] = []
+  if (!args.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(args.email)) errors.push('--email must be a valid email address')
+  if (!args.password || args.password.length < 8) errors.push('--password must be at least 8 characters')
+  if (!args.name) errors.push('--name is required')
+  if (args.role !== 'admin' && args.role !== 'staff') errors.push('--role must be "admin" or "staff"')
+  return errors
+}
+
+function parseArgs(): { email: string; password: string; name: string; role: 'admin' | 'staff' } {
+  const fromArgs = parseFlags(process.argv.slice(2))
 
   const email = (fromArgs.email || process.env.BOOTSTRAP_ADMIN_EMAIL || '').toLowerCase().trim()
   const password = fromArgs.password || process.env.BOOTSTRAP_ADMIN_PASSWORD || ''
   const name = fromArgs.name || process.env.BOOTSTRAP_ADMIN_NAME || ''
   const role = (fromArgs.role as 'admin' | 'staff') || (process.env.BOOTSTRAP_ADMIN_ROLE as 'admin' | 'staff') || 'admin'
 
-  const errors: string[] = []
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('--email must be a valid email address')
-  if (!password || password.length < 8) errors.push('--password must be at least 8 characters')
-  if (!name) errors.push('--name is required')
-  if (role !== 'admin' && role !== 'staff') errors.push('--role must be "admin" or "staff"')
+  const errors = collectArgErrors({ email, password, name, role })
   if (errors.length > 0) {
     console.error('❌ Invalid arguments:')
     for (const e of errors) console.error('   - ' + e)

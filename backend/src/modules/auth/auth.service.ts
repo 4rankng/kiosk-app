@@ -20,6 +20,42 @@ import {
 import { AppError, BadRequest, Conflict, Forbidden, Unauthorized } from '../../lib/errors.js'
 import { logger } from '../../config/logger.js'
 
+/**
+ * First-ever registration is open; afterwards a valid admin bearer token is
+ * required. Throws the auth errors that register surfaces to clients.
+ */
+function assertRegistrationAllowed(totalUsers: number, authHeader?: string): void {
+  if (totalUsers === 0) return
+  if (!authHeader || !authHeader.toLowerCase().startsWith('bearer ')) {
+    throw Unauthorized('Yêu cầu đăng nhập')
+  }
+  const token = authHeader.slice(7).trim()
+  const me = verifyAccessToken(token)
+  if (me.role !== 'admin') {
+    throw Forbidden('Chỉ quản trị viên mới có thể tạo người dùng')
+  }
+}
+
+/** Hash the password and insert the new user row. */
+async function createUserWithPassword(input: { email: string; name: string; password: string; role: 'admin' | 'staff' }) {
+  const passwordHash = await hashPassword(input.password)
+  const inserted = await db
+    .insert(users)
+    .values([
+      {
+        email: input.email,
+        name: input.name,
+        passwordHash,
+        role: input.role,
+        isActive: true,
+      },
+    ])
+    .returning()
+  const u = inserted[0]
+  if (!u) throw new AppError(500, 'Failed to create user')
+  return u
+}
+
 export const authService = {
   /** Check if an email is in the ALLOWED_EMAILS list (open if list is empty). */
   isEmailAllowed(email: string): boolean {
@@ -188,17 +224,7 @@ export const authService = {
     authHeader?: string
   ) {
     const totalUsers = await authService.countUsers()
-
-    if (totalUsers > 0) {
-      if (!authHeader || !authHeader.toLowerCase().startsWith('bearer ')) {
-        throw Unauthorized('Yêu cầu đăng nhập')
-      }
-      const token = authHeader.slice(7).trim()
-      const me = verifyAccessToken(token)
-      if (me.role !== 'admin') {
-        throw Forbidden('Chỉ quản trị viên mới có thể tạo người dùng')
-      }
-    }
+    assertRegistrationAllowed(totalUsers, authHeader)
 
     if (!authService.isEmailAllowed(body.email)) {
       throw BadRequest('Email này không nằm trong danh sách được phép truy cập')
@@ -207,21 +233,10 @@ export const authService = {
     const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, body.email)).limit(1)
     if (existing) throw Conflict('Email đã tồn tại')
 
-    const passwordHash = await hashPassword(body.password)
-    const inserted = await db
-      .insert(users)
-      .values([
-        {
-          email: body.email,
-          name: body.name,
-          passwordHash,
-          role: (totalUsers === 0 ? 'admin' : body.role) as 'admin' | 'staff',
-          isActive: true,
-        },
-      ])
-      .returning()
-    const u = inserted[0]
-    if (!u) throw new AppError(500, 'Failed to create user')
+    const u = await createUserWithPassword({
+      ...body,
+      role: (totalUsers === 0 ? 'admin' : body.role) as 'admin' | 'staff',
+    })
 
     logger.info({ user: u.email, byAdmin: totalUsers > 0 }, 'User registered')
 

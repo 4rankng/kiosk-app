@@ -74,66 +74,84 @@ interface CreateOrderInput {
   generateInvoice: boolean
 }
 
+interface ListParams {
+  page: number
+  pageSize: number
+  offset: number
+  q?: string
+  status?: OrderStatus
+  customerId?: string
+  companyId?: string
+  from?: string
+  to?: string
+}
+
+// ---------------------------------------------------------------------------
+//  List helpers — WHERE building + the rows/count query pair behind list()
+// ---------------------------------------------------------------------------
+
+/** Build the list WHERE clause from the filter params (undefined = no filter). */
+function buildListWhere(params: ListParams) {
+  const { q, status, customerId, companyId, from, to } = params
+  const conditions = []
+  if (status) conditions.push(eq(orders.status, status))
+  if (customerId) conditions.push(eq(orders.customerId, customerId))
+  if (companyId) conditions.push(eq(customers.companyId, companyId))
+  if (from) conditions.push(gte(orders.createdAt, new Date(from)))
+  if (to) conditions.push(lte(orders.createdAt, new Date(to)))
+  if (q) conditions.push(or(ilike(orders.code, `%${q}%`), ilike(customers.name, `%${q}%`)))
+  return conditions.length ? and(...conditions) : undefined
+}
+
+/** Page of orders with customer + business-entity names. */
+function fetchOrderRows(where: ReturnType<typeof buildListWhere>, pageSize: number, offset: number) {
+  return db
+    .select({
+      id: orders.id,
+      code: orders.code,
+      customerId: orders.customerId,
+      customerName: customers.name,
+      companyId: customers.companyId,
+      businessEntityId: orders.businessEntityId,
+      businessEntityName: businessEntities.name,
+      status: orders.status,
+      subtotal: orders.subtotal,
+      discount: orders.discount,
+      total: orders.total,
+      paidAmount: orders.paidAmount,
+      createdAt: orders.createdAt,
+    })
+    .from(orders)
+    .leftJoin(customers, eq(orders.customerId, customers.id))
+    .leftJoin(businessEntities, eq(orders.businessEntityId, businessEntities.id))
+    .where(where)
+    .orderBy(desc(orders.createdAt))
+    .limit(pageSize)
+    .offset(offset)
+}
+
+/** Count query; joins customers only when the filters need them. */
+function countOrderRows(where: ReturnType<typeof buildListWhere>, params: ListParams) {
+  return params.companyId || params.q
+    ? db
+          .select({ total: sql<number>`count(*)::int` })
+          .from(orders)
+          .leftJoin(customers, eq(orders.customerId, customers.id))
+          .where(where)
+    : db.select({ total: sql<number>`count(*)::int` }).from(orders).where(where)
+}
+
 // ---------------------------------------------------------------------------
 //  Service
 // ---------------------------------------------------------------------------
 
 export const orderService = {
   /** List orders with filters and pagination. */
-  async list(params: {
-    page: number
-    pageSize: number
-    offset: number
-    q?: string
-    status?: OrderStatus
-    customerId?: string
-    companyId?: string
-    from?: string
-    to?: string
-  }) {
-    const { pageSize, offset, q, status, customerId, companyId, from, to } = params
-
-    const conditions = []
-    if (status) conditions.push(eq(orders.status, status))
-    if (customerId) conditions.push(eq(orders.customerId, customerId))
-    if (companyId) conditions.push(eq(customers.companyId, companyId))
-    if (from) conditions.push(gte(orders.createdAt, new Date(from)))
-    if (to) conditions.push(lte(orders.createdAt, new Date(to)))
-    if (q) conditions.push(or(ilike(orders.code, `%${q}%`), ilike(customers.name, `%${q}%`)))
-    const where = conditions.length ? and(...conditions) : undefined
-
+  async list(params: ListParams) {
+    const where = buildListWhere(params)
     const [rows, [{ total = 0 } = { total: 0 }]] = await Promise.all([
-      db
-        .select({
-          id: orders.id,
-          code: orders.code,
-          customerId: orders.customerId,
-          customerName: customers.name,
-          companyId: customers.companyId,
-          businessEntityId: orders.businessEntityId,
-          businessEntityName: businessEntities.name,
-          status: orders.status,
-          subtotal: orders.subtotal,
-          discount: orders.discount,
-          total: orders.total,
-          paidAmount: orders.paidAmount,
-          createdAt: orders.createdAt,
-        })
-        .from(orders)
-        .leftJoin(customers, eq(orders.customerId, customers.id))
-        .leftJoin(businessEntities, eq(orders.businessEntityId, businessEntities.id))
-        .where(where)
-        .orderBy(desc(orders.createdAt))
-        .limit(pageSize)
-        .offset(offset),
-      // Count without the customers JOIN when we don't need it for filtering
-      companyId || q
-        ? db
-            .select({ total: sql<number>`count(*)::int` })
-            .from(orders)
-            .leftJoin(customers, eq(orders.customerId, customers.id))
-            .where(where)
-        : db.select({ total: sql<number>`count(*)::int` }).from(orders).where(where),
+      fetchOrderRows(where, params.pageSize, params.offset),
+      countOrderRows(where, params),
     ])
     return { items: rows, total: Number(total) }
   },
