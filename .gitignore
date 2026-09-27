@@ -177,3 +177,6 @@ plans/backups/
 
 # repowise API keys (local)
 .repowise/.env
+
+# Vitest browser failure screenshots
+__screenshots__/
