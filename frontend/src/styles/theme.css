@@ -54,13 +54,16 @@
   /* 10px Fresh Market corner radius (rounded-lg maps through --radius-lg below). */
   --radius: 0.625rem;
 
-  /* WCAG contrast fixes (≥4.5:1 on white AND on the paper canvas):
-     warning text darkened from yellow-600 (2.93:1) to pass on both surfaces
-     (5.2:1 on white, 4.7:1 on paper); success green-700 = 4.95:1 on white. */
+  /* WCAG contrast fixes (≥4.5:1 on white AND on the paper canvas),
+     enforced by src/styles/contrast.test.ts:
+     warning oklch(0.52) = 5.6:1 white / 5.1:1 paper; success oklch(0.50) =
+     5.4:1 white / 4.7:1 paper; error oklch(0.545) = 5.3:1 white / 4.6:1 paper. */
   --color-fg-warning-primary: oklch(0.52 0.145 75);
   --color-text-warning-primary: oklch(0.52 0.145 75);
-  --color-fg-success-primary: oklch(0.527 0.154 150);
-  --color-text-success-primary: oklch(0.527 0.154 150);
+  --color-fg-success-primary: oklch(0.5 0.155 150);
+  --color-text-success-primary: oklch(0.5 0.155 150);
+  --color-fg-error-primary: oklch(0.545 0.245 27.325);
+  --color-text-error-primary: oklch(0.545 0.245 27.325);
 
   /* Legacy aliases consumed by ui/chart.tsx and index.css base rules only. */
   --background: var(--color-bg-secondary);
@@ -78,7 +81,7 @@
      Warm ivory behind the white cards, sidebar, and header so components
      separate clearly from the background. Only the page canvas uses it;
      components stay on their own semantic tokens. */
-  --color-paper: oklch(0.968 0.012 85);
+  --color-paper: oklch(0.956 0.013 85);
 }
 
 /* Paper canvas: unlayered rule beats the layered bg-secondary @apply on
