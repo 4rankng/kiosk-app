@@ -13,6 +13,31 @@ interface ToggleBaseProps {
     isDisabled?: boolean;
 }
 
+interface ToggleThumbProps {
+    slim?: boolean;
+    isSelected?: boolean;
+    isHovered?: boolean;
+    classes: { root: string; switch: string };
+}
+
+const ToggleThumb = ({ slim, isSelected, isHovered, classes }: ToggleThumbProps) => (
+    <div
+        style={{
+            transition: "transform 0.15s ease-in-out, translate 0.15s ease-in-out, border-color 0.1s linear, background-color 0.1s linear",
+        }}
+        className={cx(
+            "rounded-full bg-fg-white shadow-sm",
+
+            slim && "shadow-xs",
+            slim && "border border-toggle-border",
+            slim && isSelected && "border-toggle-slim-border_pressed",
+            slim && isSelected && isHovered && "border-toggle-slim-border_pressed-hover",
+
+            classes.switch,
+        )}
+    />
+);
+
 export const ToggleBase = ({ className, isHovered, isDisabled, isFocusVisible, isSelected, slim, size = "sm" }: ToggleBaseProps) => {
     const styles = {
         default: {
@@ -54,21 +79,7 @@ export const ToggleBase = ({ className, isHovered, isDisabled, isFocusVisible, i
                 className,
             )}
         >
-            <div
-                style={{
-                    transition: "transform 0.15s ease-in-out, translate 0.15s ease-in-out, border-color 0.1s linear, background-color 0.1s linear",
-                }}
-                className={cx(
-                    "rounded-full bg-fg-white shadow-sm",
-
-                    slim && "shadow-xs",
-                    slim && "border border-toggle-border",
-                    slim && isSelected && "border-toggle-slim-border_pressed",
-                    slim && isSelected && isHovered && "border-toggle-slim-border_pressed-hover",
-
-                    classes.switch,
-                )}
-            />
+            <ToggleThumb slim={slim} isSelected={isSelected} isHovered={isHovered} classes={classes} />
         </div>
     );
 };

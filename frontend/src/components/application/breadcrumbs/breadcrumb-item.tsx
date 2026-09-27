@@ -6,7 +6,7 @@ import {
     Link as AriaLink,
     type LinkProps as AriaLinkProps,
 } from "react-aria-components";
-import { type BreadcrumbType, BreadcrumbsContext } from "@/components/application/breadcrumbs/breadcrumbs";
+import { type BreadcrumbType, BreadcrumbsContext } from "@/components/application/breadcrumbs/breadcrumbs-context";
 import { Avatar } from "@/components/base/avatar/avatar";
 import { cx } from "@/utils/cx";
 import { isReactComponent } from "@/utils/is-react-component";

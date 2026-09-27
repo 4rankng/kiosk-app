@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { ChevronRight, ChevronSelectorVertical, SlashDivider } from "@untitledui/icons";
 import { Breadcrumb as AriaBreadcrumb, Button as AriaButton, MenuItem as AriaMenuItem } from "react-aria-components";
-import { BreadcrumbsContext } from "@/components/application/breadcrumbs/breadcrumbs";
+import { BreadcrumbsContext } from "@/components/application/breadcrumbs/breadcrumbs-context";
 import { Avatar } from "@/components/base/avatar/avatar";
 import { Dropdown } from "@/components/base/dropdown/dropdown";
 import { RadioButtonBase } from "@/components/base/radio-buttons/radio-buttons";

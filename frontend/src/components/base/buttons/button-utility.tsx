@@ -50,16 +50,7 @@ interface LinkProps extends CommonProps, DetailedHTMLProps<Omit<AnchorHTMLAttrib
 /** Union type of button and link props */
 export type Props = ButtonProps | LinkProps;
 
-export const ButtonUtility = ({
-    tooltip,
-    className,
-    isDisabled,
-    icon: Icon,
-    size = "sm",
-    color = "secondary",
-    tooltipPlacement = "top",
-    ...otherProps
-}: Props) => {
+const ButtonUtilityContent = ({ tooltip, className, isDisabled, icon: Icon, size = "sm", color = "secondary", ...otherProps }: Props) => {
     const href = "href" in otherProps ? otherProps.href : undefined;
     const Component = href ? AriaLink : AriaButton;
 
@@ -85,7 +76,7 @@ export const ButtonUtility = ({
         };
     }
 
-    const content = (
+    return (
         <Component
             aria-label={tooltip}
             {...props}
@@ -104,6 +95,12 @@ export const ButtonUtility = ({
             {isValidElement(Icon) && Icon}
         </Component>
     );
+};
+
+export const ButtonUtility = (props: Props) => {
+    const { tooltip, isDisabled, size = "sm", tooltipPlacement = "top" } = props;
+
+    const content = <ButtonUtilityContent {...props} />;
 
     if (tooltip) {
         return (

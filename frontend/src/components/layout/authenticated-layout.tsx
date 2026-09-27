@@ -9,6 +9,15 @@ type AuthenticatedLayoutProps = {
   children?: React.ReactNode
 }
 
+type SidebarVariant = ReturnType<typeof useLayout>['variant']
+type SidebarCollapsible = ReturnType<typeof useLayout>['collapsible']
+
+function getContentPad(variant: SidebarVariant, collapsible: SidebarCollapsible, rail: boolean) {
+  if (collapsible === 'offcanvas') return undefined
+  if (variant === 'floating') return rail ? 'lg:pl-[calc(4rem+8px)]' : 'lg:pl-[calc(15rem+8px)]'
+  return rail ? 'lg:pl-16' : 'lg:pl-60'
+}
+
 function Shell({
   children,
 }: {
@@ -18,16 +27,7 @@ function Shell({
   const { collapsed } = useSidebarUI()
   const rail = collapsible === 'icon' && collapsed
 
-  const contentPad =
-    collapsible === 'offcanvas'
-      ? undefined
-      : variant === 'floating'
-        ? rail
-          ? 'lg:pl-[calc(4rem+8px)]'
-          : 'lg:pl-[calc(15rem+8px)]'
-        : rail
-          ? 'lg:pl-16'
-          : 'lg:pl-60'
+  const contentPad = getContentPad(variant, collapsible, rail)
 
   return (
     <>

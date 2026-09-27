@@ -29,7 +29,8 @@ export function SearchProvider({ children }: SearchProviderProps) {
   return (
     <SearchContext value={{ open, setOpen }}>
       {children}
-      <CommandMenu />
+      {/* Props instead of useSearch keeps command-menu from importing this module back (import cycle). */}
+      <CommandMenu open={open} onOpenChange={setOpen} />
     </SearchContext>
   )
 }

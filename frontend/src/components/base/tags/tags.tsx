@@ -1,4 +1,4 @@
-import { type ImgHTMLAttributes, type PropsWithChildren, type RefAttributes, createContext, useContext, useState } from "react";
+import { type ImgHTMLAttributes, type PropsWithChildren, type ReactNode, type RefAttributes, createContext, useContext, useState } from "react";
 import { User01 } from "@untitledui/icons";
 import {
     Tag as AriaTag,
@@ -110,6 +110,64 @@ const styles = {
 
 interface TagProps extends AriaTagProps, RefAttributes<object>, Omit<TagItem, "label" | "id"> {}
 
+interface TagContentProps {
+    id?: string | number;
+    avatarSrc?: string;
+    avatarContrastBorder?: boolean;
+    dot?: boolean;
+    dotClassName?: string;
+    count?: number;
+    isSelected: boolean;
+    isDisabled?: boolean;
+    allowsRemoving: boolean;
+    children?: ReactNode;
+    onClose?: (id: string) => void;
+}
+
+const TagContent = ({
+    id,
+    avatarSrc,
+    avatarContrastBorder,
+    dot,
+    dotClassName,
+    count,
+    isSelected,
+    isDisabled,
+    allowsRemoving,
+    children,
+    onClose,
+}: TagContentProps) => {
+    const context = useContext(TagGroupContext);
+
+    const leadingContent = avatarSrc ? (
+        <TagAvatar src={avatarSrc} alt="Avatar" contrastBorder={avatarContrastBorder} />
+    ) : dot ? (
+        <Dot className={cx("text-fg-success-secondary", dotClassName)} size="sm" />
+    ) : null;
+
+    return (
+        <>
+            <div className={cx("flex items-center gap-1", styles[context.size].content)}>
+                {context.selectionMode !== "none" && <TagCheckbox size={context.size} isSelected={isSelected} isDisabled={isDisabled} />}
+
+                {leadingContent}
+
+                {children}
+
+                {typeof count === "number" && (
+                    <span className={cx("flex items-center justify-center rounded-[3px] bg-tertiary text-center", styles[context.size].count)}>
+                        {count}
+                    </span>
+                )}
+            </div>
+
+            {(onClose || allowsRemoving) && (
+                <TagCloseX size={context.size} excludeFromTabOrder={allowsRemoving} onPress={() => id && onClose?.(id.toString())} />
+            )}
+        </>
+    );
+};
+
 export const Tag = ({
     id,
     avatarSrc,
@@ -123,12 +181,6 @@ export const Tag = ({
     onClose,
 }: PropsWithChildren<TagProps>) => {
     const context = useContext(TagGroupContext);
-
-    const leadingContent = avatarSrc ? (
-        <TagAvatar src={avatarSrc} alt="Avatar" contrastBorder={avatarContrastBorder} />
-    ) : dot ? (
-        <Dot className={cx("text-fg-success-secondary", dotClassName)} size="sm" />
-    ) : null;
 
     return (
         <AriaTag
@@ -158,25 +210,20 @@ export const Tag = ({
             }
         >
             {({ isSelected, isDisabled, allowsRemoving }) => (
-                <>
-                    <div className={cx("flex items-center gap-1", styles[context.size].content)}>
-                        {context.selectionMode !== "none" && <TagCheckbox size={context.size} isSelected={isSelected} isDisabled={isDisabled} />}
-
-                        {leadingContent}
-
-                        {children}
-
-                        {typeof count === "number" && (
-                            <span className={cx("flex items-center justify-center rounded-[3px] bg-tertiary text-center", styles[context.size].count)}>
-                                {count}
-                            </span>
-                        )}
-                    </div>
-
-                    {(onClose || allowsRemoving) && (
-                        <TagCloseX size={context.size} excludeFromTabOrder={allowsRemoving} onPress={() => id && onClose?.(id.toString())} />
-                    )}
-                </>
+                <TagContent
+                    id={id}
+                    avatarSrc={avatarSrc}
+                    avatarContrastBorder={avatarContrastBorder}
+                    dot={dot}
+                    dotClassName={dotClassName}
+                    count={count}
+                    isSelected={isSelected}
+                    isDisabled={isDisabled}
+                    allowsRemoving={allowsRemoving}
+                    onClose={onClose}
+                >
+                    {children}
+                </TagContent>
             )}
         </AriaTag>
     );

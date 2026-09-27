@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight } from '@untitledui/icons'
 import { Dialog, Modal, ModalOverlay } from '@/components/application/modals/modal'
-import { useSearch } from '@/context/search-provider'
 import { cn } from '@/lib/utils'
 import { sidebarData } from './layout/data/sidebar-data'
 import { type NavLink } from './layout/types'
@@ -14,15 +13,19 @@ type CommandItem = {
   url: NavLink['url']
 }
 
-export function CommandMenu() {
+type CommandMenuProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const navigate = useNavigate()
-  const { open, setOpen } = useSearch()
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
 
   /** Every close path (Escape, outside click, selection) resets the palette. */
   const handleOpenChange = (v: boolean) => {
-    setOpen(v)
+    onOpenChange(v)
     if (!v) {
       setQuery('')
       setActiveIndex(0)

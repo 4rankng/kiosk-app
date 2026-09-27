@@ -1,15 +1,11 @@
-import React, { type ReactNode, createContext, useState } from "react";
+import React, { type ReactNode, useState } from "react";
 import { Breadcrumbs as AriaBreadcrumbs } from "react-aria-components";
 import { BreadcrumbAccountItem } from "@/components/application/breadcrumbs/breadcrumb-account-item";
 import { BreadcrumbItem } from "@/components/application/breadcrumbs/breadcrumb-item";
 import { cx } from "@/utils/cx";
+import { type BreadcrumbType, BreadcrumbsContext } from "./breadcrumbs-context";
 
-export type BreadcrumbType = "text" | "text-line" | "button";
-
-export const BreadcrumbsContext = createContext<{ divider: "chevron" | "slash"; type: BreadcrumbType }>({
-    divider: "chevron",
-    type: "text",
-});
+export type { BreadcrumbType };
 
 interface BreadcrumbsProps {
     divider?: "chevron" | "slash";
