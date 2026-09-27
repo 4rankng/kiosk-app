@@ -171,3 +171,9 @@ plans/backups/
 
 # Local Netlify folder
 .netlify
+
+# Repowise generated index (rebuild with: repowise init)
+.repowise/
+
+# repowise API keys (local)
+.repowise/.env
