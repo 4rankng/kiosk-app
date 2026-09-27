@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -75,6 +75,13 @@ async function openDialog(screen: Awaited<ReturnType<typeof renderDialog>>['scre
     .element(screen.getByRole('heading', { name: /công ty/ }))
     .toBeInTheDocument()
 }
+
+// The dialog's ['price-lists'] query fires on mount, before openDialog seeds
+// the mock — give every render a defined value so react-query never sees
+// an undefined query result.
+beforeEach(() => {
+  mockedGetPriceLists.mockResolvedValue(priceLists)
+})
 
 describe('CompanyMutateDialog', () => {
   it('opens in add mode with title and action buttons', async () => {

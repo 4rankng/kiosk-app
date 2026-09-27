@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -37,6 +37,13 @@ function page(data: { id: string; name: string }[]): PaginatedResponse<Company> 
     meta: { page: 1, pageSize: 20, total: data.length, totalPages: 1 },
   }
 }
+
+// The dialog's ['companies'] query fires on mount, before openDialog seeds
+// the mock — give every render a defined value so react-query never sees
+// an undefined query result.
+beforeEach(() => {
+  mockedGetCompanies.mockResolvedValue(page([{ id: 'co-1', name: 'Công ty A' }]))
+})
 
 function makeQueryClient() {
   return new QueryClient({
