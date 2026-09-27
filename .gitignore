@@ -180,3 +180,4 @@ plans/backups/
 
 # Vitest browser failure screenshots
 __screenshots__/
+.vitest-attachments/
