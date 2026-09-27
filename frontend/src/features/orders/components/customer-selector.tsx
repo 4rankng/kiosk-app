@@ -12,7 +12,9 @@ import type { Customer } from '@/types'
 
 interface CustomerSelectorProps {
   selectedCustomer: Customer | null
-  onSelect: (customer: Customer | null, priceListId: string) => void
+  company?: { name: string }
+  priceList?: { id: string; name: string }
+  onSelect: (customer: Customer | null) => void
 }
 
 /**
@@ -20,7 +22,7 @@ interface CustomerSelectorProps {
  * keyed by companyId and stay disabled until a customer with a company is
  * selected.
  */
-function useCustomerReferenceData(companyId: string | undefined) {
+export function useCustomerReferenceData(companyId: string | undefined) {
   const { data: company } = useQuery({
     queryKey: ['company', companyId],
     queryFn: () => {
@@ -61,7 +63,7 @@ function CustomerSummary({
         <Button
           color='link-gray'
           size='sm'
-          onPress={() => onSelect(null, '')}
+          onPress={() => onSelect(null)}
         >
           Thay đổi
         </Button>
@@ -201,7 +203,12 @@ function CustomerMobileSheet({
   )
 }
 
-export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelectorProps) {
+export function CustomerSelector({
+  selectedCustomer,
+  company,
+  priceList,
+  onSelect,
+}: CustomerSelectorProps) {
   const [query, setQuery] = useState('')
   const [focused, setFocused] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -213,8 +220,6 @@ export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelecto
     queryFn: () => getCustomers(),
   })
   const customers = customersData?.data ?? []
-
-  const { company, priceList } = useCustomerReferenceData(selectedCustomer?.companyId)
 
   const filtered = useMemo(() => {
     if (!query) return customers
@@ -231,7 +236,7 @@ export function CustomerSelector({ selectedCustomer, onSelect }: CustomerSelecto
     setQuery('')
     setFocused(false)
     setSheetOpen(false)
-    onSelect(customer, priceList?.id ?? '')
+    onSelect(customer)
   }
 
   const handleFocus = () => {

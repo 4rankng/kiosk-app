@@ -224,9 +224,9 @@ describe('OrderCreate', () => {
   it('creates the order with selected customer, priced items, and shows the success dialog', async () => {
     const screen = await renderOrderCreate()
 
-    // First customer selection: the by-company price-list query is still
-    // disabled at click time, so the captured priceListId is '' (current
-    // behavior) and products price from defaultSalePrice.
+    // Selecting the customer enables the by-company price-list query; the
+    // page derives priceListId from that query, so the FIRST selection
+    // already prices products from the customer's price list.
     await userEvent.click(screen.getByPlaceholder('Tìm khách hàng...'))
     await userEvent.click(screen.getByRole('button', { name: /Nhà hàng Hoa Sứ/ }))
 
@@ -235,25 +235,17 @@ describe('OrderCreate', () => {
       .element(screen.getByText(/Bảng giá tự động: Bảng giá Hoa Sứ/))
       .toBeInTheDocument()
 
-    // Add a product through the product search — default-price fallback path
+    // Add a product that IS in the price list — the dropdown shows the
+    // price-list price (customPrice 125.000) once the detail query lands.
     const productInput = screen.getByPlaceholder('Gõ tên hàng để thêm...')
     await userEvent.fill(productInput, 'Tôm')
+    await expect.element(screen.getByText('125.000 đ')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: /Tôm sú/ }))
 
-    // Line item keeps the default sale price (120.000), fixed at add time
-    await expect.element(screen.getByText('120.000 đ').first()).toBeInTheDocument()
     await expect.element(screen.getByText('1 mặt hàng đã chọn')).toBeInTheDocument()
+    await expect.element(screen.getByText('125.000 đ').first()).toBeInTheDocument()
 
-    // Re-select the same customer — the price list is cached now, so the
-    // second selection captures priceListId 'pl1' and new adds use its prices.
-    await userEvent.click(screen.getByRole('button', { name: 'Thay đổi' }))
-    await vi.waitFor(() =>
-      expect(m.getPriceListByCompany).toHaveBeenCalledOnce()
-    )
-    await userEvent.click(screen.getByPlaceholder('Tìm khách hàng...'))
-    await userEvent.click(screen.getByRole('button', { name: /Nhà hàng Hoa Sứ/ }))
-
-    // Add a second product: not in the price list → default price again
+    // Add a second product: not in the price list → default price
     await userEvent.fill(productInput, 'Cá')
     await userEvent.click(screen.getByRole('button', { name: /Cá basa/ }))
 
@@ -270,7 +262,7 @@ describe('OrderCreate', () => {
       customerId: 'c1',
       businessEntityId: 'be1',
       items: [
-        { productId: 'p1', quantity: 1, unitPrice: 120000 },
+        { productId: 'p1', quantity: 1, unitPrice: 125000 },
         { productId: 'p2', quantity: 1, unitPrice: 45000 },
       ],
       discount: 0,

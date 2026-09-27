@@ -10,7 +10,7 @@ import { formatCurrency } from '@/lib/format'
 import { createOrder } from '@/services/orders'
 import { useIsMobile } from '@/hooks/use-mobile'
 import type { OrderItem, Customer } from '@/types'
-import { CustomerSelector } from './customer-selector'
+import { CustomerSelector, useCustomerReferenceData } from './customer-selector'
 import { ProductSearch } from './product-search'
 import { POSCategoryGrid } from './pos-category-grid'
 import { OrderLineItems } from './order-line-items'
@@ -27,7 +27,10 @@ export function OrderCreate() {
 
   // Order state
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
-  const [priceListId, setPriceListId] = useState<string>('')
+  // Derived from the customer's company query — never captured at selection
+  // time, so the first selection prices from the customer's price list.
+  const { company, priceList } = useCustomerReferenceData(selectedCustomer?.companyId)
+  const priceListId = priceList?.id ?? ''
   const [items, setItems] = useState<OrderItem[]>([])
   const [discount, setDiscount] = useState(0)
   const [businessEntityId, setBusinessEntityId] = useState('')
@@ -149,10 +152,9 @@ export function OrderCreate() {
               <div className='rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
                 <CustomerSelector
                   selectedCustomer={selectedCustomer}
-                  onSelect={(customer, plId) => {
-                    setSelectedCustomer(customer)
-                    setPriceListId(plId)
-                  }}
+                  company={company}
+                  priceList={priceList}
+                  onSelect={setSelectedCustomer}
                 />
               </div>
             </section>
@@ -227,10 +229,9 @@ export function OrderCreate() {
                 <div className='rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
                   <CustomerSelector
                     selectedCustomer={selectedCustomer}
-                    onSelect={(customer, plId) => {
-                      setSelectedCustomer(customer)
-                      setPriceListId(plId)
-                    }}
+                    company={company}
+                    priceList={priceList}
+                    onSelect={setSelectedCustomer}
                   />
                 </div>
               </section>
