@@ -2,7 +2,7 @@
  * Auth service — talks to /api/auth/*.
  * Replaces the previous MOCK_CREDENTIALS / hardcoded whitelist.
  */
-import { apiClient, setTokens, setUser, clearTokens, getUser, type AuthUser } from '@/lib/api-client'
+import { apiClient, setTokens, setUser, type AuthUser } from '@/lib/api-client'
 
 export interface LoginPayload {
   email: string
@@ -31,17 +31,4 @@ export async function register(input: {
 }): Promise<AuthUser> {
   const { data } = await apiClient.post<{ data: AuthUser }>('/api/auth/register', input)
   return data.data
-}
-
-export async function signOut(): Promise<void> {
-  try {
-    await apiClient.post('/api/auth/logout')
-  } catch {
-    // ignore — clearing local state is enough
-  }
-  clearTokens()
-}
-
-export function getCurrentUser(): AuthUser | null {
-  return getUser()
 }

@@ -9,11 +9,6 @@ export async function getProducts(): Promise<Product[]> {
   return data.data
 }
 
-export async function getProductById(id: string, priceListId?: string): Promise<Product> {
-  const { data } = await apiClient.get<{ data: Product }>(`/api/products/${id}`, { params: { priceListId } })
-  return data.data
-}
-
 export async function searchProducts(query: string, priceListId?: string): Promise<Product[]> {
   const { data } = await apiClient.get<{ data: Product[] }>('/api/products', { params: { q: query, priceListId, pageSize: 50 } })
   return data.data

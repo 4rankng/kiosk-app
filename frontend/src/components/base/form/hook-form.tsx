@@ -1,8 +1,8 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
-import { createContext, useContext, useId } from "react";
+import { createContext, useId } from "react";
 import { Form as AriaForm } from "react-aria-components";
 import type { Control, FieldPath, FieldValues, UseControllerReturn, UseFormReturn } from "react-hook-form";
-import { FormProvider, useController, useFormContext } from "react-hook-form";
+import { FormProvider, useController } from "react-hook-form";
 
 interface FormProps<TFieldValues extends FieldValues = FieldValues> extends ComponentPropsWithoutRef<typeof AriaForm> {
     form: UseFormReturn<TFieldValues>;
@@ -22,18 +22,6 @@ interface FormFieldContextValues<TFieldValues extends FieldValues = FieldValues,
 }
 
 const FormFieldContext = createContext<FormFieldContextValues>({} as FormFieldContextValues);
-
-export const useFormFieldContext = () => {
-    const context = useContext(FormFieldContext);
-    const { getFieldState, formState } = useFormContext();
-    const fieldState = getFieldState(context.name, formState);
-
-    if (!context) {
-        throw new Error("The 'useFormContext' hook must be used within a '<FormField />'");
-    }
-
-    return { ...context, ...fieldState };
-};
 
 export const HookForm = <TFieldValues extends FieldValues = FieldValues>({ form, ...props }: FormProps<TFieldValues>) => {
     return (

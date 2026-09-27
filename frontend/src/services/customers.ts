@@ -17,11 +17,6 @@ export async function getCustomers(params?: {
   return body
 }
 
-export async function getCustomerById(id: string): Promise<Customer> {
-  const { data } = await apiClient.get<{ data: Customer }>(`/api/customers/${id}`)
-  return data.data
-}
-
 export async function createCustomer(input: {
   code: string
   name: string

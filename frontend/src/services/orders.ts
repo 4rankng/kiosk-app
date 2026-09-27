@@ -1,30 +1,15 @@
 /**
  * Orders. Backward-compatible signatures.
  */
-import { apiClient, DEFAULT_PAGE_SIZE } from '@/lib/api-client'
-import type { Order, OrderDetail, OrderStatus } from '@/types/api'
+import { apiClient } from '@/lib/api-client'
+import type { OrderDetail } from '@/types/api'
 import type { OrderCreateInput } from '@kiosk/shared'
 
 /** Order create payload — mirrors the backend via @kiosk/shared (no drift). */
 export type CreateOrderInput = OrderCreateInput
 
-export async function getOrders(): Promise<Order[]> {
-  const { data } = await apiClient.get<{ data: Order[] }>('/api/orders', { params: { pageSize: DEFAULT_PAGE_SIZE } })
-  return data.data
-}
-
-export async function getOrderById(id: string): Promise<OrderDetail> {
-  const { data } = await apiClient.get<{ data: OrderDetail }>(`/api/orders/${id}`)
-  return data.data
-}
-
 export async function createOrder(input: CreateOrderInput): Promise<OrderDetail> {
   const { data } = await apiClient.post<{ data: OrderDetail }>('/api/orders', input)
-  return data.data
-}
-
-export async function updateOrderStatus(id: string, status: OrderStatus): Promise<{ id: string; status: OrderStatus }> {
-  const { data } = await apiClient.patch<{ data: { id: string; status: OrderStatus } }>(`/api/orders/${id}/status`, { status })
   return data.data
 }
 

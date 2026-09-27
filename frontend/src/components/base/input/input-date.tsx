@@ -1,18 +1,13 @@
-import { type ComponentType, type HTMLAttributes, type ReactNode, type Ref, createContext, useContext } from "react";
+import { type ComponentType, type HTMLAttributes, type Ref, createContext, useContext } from "react";
 import { HelpCircle, InfoCircle } from "@untitledui/icons";
 import type { DateInputProps as AriaDateInputProps } from "react-aria-components";
 import {
-    DateField as AriaDateField,
-    type DateFieldProps as AriaDateFieldProps,
     DateInput as AriaDateInput,
     DateSegment as AriaDateSegment,
     Group as AriaGroup,
-    type DateValue,
 } from "react-aria-components";
 import { cx, sortCx } from "@/utils/cx";
 import { Tooltip, TooltipTrigger } from "../tooltip/tooltip";
-import { HintText } from "./hint-text";
-import { Label } from "./label";
 
 const DateFieldContext = createContext<{
     size?: "sm" | "md" | "lg";
@@ -182,82 +177,5 @@ export const InputDateBase = ({
                 </div>
             )}
         </AriaGroup>
-    );
-};
-
-interface InputProps
-    extends
-        AriaDateFieldProps<DateValue>,
-        Pick<
-            InputDateBaseProps,
-            "ref" | "size" | "placeholder" | "icon" | "shortcut" | "tooltip" | "groupRef" | "iconClassName" | "wrapperClassName" | "tooltipClassName"
-        > {
-    /** Label text for the input */
-    label?: string;
-    /** Helper text displayed below the input */
-    hint?: ReactNode;
-    /** Whether to hide required indicator from label */
-    hideRequiredIndicator?: boolean;
-    /** Class name for the input. */
-    inputClassName?: string;
-}
-
-export const InputDate = ({
-    size = "md",
-    placeholder,
-    icon: Icon,
-    label,
-    hint,
-    shortcut,
-    hideRequiredIndicator,
-    className,
-    ref,
-    groupRef,
-    tooltip,
-    iconClassName,
-    inputClassName,
-    wrapperClassName,
-    tooltipClassName,
-    ...props
-}: InputProps) => {
-    return (
-        <AriaDateField
-            {...props}
-            className={(state) =>
-                cx("group flex h-max w-full flex-col items-start justify-start gap-1.5", typeof className === "function" ? className(state) : className)
-            }
-        >
-            {({ isInvalid, state }) => (
-                <>
-                    {label && (
-                        <Label isRequired={hideRequiredIndicator ? !hideRequiredIndicator : state.isRequired} isInvalid={isInvalid}>
-                            {label}
-                        </Label>
-                    )}
-
-                    <InputDateBase
-                        className={inputClassName}
-                        {...{
-                            ref,
-                            groupRef,
-                            size,
-                            placeholder,
-                            icon: Icon,
-                            shortcut,
-                            iconClassName,
-                            wrapperClassName,
-                            tooltipClassName,
-                            tooltip,
-                        }}
-                    />
-
-                    {hint && (
-                        <HintText isInvalid={isInvalid} className={cx(size === "sm" && "text-xs")}>
-                            {hint}
-                        </HintText>
-                    )}
-                </>
-            )}
-        </AriaDateField>
     );
 };

@@ -1,38 +1,7 @@
 import type { TooltipProps } from "recharts";
 import type { Props as LegendContentProps } from "recharts/types/component/DefaultLegendContent";
 import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
-import type { Props as DotProps } from "recharts/types/shape/Dot";
 import { cx } from "@/utils/cx";
-
-/**
- * Selects evenly spaced items from an array. Used for rendering
- * certain number of x-axis labels.
- * @param dataArray - The array of items to select from.
- * @param count - The number of items to select.
- * @returns The selected items.
- */
-export const selectEvenlySpacedItems = <T extends readonly unknown[]>(dataArray: T, count: number): Array<T[number]> => {
-    if (!dataArray || dataArray.length === 0) {
-        return [];
-    }
-
-    const selectedItems: Array<T[number]> = [];
-
-    if (dataArray.length === 1) {
-        for (let i = 0; i < count; i++) {
-            selectedItems.push(dataArray[0]);
-        }
-        return selectedItems;
-    }
-
-    for (let i = 0; i < count; i++) {
-        const targetIndex = Math.round((i * (dataArray.length - 1)) / (count - 1));
-        const boundedIndex = Math.max(0, Math.min(targetIndex, dataArray.length - 1));
-        selectedItems.push(dataArray[boundedIndex]);
-    }
-
-    return selectedItems;
-};
 
 /**
  * Renders the legend content for a chart.
@@ -118,21 +87,5 @@ export const ChartTooltipContent = ({ active, payload, label, isRadialChart, isP
                 <p className="text-xs text-tooltip-supporting-text">{secondaryTitle}</p>
             )}
         </div>
-    );
-};
-
-interface ChartActiveDotProps extends DotProps {
-    // We have to use `any` here because the `payload` prop is not typed correctly in the `recharts` library.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    payload?: any;
-}
-
-export const ChartActiveDot = ({ cx = 0, cy = 0 }: ChartActiveDotProps) => {
-    const size = 12;
-
-    return (
-        <svg x={cx - size / 2} y={cy - size / 2} width={size} height={size} viewBox="0 0 12 12" fill="none">
-            <rect x="2" y="2" width="8" height="8" rx="6" className="fill-bg-primary stroke-utility-brand-600" strokeWidth="2" />
-        </svg>
     );
 };

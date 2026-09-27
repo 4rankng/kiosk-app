@@ -13,7 +13,3 @@ export async function createUnit(input: { name: string; abbreviation?: string })
   const { data } = await apiClient.post<{ data: Unit }>('/api/units', input)
   return data.data
 }
-
-export async function deleteUnit(id: string): Promise<void> {
-  await apiClient.delete(`/api/units/${id}`)
-}

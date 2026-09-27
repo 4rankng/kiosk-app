@@ -25,6 +25,3 @@ export const NotFound = (message = 'Not found') => new AppError(404, message)
 
 export const Conflict = (message = 'Conflict', details?: unknown) =>
   new AppError(409, message, details)
-
-export const Unprocessable = (message = 'Unprocessable entity', details?: unknown) =>
-  new AppError(422, message, details)

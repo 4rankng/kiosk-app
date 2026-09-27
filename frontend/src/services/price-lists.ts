@@ -38,7 +38,3 @@ export async function bulkUpsertPriceListItems(
   const { data } = await apiClient.put<{ data: { upserted: number } }>(`/api/price-lists/${priceListId}/items`, { items })
   return data.data
 }
-
-export async function deletePriceList(id: string): Promise<void> {
-  await apiClient.delete(`/api/price-lists/${id}`)
-}

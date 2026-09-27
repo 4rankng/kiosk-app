@@ -20,10 +20,6 @@ export function created<T>(c: Context, data: T) {
   return c.json({ data }, 201)
 }
 
-export function noContent(c: Context) {
-  return c.body(null, 204)
-}
-
 export function paginated<T>(c: Context, items: T[], total: number, page: number, pageSize: number) {
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   return c.json(
