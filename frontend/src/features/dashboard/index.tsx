@@ -20,7 +20,7 @@ export function Dashboard() {
         <NotificationBell />
         <ProfileDropdown />
       </Header>
-      <Main>
+      <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <PageHeader title='Tổng quan' description='Tình hình kinh doanh hôm nay.' />
 
         <div className='space-y-4'>

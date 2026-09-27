@@ -17,6 +17,14 @@
   --color-brand-900: oklch(0.34 0.065 155);
   --color-brand-950: oklch(0.26 0.045 155);
 
+  /* ---- WCAG AA semantic text on white (measured with the running app) ----
+     yellow-600 measures 2.94:1 and green-600 3.22:1 — below the 4.5:1 floor
+     for small text. The -700 steps measure 4.93:1 and 4.95:1. red-600 passes
+     at 4.77:1 and stays. The app is light-only; the .dark block in
+     untitledui.css never activates. */
+  --color-text-warning-primary: var(--color-yellow-700);
+  --color-text-success-primary: var(--color-green-700);
+
   /* Fonts: Inter body / Manrope headings (project identity). */
   --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;

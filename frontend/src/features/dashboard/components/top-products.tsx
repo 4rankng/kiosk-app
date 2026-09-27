@@ -34,7 +34,7 @@ export function TopProducts() {
   if (isError) {
     return (
       <WidgetCard title={TITLE} description={DESCRIPTION}>
-        <EmptyState variant='error' onRetry={() => refetch()} description='Không tải được danh sách sản phẩm.' />
+        <EmptyState variant='error' className='my-auto' onRetry={() => refetch()} description='Không tải được danh sách sản phẩm.' />
       </WidgetCard>
     )
   }
@@ -49,6 +49,7 @@ export function TopProducts() {
           icon={<Package className='size-10 text-fg-quaternary' />}
           title='Chưa có sản phẩm'
           description='Dữ liệu sẽ xuất hiện khi có đơn hàng'
+          className='my-auto'
         />
       </WidgetCard>
     )

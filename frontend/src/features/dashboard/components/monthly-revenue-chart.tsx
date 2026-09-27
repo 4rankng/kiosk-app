@@ -31,7 +31,7 @@ export function buildRevenueChartData(
 
 function ChartEmptyState() {
   return (
-    <div className='flex h-[250px] w-full items-center justify-center'>
+    <div className='my-auto flex h-[250px] w-full items-center justify-center'>
       <EmptyState
         variant='empty'
         icon={<BarChart01 className='size-10 text-fg-quaternary' />}
@@ -47,7 +47,7 @@ export function MonthlyRevenueChart() {
 
   if (isError) {
     return (
-      <div className='flex h-[250px] w-full items-center'>
+      <div className='my-auto flex h-[250px] w-full items-center'>
         <EmptyState variant='error' className='w-full' onRetry={() => refetch()} description='Không tải được dữ liệu biểu đồ.' />
       </div>
     )

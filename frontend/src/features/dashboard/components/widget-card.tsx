@@ -17,14 +17,14 @@ interface WidgetCardProps {
  */
 export function WidgetCard({ title, description, className, contentClassName, children }: WidgetCardProps) {
   return (
-    <div className={cn('rounded-lg border border-primary bg-primary', className)}>
+    <div className={cn('h-full rounded-lg border border-primary bg-primary', className)}>
       {title && (
         <div className='flex flex-col gap-0.5 px-4 pt-4'>
           <h3 className='text-md font-semibold text-primary'>{title}</h3>
           {description && <p className='text-xs text-tertiary'>{description}</p>}
         </div>
       )}
-      <div className={cn('p-4', title && 'pt-3', contentClassName)}>{children}</div>
+      <div className={cn('flex flex-col p-4', title && 'pt-3', contentClassName)}>{children}</div>
     </div>
   )
 }

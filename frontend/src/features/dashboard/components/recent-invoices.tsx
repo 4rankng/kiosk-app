@@ -47,20 +47,28 @@ function formatInvoiceTime(date: string): string {
 }
 
 function RecentInvoiceRow({ invoice }: { invoice: RecentInvoice }) {
+  // Cancelled rows mute via text-quaternary (4.74:1 on white) rather than
+  // opacity, which would push the text below the 4.5:1 WCAG floor.
+  const isCancelled = invoice.status === 'cancelled'
   return (
-    <div
-      className={cn(
-        'flex items-center gap-3 py-2.5 first:pt-0 last:pb-0',
-        invoice.status === 'cancelled' && 'opacity-50',
-      )}
-    >
+    <div className='flex items-center gap-3 py-2.5 first:pt-0 last:pb-0'>
       <span className='shrink-0 font-mono text-xs text-tertiary tabular-nums'>
         {invoice.code}
       </span>
-      <span className='min-w-0 flex-1 truncate text-sm text-primary'>
+      <span
+        className={cn(
+          'min-w-0 flex-1 truncate text-sm',
+          isCancelled ? 'text-quaternary' : 'text-primary'
+        )}
+      >
         {invoice.customerName}
       </span>
-      <span className='shrink-0 text-sm font-medium text-primary tabular-nums'>
+      <span
+        className={cn(
+          'shrink-0 text-sm font-medium tabular-nums',
+          isCancelled ? 'text-quaternary' : 'text-primary'
+        )}
+      >
         {formatCurrency(invoice.total)}
       </span>
       <StatusBadge status={invoice.status} isPaid={invoice.isPaid} />
@@ -96,7 +104,7 @@ export function RecentInvoices() {
   if (isError) {
     return (
       <WidgetCard title='Hóa đơn gần đây'>
-        <EmptyState variant='error' onRetry={() => refetch()} description='Không tải được danh sách hóa đơn.' />
+        <EmptyState variant='error' className='my-auto' onRetry={() => refetch()} description='Không tải được danh sách hóa đơn.' />
       </WidgetCard>
     )
   }
@@ -106,7 +114,7 @@ export function RecentInvoices() {
   if (invoices.length === 0) {
     return (
       <WidgetCard title='Hóa đơn gần đây'>
-        <EmptyState variant='empty' icon={<File02 className='size-10 text-fg-quaternary' />} title='Chưa có hóa đơn' description='Dữ liệu sẽ xuất hiện khi có hóa đơn' />
+        <EmptyState variant='empty' className='my-auto' icon={<File02 className='size-10 text-fg-quaternary' />} title='Chưa có hóa đơn' description='Dữ liệu sẽ xuất hiện khi có hóa đơn' />
       </WidgetCard>
     )
   }

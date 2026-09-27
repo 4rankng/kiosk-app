@@ -81,8 +81,12 @@ describe('RecentInvoices', () => {
     await expect.element(screen.getByText('Đã hủy')).toBeInTheDocument()
     await expect.element(screen.getByText('Chưa TT').first()).toBeInTheDocument()
 
-    const cancelledRow = screen.getByText('HD0003').element().closest('div')
-    expect(cancelledRow?.className).toContain('opacity-50')
+    // Cancelled rows mute via text-quaternary on name/amount (4.74:1 on
+    // white) instead of row opacity, which broke the 4.5:1 WCAG floor.
+    const cancelledName = screen.getByText('Chợ Bến Thành').element()
+    expect(cancelledName.className).toContain('text-quaternary')
+    const activeRow = screen.getByText('HD0001').element().closest('div')
+    expect(activeRow?.textContent).not.toContain('opacity')
 
     const expected = new Date('2026-09-26T09:30:00.000Z').toLocaleTimeString('vi-VN', {
       hour: '2-digit',

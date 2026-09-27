@@ -32,7 +32,7 @@ export function OutstandingDebts() {
   if (isError) {
     return (
       <WidgetCard title={TITLE} description={DESCRIPTION}>
-        <EmptyState variant='error' onRetry={() => refetch()} description='Không tải được danh sách công nợ.' />
+        <EmptyState variant='error' className='my-auto' onRetry={() => refetch()} description='Không tải được danh sách công nợ.' />
       </WidgetCard>
     )
   }
@@ -47,6 +47,7 @@ export function OutstandingDebts() {
           icon={<CoinsHand className='size-10 text-fg-quaternary' />}
           title='Không có công nợ'
           description='Tất cả hóa đơn đã thanh toán'
+          className='my-auto'
         />
       </WidgetCard>
     )

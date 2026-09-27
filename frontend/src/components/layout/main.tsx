@@ -14,7 +14,7 @@ export function Main({ fixed, className, fluid, ...props }: MainProps) {
       aria-label='Nội dung chính'
       data-layout={fixed ? 'fixed' : 'auto'}
       className={cn(
-        'px-4 py-6',
+        'px-4 pb-6 pt-16',
 
         // If layout is fixed, make the main container flex and grow
         fixed && 'flex grow flex-col overflow-hidden',

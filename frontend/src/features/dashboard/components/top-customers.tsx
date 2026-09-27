@@ -32,7 +32,7 @@ export function TopCustomers() {
   if (isError) {
     return (
       <WidgetCard title={TITLE} description={DESCRIPTION}>
-        <EmptyState variant='error' onRetry={() => refetch()} description='Không tải được danh sách khách hàng.' />
+        <EmptyState variant='error' className='my-auto' onRetry={() => refetch()} description='Không tải được danh sách khách hàng.' />
       </WidgetCard>
     )
   }
@@ -47,6 +47,7 @@ export function TopCustomers() {
           icon={<Users01 className='size-10 text-fg-quaternary' />}
           title='Chưa có khách hàng'
           description='Dữ liệu sẽ xuất hiện khi có đơn hàng'
+          className='my-auto'
         />
       </WidgetCard>
     )
