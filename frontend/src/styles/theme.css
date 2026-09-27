@@ -17,14 +17,6 @@
   --color-brand-900: oklch(0.34 0.065 155);
   --color-brand-950: oklch(0.26 0.045 155);
 
-  /* ---- WCAG AA semantic text on white (measured with the running app) ----
-     yellow-600 measures 2.94:1 and green-600 3.22:1 — below the 4.5:1 floor
-     for small text. The -700 steps measure 4.93:1 and 4.95:1. red-600 passes
-     at 4.77:1 and stays. The app is light-only; the .dark block in
-     untitledui.css never activates. */
-  --color-text-warning-primary: var(--color-yellow-700);
-  --color-text-success-primary: var(--color-green-700);
-
   /* Fonts: Inter body / Manrope headings (project identity). */
   --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
@@ -62,10 +54,11 @@
   /* 10px Fresh Market corner radius (rounded-lg maps through --radius-lg below). */
   --radius: 0.625rem;
 
-  /* WCAG contrast fixes (≥4.5:1 on white for text pairs):
-     warning text was yellow-600 (2.93:1) → amber 4.70:1; success text was green-600 (3.22:1) → green-700 4.94:1. */
-  --color-fg-warning-primary: oklch(0.562 0.14 75);
-  --color-text-warning-primary: oklch(0.562 0.14 75);
+  /* WCAG contrast fixes (≥4.5:1 on white AND on the paper canvas):
+     warning text darkened from yellow-600 (2.93:1) to pass on both surfaces
+     (5.2:1 on white, 4.7:1 on paper); success green-700 = 4.95:1 on white. */
+  --color-fg-warning-primary: oklch(0.52 0.145 75);
+  --color-text-warning-primary: oklch(0.52 0.145 75);
   --color-fg-success-primary: oklch(0.527 0.154 150);
   --color-text-success-primary: oklch(0.527 0.154 150);
 
@@ -80,6 +73,18 @@
   --chart-3: oklch(0.55 0.08 195);
   --chart-4: oklch(0.5 0.06 250);
   --chart-5: oklch(0.62 0.09 110);
+
+  /* ---- Paper page canvas ----
+     Warm ivory behind the white cards, sidebar, and header so components
+     separate clearly from the background. Only the page canvas uses it;
+     components stay on their own semantic tokens. */
+  --color-paper: oklch(0.968 0.012 85);
+}
+
+/* Paper canvas: unlayered rule beats the layered bg-secondary @apply on
+   body in index.css. Cards, sidebar, and header keep bg-primary (white). */
+body {
+  background-color: var(--color-paper);
 }
 
 @theme inline {
