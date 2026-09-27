@@ -1,12 +1,12 @@
 .PHONY: dev build test seed migrate reset db-setup prod-up prod-down
 
-# Development
+# Development — starts postgres/redis/adminer, then streams backend API and
+# frontend web into this terminal. Ctrl+C stops both; containers keep running
+# (make clean removes them).
 dev:
 	@test -f .env || cp .env.example .env
 	docker compose up -d postgres redis adminer
-	@echo "Run in separate terminals:"
-	@echo "  cd backend && pnpm dev"
-	@echo "  cd frontend && pnpm dev"
+	pnpm -r --parallel dev
 
 # Build
 build:
