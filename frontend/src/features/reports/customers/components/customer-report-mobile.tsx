@@ -44,7 +44,7 @@ export function CustomerReportMobile({ data }: { data: CustomerReportRow[] }) {
             metric={
               <span className='flex gap-3 tabular-nums'>
                 <span>Doanh thu: {formatCurrency(totals.revenue)}</span>
-                <span className='text-warning-primary'>Công nợ: {formatCurrency(totals.unpaid)}</span>
+                <span className='text-brand-tertiary'>Công nợ: {formatCurrency(totals.unpaid)}</span>
               </span>
             }
             expanded={isExpanded}
@@ -63,7 +63,7 @@ export function CustomerReportMobile({ data }: { data: CustomerReportRow[] }) {
                   <div className='shrink-0 text-right tabular-nums'>
                     <p className='text-sm font-medium text-primary'>{formatCurrency(row.totalRevenue)}</p>
                     {row.unpaidAmount > 0 && (
-                      <p className='text-xs text-warning-primary'>
+                      <p className='text-xs text-brand-tertiary'>
                         Chưa thu: {formatCurrency(row.unpaidAmount)}
                       </p>
                     )}

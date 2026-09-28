@@ -31,7 +31,9 @@ const columns: ColumnDef<ProductReportRow>[] = [
     accessorKey: 'totalRevenue',
     header: 'Tổng Doanh Thu',
     cell: ({ getValue }) => (
-      <span className='tabular-nums font-medium text-success-primary'>{formatCurrency(getValue() as number)}</span>
+      // Neutral, not success-green: green is this app's "Đã TT" paid status,
+      // and colouring every revenue figure green made the two indistinguishable.
+      <span className='tabular-nums font-medium text-primary'>{formatCurrency(getValue() as number)}</span>
     ),
   },
 ]

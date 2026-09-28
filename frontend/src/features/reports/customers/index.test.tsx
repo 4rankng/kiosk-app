@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ReactNode } from 'react'
 import { render } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
+import { I18nProvider, RouterProvider } from 'react-aria-components'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { CustomerReport } from './index'
 
@@ -67,7 +68,15 @@ function makeWrapper() {
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   })
   return function Wrapper({ children }: { children: ReactNode }) {
-    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    // DateRangePicker reads react-aria's router/i18n context; the page-level
+    // tests render the page in isolation, so supply it explicitly.
+    return (
+      <I18nProvider>
+        <RouterProvider navigate={() => {}} useHref={(href) => href}>
+          <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        </RouterProvider>
+      </I18nProvider>
+    )
   }
 }
 

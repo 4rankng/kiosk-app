@@ -66,7 +66,10 @@ export function OutstandingDebts() {
             <p className='min-w-0 flex-1 truncate text-sm font-medium leading-none text-primary'>
               {d.customerName}
             </p>
-            <span className='shrink-0 text-sm font-medium text-warning-primary tabular-nums'>
+            {/* Brand, not warning: this is money owed, not a payment status.
+                Amber is reserved for the "partial payment" badge, and reusing
+                it here made the two indistinguishable. */}
+            <span className='shrink-0 text-sm font-medium text-brand-tertiary tabular-nums'>
               {formatCurrency(d.amount)}
             </span>
           </div>
@@ -75,7 +78,7 @@ export function OutstandingDebts() {
       <div className='my-3 h-px w-full bg-border-secondary' />
       <div className='flex items-center justify-between rounded-md bg-secondary px-3 py-2'>
         <span className='text-sm font-medium text-primary'>Tổng công nợ</span>
-        <span className='text-sm font-semibold text-warning-primary tabular-nums'>
+        <span className='text-sm font-semibold text-brand-tertiary tabular-nums'>
           {formatCurrency(totalDebt)}
         </span>
       </div>

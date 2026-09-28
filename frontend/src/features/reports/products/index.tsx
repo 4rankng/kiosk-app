@@ -11,17 +11,15 @@ import { getProductReport, type ProductReportRow } from '@/services/reports'
 import { Button } from '@/components/base/buttons/button'
 import { Label } from '@/components/base/input/label'
 import { Breadcrumbs } from '@/components/application/breadcrumbs/breadcrumbs'
+import { DateRangePicker } from '@/components/application/date-picker/date-range-picker'
+import { parseDate } from '@internationalized/date'
+import type { DateRange } from 'react-aria-components'
 import { ProductReportTable } from './components/product-report-table'
 import { EmptyState } from '@/components/empty-state'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { formatCurrency } from '@/lib/format'
 import { ReportKpiCard } from '@/features/reports/components/report-kpi-card'
 
-const DATE_INPUT_CLASS = [
-  'h-9 w-full rounded-lg bg-primary px-3 text-sm text-primary shadow-xs',
-  'ring-1 ring-primary ring-inset outline-hidden transition duration-100 ease-linear',
-  'placeholder:text-placeholder focus:ring-2 focus:ring-brand',
-].join(' ')
 
 /** Roll the report rows up into the three summary KPI values. */
 function summarizeProductReport(rows: ProductReportRow[]) {
@@ -60,9 +58,9 @@ function ProductReportKpis({
         label='Tổng doanh thu'
         value={formatCurrency(summary.revenue)}
         hint='doanh thu tích lũy'
-        labelClassName='text-success-primary'
-        valueClassName='text-success-primary'
-        iconClassName='text-fg-success-secondary'
+        labelClassName='text-primary'
+        valueClassName='text-primary'
+        iconClassName='text-fg-secondary'
       />
     </div>
   )
@@ -72,8 +70,14 @@ export function ProductReport() {
   useDocumentTitle('Báo cáo bán hàng theo sản phẩm')
   const today = new Date().toISOString().slice(0, 10)
   const firstOfMonth = today.slice(0, 7) + '-01'
-  const [startDate, setStartDate] = useState(firstOfMonth)
-  const [endDate, setEndDate] = useState(today)
+  // DateRangePicker speaks react-aria DateValue; the report API takes plain
+  // YYYY-MM-DD strings, so derive them rather than storing two copies.
+  const [dateRange, setDateRange] = useState<DateRange>({
+    start: parseDate(firstOfMonth),
+    end: parseDate(today),
+  })
+  const startDate = dateRange.start?.toString() ?? firstOfMonth
+  const endDate = dateRange.end?.toString() ?? today
   const [queryTrigger, setQueryTrigger] = useState(0)
 
   const { data: reportData = [], isLoading, refetch } = useQuery({
@@ -106,22 +110,16 @@ export function ProductReport() {
 
         {/* Filters */}
         <div className='flex flex-wrap items-end gap-3'>
-          <div className='flex w-full flex-col gap-1.5 sm:w-40'>
-            <Label>Từ ngày</Label>
-            <input
-              type='date'
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className={DATE_INPUT_CLASS}
-            />
-          </div>
-          <div className='flex w-full flex-col gap-1.5 sm:w-40'>
-            <Label>Đến ngày</Label>
-            <input
-              type='date'
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className={DATE_INPUT_CLASS}
+          <div className='flex w-full flex-col gap-1.5 sm:w-64'>
+            <Label>Khoảng thời gian</Label>
+            <DateRangePicker
+              value={dateRange}
+              onChange={(range) => {
+                // The report query needs both bounds; ignore a half-picked range.
+                if (range?.start && range.end) setDateRange({ start: range.start, end: range.end })
+              }}
+              onApply={handleFilter}
+              aria-label='Khoảng thời gian báo cáo'
             />
           </div>
           <Button onPress={handleFilter} isDisabled={isLoading} isLoading={isLoading}>

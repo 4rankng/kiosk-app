@@ -14,6 +14,9 @@ import { Label } from '@/components/base/input/label'
 import { Select } from '@/components/base/select/select'
 import { SelectItem } from '@/components/base/select/select-item'
 import { Breadcrumbs } from '@/components/application/breadcrumbs/breadcrumbs'
+import { DateRangePicker } from '@/components/application/date-picker/date-range-picker'
+import { parseDate } from '@internationalized/date'
+import type { DateRange } from 'react-aria-components'
 import { CustomerReportTable } from './components/customer-report-table'
 import { ExportActions } from './components/export-actions'
 import { EmptyState } from '@/components/empty-state'
@@ -21,11 +24,6 @@ import { useDocumentTitle } from '@/hooks/use-document-title'
 import { formatCurrency } from '@/lib/format'
 import { ReportKpiCard } from '@/features/reports/components/report-kpi-card'
 
-const DATE_INPUT_CLASS = [
-  'h-9 w-full rounded-lg bg-primary px-3 text-sm text-primary shadow-xs',
-  'ring-1 ring-primary ring-inset outline-hidden transition duration-100 ease-linear',
-  'placeholder:text-placeholder focus:ring-2 focus:ring-brand',
-].join(' ')
 
 /** Roll the report rows up into the three summary KPI values. */
 function summarizeCustomerReport(rows: CustomerReportRow[]) {
@@ -64,9 +62,9 @@ function CustomerReportKpis({
         label='Tiền chưa thu (Công nợ)'
         value={formatCurrency(summary.unpaid)}
         hint='cần đối chiếu thu nợ'
-        labelClassName='text-warning-primary'
-        valueClassName='text-warning-primary'
-        iconClassName='text-fg-warning-secondary'
+        labelClassName='text-brand-tertiary'
+        valueClassName='text-brand-tertiary'
+        iconClassName='text-brand-tertiary'
       />
     </div>
   )
@@ -76,8 +74,14 @@ export function CustomerReport() {
   useDocumentTitle('Báo cáo công nợ khách hàng')
   const today = new Date().toISOString().slice(0, 10)
   const firstOfMonth = today.slice(0, 7) + '-01'
-  const [startDate, setStartDate] = useState(firstOfMonth)
-  const [endDate, setEndDate] = useState(today)
+  // DateRangePicker speaks react-aria DateValue; the report API takes plain
+  // YYYY-MM-DD strings, so derive them rather than storing two copies.
+  const [dateRange, setDateRange] = useState<DateRange>({
+    start: parseDate(firstOfMonth),
+    end: parseDate(today),
+  })
+  const startDate = dateRange.start?.toString() ?? firstOfMonth
+  const endDate = dateRange.end?.toString() ?? today
   const [companyId, setCompanyId] = useState('all')
   const [queryTrigger, setQueryTrigger] = useState(0)
 
@@ -116,22 +120,16 @@ export function CustomerReport() {
 
         {/* Filters */}
         <div className='flex flex-wrap items-end gap-3'>
-          <div className='flex w-full flex-col gap-1.5 sm:w-40'>
-            <Label>Từ ngày</Label>
-            <input
-              type='date'
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className={DATE_INPUT_CLASS}
-            />
-          </div>
-          <div className='flex w-full flex-col gap-1.5 sm:w-40'>
-            <Label>Đến ngày</Label>
-            <input
-              type='date'
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className={DATE_INPUT_CLASS}
+          <div className='flex w-full flex-col gap-1.5 sm:w-64'>
+            <Label>Khoảng thời gian</Label>
+            <DateRangePicker
+              value={dateRange}
+              onChange={(range) => {
+                // The report query needs both bounds; ignore a half-picked range.
+                if (range?.start && range.end) setDateRange({ start: range.start, end: range.end })
+              }}
+              onApply={handleFilter}
+              aria-label='Khoảng thời gian báo cáo'
             />
           </div>
           <div className='w-full sm:w-[200px]'>

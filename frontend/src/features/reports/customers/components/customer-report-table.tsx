@@ -46,7 +46,7 @@ export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
                     <TableCell className='font-mono text-sm'>{row.customerCode}</TableCell>
                     <TableCell className='font-medium'>{row.customerName}</TableCell>
                     <TableCell className='text-right tabular-nums'>{formatCurrency(row.totalRevenue)}</TableCell>
-                    <TableCell className='text-right tabular-nums font-medium text-warning-primary'>
+                    <TableCell className='text-right tabular-nums font-medium text-brand-tertiary'>
                       {formatCurrency(row.unpaidAmount)}
                     </TableCell>
                   </TableRow>
@@ -54,7 +54,7 @@ export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
                 <TableRow className='bg-secondary font-bold hover:bg-secondary'>
                   <TableCell colSpan={2}>Tổng cộng công nợ {rows[0].companyName}:</TableCell>
                   <TableCell className='text-right font-bold tabular-nums'>{formatCurrency(totals.revenue)}</TableCell>
-                  <TableCell className='text-right font-bold tabular-nums text-warning-primary'>
+                  <TableCell className='text-right font-bold tabular-nums text-brand-tertiary'>
                     {formatCurrency(totals.unpaid)}
                   </TableCell>
                 </TableRow>
