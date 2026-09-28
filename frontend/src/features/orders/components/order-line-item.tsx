@@ -1,5 +1,5 @@
 import type { OrderItem } from '@/types'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { Button } from '@/components/base/buttons/button'
 import { NumberInput } from '@/components/number-input'
 import { Minus, Plus, X } from '@untitledui/icons'
@@ -61,7 +61,7 @@ export function OrderLineItem({ item, onUpdateQuantity, onUpdatePrice, onRemove 
         )}
 
         <NumberInput
-          value={item.unitPrice}
+          value={toNumber(item.unitPrice)}
           onValueChange={(val) => onUpdatePrice(item.productId, val)}
           className='h-10 sm:h-8 w-[95px] sm:w-[90px] shrink-0 text-sm'
         />

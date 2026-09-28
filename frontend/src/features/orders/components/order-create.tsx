@@ -6,7 +6,7 @@ import { Button } from '@/components/base/buttons/button'
 import { ShoppingCart01, ChevronUp } from '@untitledui/icons'
 import { toast } from 'sonner'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { createOrder } from '@/services/orders'
 import { useIsMobile } from '@/hooks/use-mobile'
 import type { OrderItem, Customer } from '@/types'
@@ -39,8 +39,10 @@ export function OrderCreate() {
   const [createdOrderCode, setCreatedOrderCode] = useState('')
   const [reviewOpen, setReviewOpen] = useState(false)
 
-  const subtotal = items.reduce((s, i) => s + i.total, 0)
-  const total = subtotal - discount
+  // Money arrives from the API as strings (Postgres numeric). Coerce before
+  // arithmetic or `+` concatenates and every total becomes NaN.
+  const subtotal = items.reduce((s, i) => s + toNumber(i.total), 0)
+  const total = toNumber(subtotal) - toNumber(discount)
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -50,7 +52,7 @@ export function OrderCreate() {
         items: items.map((i) => ({
           productId: i.productId,
           quantity: i.quantity,
-          unitPrice: i.unitPrice,
+          unitPrice: toNumber(i.unitPrice),
         })),
         discount,
       }),
@@ -61,16 +63,24 @@ export function OrderCreate() {
       setCreatedOrderCode(order.code)
       setShowSuccess(true)
     },
+    onError: (error) => {
+      // The cart is intentionally left intact so the user can retry without
+      // rebuilding it. Surface the server's own message when there is one.
+      toast.error(error instanceof Error && error.message
+        ? `Không tạo được đơn hàng: ${error.message}`
+        : 'Không tạo được đơn hàng, vui lòng thử lại.')
+    },
   })
 
   const addItem = useCallback(
-    (product: { id: string; name: string; unit: string }, price: number) => {
+    (product: { id: string; name: string; unit: string }, rawPrice: number | string) => {
+      const price = toNumber(rawPrice)
       setItems((prev) => {
         const existing = prev.find((i) => i.productId === product.id)
         if (existing) {
           return prev.map((i) =>
             i.productId === product.id
-              ? { ...i, quantity: i.quantity + 1, total: (i.quantity + 1) * i.unitPrice }
+              ? { ...i, quantity: i.quantity + 1, total: (i.quantity + 1) * toNumber(i.unitPrice) }
               : i
           )
         }
@@ -93,7 +103,7 @@ export function OrderCreate() {
   const updateItemQuantity = useCallback((productId: string, qty: number) => {
     setItems((prev) =>
       prev.map((i) =>
-        i.productId === productId ? { ...i, quantity: qty, total: qty * i.unitPrice } : i
+        i.productId === productId ? { ...i, quantity: qty, total: qty * toNumber(i.unitPrice) } : i
       )
     )
   }, [])

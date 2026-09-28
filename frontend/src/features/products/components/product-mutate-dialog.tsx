@@ -11,6 +11,7 @@ import { Dialog, Modal, ModalOverlay } from '@/components/application/modals/mod
 import { Button } from '@/components/base/buttons/button'
 import { toast } from 'sonner'
 import { ProductFormFields } from './product-form-fields'
+import { toNumber } from '@/lib/format'
 
 /** Default (empty or selected-product) values for the product form. */
 function getProductFormDefaults(
@@ -21,8 +22,8 @@ function getProductFormDefaults(
     categoryName?: string | null
     unitName?: string | null
     description?: string | null
-    purchasePrice?: number
-    defaultSalePrice: number
+    purchasePrice?: number | string
+    defaultSalePrice: number | string
   } | null
 ): ProductSchema {
   if (isEdit && selectedProduct) {
@@ -32,8 +33,11 @@ function getProductFormDefaults(
       category: selectedProduct.categoryName ?? '',
       unit: selectedProduct.unitName ?? '',
       description: selectedProduct.description ?? '',
-      purchasePrice: selectedProduct.purchasePrice ?? 0,
-      defaultSalePrice: selectedProduct.defaultSalePrice ?? 0,
+      // numeric(15,2) arrives as a string. The zod schema and the update
+      // payload both expect numbers, so coerce at the form boundary rather than
+      // letting a string ride along into a save.
+      purchasePrice: toNumber(selectedProduct.purchasePrice),
+      defaultSalePrice: toNumber(selectedProduct.defaultSalePrice),
     }
   }
   return {

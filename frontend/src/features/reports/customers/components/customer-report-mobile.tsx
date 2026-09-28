@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { MobileCard } from '@/components/data-table/mobile-card'
 import type { CustomerReportRow } from '@/services/reports'
 
@@ -30,7 +30,7 @@ export function CustomerReportMobile({ data }: { data: CustomerReportRow[] }) {
         const companyName = rows[0].companyName
         const totals = rows.reduce(
           (acc, r) => ({
-            revenue: acc.revenue + r.totalRevenue,
+            revenue: acc.revenue + toNumber(r.totalRevenue),
             unpaid: acc.unpaid + r.unpaidAmount,
           }),
           { revenue: 0, unpaid: 0 },

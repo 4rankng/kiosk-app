@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { CoinsHand } from '@untitledui/icons'
 import { getDashboardStats } from '@/services/reports'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { EmptyState } from '@/components/empty-state'
 import { WidgetCard } from './widget-card'
 
@@ -53,7 +53,7 @@ export function OutstandingDebts() {
     )
   }
 
-  const totalDebt = debts.reduce((s, d) => s + d.amount, 0)
+  const totalDebt = debts.reduce((s, d) => s + toNumber(d.amount), 0)
 
   return (
     <WidgetCard title={TITLE} description={DESCRIPTION}>

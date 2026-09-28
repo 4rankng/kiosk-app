@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getDashboardStats } from '@/services/reports'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { AlertFullWidth } from '@/components/application/alerts/alerts'
 
 /**
@@ -27,7 +27,7 @@ export function DebtAlert() {
   const debts = data?.outstandingDebts ?? []
   if (debts.length === 0) return null
 
-  const totalDebt = debts.reduce((sum, d) => sum + d.amount, 0)
+  const totalDebt = debts.reduce((sum, d) => sum + toNumber(d.amount), 0)
   const customerCount = debts.length
 
   return (

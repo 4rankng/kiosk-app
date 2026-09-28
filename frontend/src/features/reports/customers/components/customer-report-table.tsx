@@ -1,5 +1,5 @@
 import { useMemo, Fragment } from 'react'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/features/reports/components/table'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { CustomerReportMobile } from './customer-report-mobile'
@@ -36,7 +36,7 @@ export function CustomerReportTable({ data }: { data: CustomerReportRow[] }) {
         <TableBody>
           {Object.entries(grouped).map(([companyId, rows]) => {
             const totals = rows.reduce(
-              (acc, r) => ({ revenue: acc.revenue + r.totalRevenue, unpaid: acc.unpaid + r.unpaidAmount }),
+              (acc, r) => ({ revenue: acc.revenue + toNumber(r.totalRevenue), unpaid: acc.unpaid + toNumber(r.unpaidAmount) }),
               { revenue: 0, unpaid: 0 },
             )
             return (

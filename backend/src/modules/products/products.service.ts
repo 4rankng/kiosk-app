@@ -45,6 +45,10 @@ export const productService = {
           categoryName: categories.name,
           unitId: products.unitId,
           unitName: units.name,
+          // NOTE: keep these as raw columns. Values in a .select() map are SQL
+          // expressions, so calling Number() here would evaluate once at
+          // query-build time against the column object and select NaN.
+          // Coercion happens in the row mapping below instead.
           purchasePrice: products.purchasePrice,
           defaultSalePrice: products.defaultSalePrice,
           stockQuantity: products.stockQuantity,
@@ -63,8 +67,13 @@ export const productService = {
     // Resolve effective prices
     const ids = rows.map((r) => r.id)
     const eff = await resolveEffectivePrices(ids, priceListId)
+    // `numeric(15,2)` columns come back from Drizzle as strings. Coerce here so
+    // the API is consistently numeric; the frontend does arithmetic on these and
+    // `+` on a string concatenates.
     const withEffective = rows.map((r) => ({
       ...r,
+      purchasePrice: Number(r.purchasePrice),
+      defaultSalePrice: Number(r.defaultSalePrice),
       effectivePrice: eff.get(r.id) ?? Number(r.defaultSalePrice),
     }))
 
@@ -95,7 +104,12 @@ export const productService = {
       .limit(1)
     if (!row) throw NotFound('Sản phẩm không tồn tại')
     const eff = await resolveEffectivePrices([id], priceListId ?? null)
-    return { ...row, effectivePrice: eff.get(id) ?? Number(row.defaultSalePrice) }
+    return {
+      ...row,
+      purchasePrice: Number(row.purchasePrice),
+      defaultSalePrice: Number(row.defaultSalePrice),
+      effectivePrice: eff.get(id) ?? Number(row.defaultSalePrice),
+    }
   },
 
   /** Create a product and auto-add to general price list (single TX). */

@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { markInvoiceAsPaid } from '@/services/invoices'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { toast } from 'sonner'
 import { CoinsHand } from '@untitledui/icons'
 import { ModalOverlay, Modal, Dialog } from '@/components/application/modals/modal'
@@ -27,7 +27,8 @@ export function PaymentDialog() {
   })
 
   if (!invoice) return null
-  const remaining = invoice.total - invoice.paidAmount
+  // numeric(15,2) arrives as a string; `-` on two strings is not subtraction.
+  const remaining = toNumber(invoice.total) - toNumber(invoice.paidAmount)
 
   return (
     <ModalOverlay isOpen={open === 'payment'} onOpenChange={(v) => { if (!v) setOpen(null) }}>

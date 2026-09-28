@@ -33,8 +33,8 @@ export function ReportKpiGrid({ kpis }: { kpis: ReportKpiCardConfig[] }) {
   )
 }
 
-/** Summary KPI card shared by the report pages (customers, products). */
-export function ReportKpiCard({
+/** Summary KPI card. Internal to ReportKpiGrid — reports configure cards, not render them. */
+function ReportKpiCard({
   icon: Icon,
   label,
   value,

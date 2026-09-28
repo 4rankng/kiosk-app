@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Save01, SearchMd } from '@untitledui/icons'
 import { bulkUpsertPriceListItems } from '@/services/price-lists'
 import type { PriceList, PriceListItem } from '@/types/api'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { InputBase } from '@/components/base/input/input'
 import { NumberInput } from '@/components/number-input'
 import { Button } from '@/components/base/buttons/button'
@@ -47,7 +47,7 @@ function PriceListDesktopTable({
               <td className='px-3 py-2.5 text-end'>
                 <div className='flex justify-end'>
                   <NumberInput
-                    value={item.customPrice}
+                    value={toNumber(item.customPrice)}
                     onValueChange={(val) => onUpdatePrice(item.productId, val)}
                     className='w-[130px]'
                   />
@@ -92,7 +92,7 @@ export function PriceListTable({ priceList, items: initialItems }: PriceListTabl
     mutationFn: () =>
       bulkUpsertPriceListItems(
         priceList.id,
-        items.map((item) => ({ productId: item.productId, customPrice: item.customPrice }))
+        items.map((item) => ({ productId: item.productId, customPrice: toNumber(item.customPrice) }))
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['price-lists'] })

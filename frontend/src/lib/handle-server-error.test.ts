@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ApiError } from './api-client'
 import { handleServerError } from './handle-server-error'
 
 const toastError = vi.hoisted(() => vi.fn())
@@ -18,7 +19,7 @@ describe('handleServerError', () => {
   it('shows a generic message when the error is not recognised', () => {
     handleServerError(new Error('network'))
 
-    expect(toastError).toHaveBeenCalledWith('Something went wrong!')
+    expect(toastError).toHaveBeenCalledWith('Đã xảy ra lỗi, vui lòng thử lại')
   })
 
   it('maps a plain object with status 204 to the no-content message', () => {
@@ -48,7 +49,7 @@ describe('handleServerError', () => {
 
     handleServerError(error)
 
-    expect(toastError).toHaveBeenCalledWith('Something went wrong!')
+    expect(toastError).toHaveBeenCalledWith('Đã xảy ra lỗi, vui lòng thử lại')
   })
 
   it('falls back to the generic message when Axios error.message is an empty string', () => {
@@ -60,7 +61,25 @@ describe('handleServerError', () => {
 
     handleServerError(error)
 
-    expect(toastError).toHaveBeenCalledWith('Something went wrong!')
+    expect(toastError).toHaveBeenCalledWith('Đã xảy ra lỗi, vui lòng thử lại')
+  })
+
+  it('surfaces the server message from a normalised ApiError', () => {
+    // The apiClient interceptor turns every AxiosError into an ApiError before
+    // it reaches here, so this is the shape that actually arrives in practice.
+    handleServerError(
+      new ApiError('duplicate key value violates unique constraint "orders_code_key"', 500)
+    )
+
+    expect(toastError).toHaveBeenCalledWith(
+      'duplicate key value violates unique constraint "orders_code_key"'
+    )
+  })
+
+  it('prefers the ApiError message over the generic fallback', () => {
+    handleServerError(new ApiError('Bãn gia không tồn tại', 404))
+
+    expect(toastError).toHaveBeenCalledWith('Bãn gia không tồn tại')
   })
 
   it('logs the error to the console in development', () => {

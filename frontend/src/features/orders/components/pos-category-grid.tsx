@@ -2,13 +2,13 @@ import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getProducts } from '@/services/products'
 import { getPriceListById } from '@/services/price-lists'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { Plus } from '@untitledui/icons'
 import { cx } from '@/utils/cx'
 
 interface POSCategoryGridProps {
   priceListId: string
-  onAddProduct: (product: { id: string; name: string; unit: string }, price: number) => void
+  onAddProduct: (product: { id: string; name: string; unit: string }, price: number | string) => void
 }
 
 export function POSCategoryGrid({ priceListId, onAddProduct }: POSCategoryGridProps) {
@@ -45,15 +45,19 @@ export function POSCategoryGrid({ priceListId, onAddProduct }: POSCategoryGridPr
     return entry?.[1] ?? []
   }, [categories, currentCategory])
 
-  function getPrice(productId: string, defaultSalePrice: number): number {
+  // Prices come from numeric(15,2) columns and can be strings. Coerce here so
+  // every caller gets a real number.
+  function getPrice(productId: string, defaultSalePrice: number | string): number {
     if (priceList) {
       const item = priceList.items.find((i) => i.productId === productId)
-      if (item) return item.customPrice
+      if (item && item.customPrice !== null && item.customPrice !== undefined) {
+        return toNumber(item.customPrice)
+      }
     }
-    return defaultSalePrice
+    return toNumber(defaultSalePrice)
   }
 
-  function handleAdd(product: { id: string; name: string; unitName: string | null; defaultSalePrice: number }) {
+  function handleAdd(product: { id: string; name: string; unitName: string | null; defaultSalePrice: number | string }) {
     onAddProduct(
       { id: product.id, name: product.name, unit: product.unitName ?? '' },
       getPrice(product.id, product.defaultSalePrice)
@@ -81,18 +85,20 @@ export function POSCategoryGrid({ priceListId, onAddProduct }: POSCategoryGridPr
         ))}
       </div>
 
-      {/* Product grid — single-line tiles capped at 44px */}
+      {/* Product grid — name gets the full tile width, price sits beneath it.
+          Side-by-side, the shrink-0 price and the + icon left the name ~20px on
+          a 390px screen and it truncated to "Ba…". */}
       <div className='grid grid-cols-2 gap-2'>
         {filteredProducts.map((p) => (
           <button
             key={p.id}
             type='button'
             onClick={() => handleAdd({ ...p, unitName: p.unitName ?? null })}
-            className='flex min-h-11 items-center justify-between gap-2 rounded-lg bg-primary px-3 py-1.5 text-left ring-1 ring-secondary_alt transition-colors active:bg-secondary'
+            className='flex min-h-11 flex-col items-start justify-center gap-0.5 rounded-lg bg-primary px-3 py-1.5 text-left ring-1 ring-secondary_alt transition-colors active:bg-secondary'
           >
-            <span className='min-w-0 truncate text-sm font-medium text-primary'>{p.name}</span>
-            <span className='flex shrink-0 items-center gap-1.5'>
-              <span className='text-xs text-tertiary tabular-nums'>
+            <span className='w-full truncate text-sm font-medium text-primary'>{p.name}</span>
+            <span className='flex w-full items-center justify-between gap-1.5'>
+              <span className='min-w-0 truncate text-xs text-tertiary tabular-nums'>
                 {formatCurrency(getPrice(p.id, p.defaultSalePrice))}
                 {p.unitName ? ` · ${p.unitName}` : ''}
               </span>
