@@ -168,10 +168,27 @@ export function OrderCreate() {
           </div>
         ) : (
           <div className='grid grid-cols-12 items-start gap-6'>
-            {/* Left 7-8 cols: Product search & Cart line items */}
+            {/* Step order matches the mobile flow: pick the customer first, then
+                build the cart. The badge numbers describe the order of work, so
+                they must not change with the breakpoint. The cart stays the wide
+                column because it is the main interaction surface. */}
+            <div className='col-span-12 space-y-4 lg:col-span-5 lg:sticky lg:top-20 xl:col-span-4'>
+              <OrderSection step={1} title='Khách hàng & Bảng giá'>
+                <OrderSectionCard>
+                  <CustomerSelector
+                    selectedCustomer={selectedCustomer}
+                    company={company}
+                    priceList={priceList}
+                    onSelect={setSelectedCustomer}
+                  />
+                </OrderSectionCard>
+              </OrderSection>
+            </div>
+
             <div className='col-span-12 space-y-4 lg:col-span-7 xl:col-span-8'>
+              {/* Product search & Cart line items */}
               <OrderSection
-                step={1}
+                step={2}
                 title='Sản phẩm & Giỏ hàng'
                 note={`${items.length} mặt hàng đã chọn`}
               >
@@ -185,21 +202,6 @@ export function OrderCreate() {
                     onUpdateQuantity={updateItemQuantity}
                     onUpdatePrice={updateItemPrice}
                     onRemove={removeItem}
-                  />
-                </OrderSectionCard>
-              </OrderSection>
-            </div>
-
-            {/* Right 4-5 cols: Customer & Summary Checkout Panel */}
-            <div className='col-span-12 space-y-4 lg:sticky lg:top-20 lg:col-span-5 xl:col-span-4'>
-              {/* Customer selection */}
-              <OrderSection step={2} title='Khách hàng & Bảng giá'>
-                <OrderSectionCard>
-                  <CustomerSelector
-                    selectedCustomer={selectedCustomer}
-                    company={company}
-                    priceList={priceList}
-                    onSelect={setSelectedCustomer}
                   />
                 </OrderSectionCard>
               </OrderSection>

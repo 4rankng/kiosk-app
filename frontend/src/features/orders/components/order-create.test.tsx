@@ -191,6 +191,28 @@ describe('OrderCreate', () => {
       .toBeInTheDocument()
   })
 
+  it('numbers the steps in task order — customer, then cart, then summary', async () => {
+    // The badge numbers describe the order of work, so they must be identical
+    // on mobile and desktop. Mobile stacks customer(1) -> cart(2); desktop used
+    // to run cart(1) -> customer(2) -> summary(3), which told the same user two
+    // different stories about the same task.
+    const { container } = await renderOrderCreate()
+
+    const sections = Array.from(container.querySelectorAll('section'))
+    const numbered = sections
+      .map((s) => ({
+        step: s.querySelector('span')?.textContent?.trim(),
+        title: s.querySelector('h3')?.textContent?.trim(),
+      }))
+      .filter((s) => s.step && s.title)
+
+    expect(numbered.map((s) => [s.step, s.title])).toEqual([
+      ['1', 'Khách hàng & Bảng giá'],
+      ['2', 'Sản phẩm & Giỏ hàng'],
+      ['3', 'Tổng kết & Thanh toán'],
+    ])
+  })
+
   it('blocks submit without a customer', async () => {
     const { getByRole } = await renderOrderCreate()
 
