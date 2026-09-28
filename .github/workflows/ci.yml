@@ -1,0 +1,81 @@
+name: ci
+
+# The five gates documented in testplan/README.md § 1. Keeping the commands
+# identical to the local ones means that file stays the single source of truth,
+# and nothing merges without the design-token guard, the contrast suite and the
+# typecheck having actually run.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: lint / typecheck / build / test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: kiosk_dev
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 25
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The backend suite opens a real Redis client on import and asserts
+      # read-only or in-memory behaviour against the local kiosk_dev database.
+      - name: Apply migrations
+        run: pnpm --filter backend db:migrate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/kiosk_dev
+          REDIS_URL: redis://localhost:6379
+
+      - run: pnpm typecheck
+
+      # Includes `lint:tokens`, the design-token guard.
+      - run: pnpm lint
+
+      - run: pnpm build
+
+      - name: Install Chromium for the browser-mode test runner
+        run: pnpm --filter frontend test:browser:install
+
+      - name: Backend tests
+        run: pnpm --filter backend test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/kiosk_dev
+          REDIS_URL: redis://localhost:6379
+
+      - name: Frontend tests
+        run: pnpm --filter frontend test
