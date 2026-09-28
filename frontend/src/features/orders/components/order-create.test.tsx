@@ -198,19 +198,39 @@ describe('OrderCreate', () => {
     // different stories about the same task.
     const { container } = await renderOrderCreate()
 
-    const sections = Array.from(container.querySelectorAll('section'))
-    const numbered = sections
-      .map((s) => ({
-        step: s.querySelector('span')?.textContent?.trim(),
-        title: s.querySelector('h3')?.textContent?.trim(),
-      }))
-      .filter((s) => s.step && s.title)
+    const numbered = Array.from(container.querySelectorAll('section[data-step]')).map((s) => [
+      s.getAttribute('data-step'),
+      s.querySelector('h3')?.textContent?.trim(),
+    ])
 
-    expect(numbered.map((s) => [s.step, s.title])).toEqual([
+    expect(numbered).toEqual([
       ['1', 'Khách hàng & Bảng giá'],
       ['2', 'Sản phẩm & Giỏ hàng'],
       ['3', 'Tổng kết & Thanh toán'],
     ])
+  })
+
+  it('marks a step complete as its condition is met', async () => {
+    const screen = await renderOrderCreate()
+
+    // Nothing is done yet.
+    expect(screen.container.querySelector('section[data-step="1"]')?.getAttribute('data-complete')).toBeNull()
+    expect(screen.container.querySelector('section[data-step="2"]')?.getAttribute('data-complete')).toBeNull()
+
+    // Choosing a customer completes step 1.
+    await userEvent.click(screen.getByPlaceholder('Tìm khách hàng...'))
+    await userEvent.click(screen.getByRole('button', { name: /Nhà hàng Hoa Sứ/ }))
+    await expect
+      .element(screen.container.querySelector<HTMLElement>('section[data-step="1"]')!)
+      .toHaveAttribute('data-complete', 'true')
+
+    // Adding a line completes step 2.
+    const productInput = screen.getByPlaceholder('Gõ tên hàng để thêm...')
+    await userEvent.fill(productInput, 'Tôm')
+    await userEvent.click(screen.getByRole('button', { name: /Tôm sú/ }))
+    await expect
+      .element(screen.container.querySelector<HTMLElement>('section[data-step="2"]')!)
+      .toHaveAttribute('data-complete', 'true')
   })
 
   it('blocks submit without a customer', async () => {

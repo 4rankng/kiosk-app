@@ -141,7 +141,7 @@ export function OrderCreate() {
         {isMobile ? (
           <div className='flex flex-col gap-4'>
             {/* Section 1: Customer */}
-            <OrderSection step={1} title='Thông tin người mua'>
+            <OrderSection step={1} title='Thông tin người mua' isComplete={!!selectedCustomer}>
               <OrderSectionCard>
                 <CustomerSelector
                   selectedCustomer={selectedCustomer}
@@ -153,7 +153,7 @@ export function OrderCreate() {
             </OrderSection>
 
             {/* Section 2: Cart */}
-            <OrderSection step={2} title='Giỏ hàng'>
+            <OrderSection step={2} title='Giỏ hàng' isComplete={items.length > 0}>
               <OrderSectionCard spaced>
                 <ProductSearch
                   priceListId={priceListId}
@@ -173,7 +173,7 @@ export function OrderCreate() {
                 they must not change with the breakpoint. The cart stays the wide
                 column because it is the main interaction surface. */}
             <div className='col-span-12 space-y-4 lg:col-span-5 lg:sticky lg:top-20 xl:col-span-4'>
-              <OrderSection step={1} title='Khách hàng & Bảng giá'>
+              <OrderSection step={1} title='Khách hàng & Bảng giá' isComplete={!!selectedCustomer}>
                 <OrderSectionCard>
                   <CustomerSelector
                     selectedCustomer={selectedCustomer}
@@ -191,6 +191,7 @@ export function OrderCreate() {
                 step={2}
                 title='Sản phẩm & Giỏ hàng'
                 note={`${items.length} mặt hàng đã chọn`}
+                isComplete={items.length > 0}
               >
                 <OrderSectionCard spaced>
                   <ProductSearch

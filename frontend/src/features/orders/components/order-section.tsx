@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Check } from '@untitledui/icons'
 
 export interface OrderSectionProps {
   /** 1-based step number shown in the brand-filled badge. */
@@ -6,6 +7,16 @@ export interface OrderSectionProps {
   title: string
   /** Optional right-aligned note in the header row, e.g. "3 mặt hàng đã chọn". */
   note?: ReactNode
+  /**
+   * Swaps the number for a tick once the step's condition is met, so the flow
+   * shows progress at a glance.
+   *
+   * This borrows the completed-state idea from Tailkit's step components but
+   * deliberately not their wizard shape: the POS is a workspace where the
+   * customer, the cart and the totals are usable at once, not a gate you click
+   * through. Nothing here locks or hides a later step.
+   */
+  isComplete?: boolean
   children: ReactNode
 }
 
@@ -17,13 +28,16 @@ export interface OrderSectionProps {
  * desktop) with the same badge and card classes each time, so the step styling
  * is defined once here.
  */
-export function OrderSection({ step, title, note, children }: OrderSectionProps) {
+export function OrderSection({ step, title, note, isComplete = false, children }: OrderSectionProps) {
   return (
-    <section className='space-y-2'>
+    <section className='space-y-2' data-step={step} data-complete={isComplete || undefined}>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2'>
-          <span className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'>
-            {step}
+          <span
+            className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'
+            aria-label={isComplete ? `Bước ${step} đã hoàn tất` : `Bước ${step}`}
+          >
+            {isComplete ? <Check className='size-3.5' /> : step}
           </span>
           <h3 className='text-sm font-semibold uppercase tracking-wider text-tertiary'>
             {title}
