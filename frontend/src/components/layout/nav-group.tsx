@@ -25,7 +25,7 @@ type NavGroupOwnProps = NavGroupProps & {
 const itemBase =
   'flex h-9 items-center gap-2 rounded-md px-2 text-sm font-semibold text-secondary outline-focus-ring transition duration-100 ease-linear select-none hover:bg-primary_hover hover:text-secondary_hover focus-visible:outline-2 focus-visible:-outline-offset-2'
 const itemActive = 'bg-secondary text-secondary_hover hover:bg-secondary hover:text-secondary_hover'
-const itemIcon = 'size-5 shrink-0 text-fg-quaternary transition-inherit-all group-hover/item:text-fg-quaternary_hover'
+const itemIcon = 'size-5 shrink-0 text-quaternary transition-inherit-all group-hover/item:text-fg-quaternary_hover'
 
 export function NavGroup({ title, items, forceExpanded = false }: NavGroupOwnProps) {
   const { collapsible } = useLayout()
@@ -112,7 +112,7 @@ function NavCollapsibleItem({ item, href }: { item: NavCollapsible; href: string
         <ChevronDown
           aria-hidden='true'
           className={cn(
-            'size-4 shrink-0 text-fg-quaternary transition-transform duration-200',
+            'size-4 shrink-0 text-quaternary transition-transform duration-200',
             open && 'rotate-180',
             !item.badge && 'ms-auto'
           )}
@@ -127,7 +127,7 @@ function NavCollapsibleItem({ item, href }: { item: NavCollapsible; href: string
                 onClick={() => setOpen(false)}
                 className={cn(itemBase, checkIsActive(href, subItem) && itemActive)}
               >
-                {subItem.icon && <subItem.icon aria-hidden='true' className='size-5 shrink-0 text-fg-quaternary' />}
+                {subItem.icon && <subItem.icon aria-hidden='true' className='size-5 shrink-0 text-quaternary' />}
                 <span className='truncate'>{subItem.title}</span>
               </Link>
             </li>
@@ -157,7 +157,7 @@ function RailLink({ item, isActive }: { item: NavLink; isActive: boolean }) {
         >
           <Icon
             aria-hidden='true'
-            className={cn('size-5 shrink-0 text-fg-quaternary', isActive && 'text-fg-quaternary_hover')}
+            className={cn('size-5 shrink-0 text-quaternary', isActive && 'text-fg-quaternary_hover')}
           />
         </Link>
       </Tooltip>
@@ -178,7 +178,7 @@ function RailGroupLink({ item, isActive }: { item: NavCollapsible; isActive: boo
           aria-label={item.title}
           className='flex size-9 items-center justify-center rounded-md outline-focus-ring transition duration-100 ease-linear select-none hover:bg-primary_hover focus-visible:outline-2 focus-visible:-outline-offset-2'
         >
-          <Icon aria-hidden='true' className={cn('size-5 shrink-0 text-fg-quaternary', isActive && 'text-fg-quaternary_hover')} />
+          <Icon aria-hidden='true' className={cn('size-5 shrink-0 text-quaternary', isActive && 'text-fg-quaternary_hover')} />
         </AriaButton>
         <AriaPopover
           placement='right top'

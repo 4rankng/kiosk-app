@@ -95,7 +95,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder='Nhập lệnh hoặc tìm kiếm...'
                 aria-label='Nhập lệnh hoặc tìm kiếm'
-                className='h-12 w-full bg-transparent text-sm text-secondary outline-hidden placeholder:text-fg-quaternary'
+                className='h-12 w-full bg-transparent text-sm text-secondary outline-hidden placeholder:text-quaternary'
               />
             </div>
             <div
@@ -121,12 +121,12 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
                       index === activeIndex && 'bg-primary_hover'
                     )}
                   >
-                    <ArrowRight aria-hidden='true' className='size-3 text-fg-quaternary' />
+                    <ArrowRight aria-hidden='true' className='size-3 text-quaternary' />
                     {item.parent ? (
                       <span className='flex items-center gap-1'>
                         {item.parent}
                         {' '}
-                        <ChevronRight aria-hidden='true' className='size-3.5 text-fg-quaternary' />
+                        <ChevronRight aria-hidden='true' className='size-3.5 text-quaternary' />
                         {' '}
                         {item.title}
                       </span>

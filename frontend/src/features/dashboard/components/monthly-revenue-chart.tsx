@@ -34,7 +34,7 @@ function ChartEmptyState() {
     <div className='my-auto flex h-[250px] w-full items-center justify-center'>
       <EmptyState
         variant='empty'
-        icon={<BarChart01 className='size-10 text-fg-quaternary' />}
+        icon={<BarChart01 className='size-10 text-quaternary' />}
         title='Chưa có doanh thu'
         description='Dữ liệu sẽ xuất hiện khi có đơn hàng trong tháng'
       />

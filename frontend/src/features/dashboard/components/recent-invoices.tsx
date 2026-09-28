@@ -114,7 +114,7 @@ export function RecentInvoices() {
   if (invoices.length === 0) {
     return (
       <WidgetCard title='Hóa đơn gần đây'>
-        <EmptyState variant='empty' className='my-auto' icon={<File02 className='size-10 text-fg-quaternary' />} title='Chưa có hóa đơn' description='Dữ liệu sẽ xuất hiện khi có hóa đơn' />
+        <EmptyState variant='empty' className='my-auto' icon={<File02 className='size-10 text-quaternary' />} title='Chưa có hóa đơn' description='Dữ liệu sẽ xuất hiện khi có hóa đơn' />
       </WidgetCard>
     )
   }

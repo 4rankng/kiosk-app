@@ -1,101 +1,24 @@
-import { useState, useMemo } from 'react'
-import { type SortingState, type ColumnFiltersState, type VisibilityState, type RowSelectionState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
 import { useQuery } from '@tanstack/react-query'
 import { getCompanies } from '@/services/companies'
-import { DataTablePagination } from '@/components/data-table'
-import { useIsMobile } from '@/hooks/use-mobile'
-import { MobileCardView } from '@/components/data-table/mobile-card-view'
+import { DataTable } from '@/components/data-table'
 import { getCompaniesColumns } from './companies-columns'
 import { companiesCardConfig } from './companies-mobile-config'
-import { EmptyState } from '@/components/empty-state'
-import { getColumnAriaSort } from '@/components/data-table/aria-sort'
 
 export function CompaniesTable() {
   const { data: companiesData, isLoading, isError, refetch } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
   const companies = companiesData?.data ?? []
-  const isMobile = useIsMobile()
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-  const columns = useMemo(() => getCompaniesColumns(), [])
-
-  const table = useReactTable({
-    data: companies, columns,
-    state: { sorting, columnFilters, columnVisibility, rowSelection },
-    onSortingChange: setSorting, onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility, onRowSelectionChange: setRowSelection,
-    getCoreRowModel: getCoreRowModel(), getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(), getSortedRowModel: getSortedRowModel(),
-  })
-
-  if (isLoading) {
-    return <EmptyState variant='loading' rows={6} />
-  }
-  if (isError) {
-    return (
-      <EmptyState
-        variant='error'
-        title='Không tải được danh sách công ty'
-        description='Vui lòng kiểm tra kết nối và thử lại.'
-        onRetry={() => refetch()}
-      />
-    )
-  }
 
   return (
-    <div className='space-y-4'>
-      {isMobile ? (
-        <MobileCardView
-          table={table}
-          config={companiesCardConfig}
-          expandedId={expandedId}
-          infiniteScroll={true}
-          onToggle={(id) => setExpandedId(expandedId === id ? null : id)}
-        />
-      ) : (
-        <div className='w-full overflow-x-auto rounded-lg bg-primary shadow-xs ring-1 ring-secondary ring-inset'>
-          <table className='w-full caption-bottom text-sm'>
-            <thead className='border-b border-secondary [&_tr]:border-b [&_tr]:border-secondary'>
-              {table.getHeaderGroups().map((hg) => (
-                <tr key={hg.id}>
-                  {hg.headers.map((h) => (
-                    <th
-                      key={h.id}
-                      scope='col'
-                      aria-sort={getColumnAriaSort(h.column)}
-                      className='h-9 px-2 text-start align-middle text-xs font-medium whitespace-nowrap text-tertiary'
-                    >
-                      {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody className='[&_tr:last-child]:border-0'>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className='border-b border-secondary transition-colors hover:bg-primary_hover'>
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className='px-2 py-1.5 align-middle whitespace-nowrap text-secondary'>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={columns.length} className='h-24 text-center text-sm text-tertiary'>
-                    Không có dữ liệu.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
-      {!isMobile && <DataTablePagination table={table} />}
-    </div>
+    <DataTable
+      data={companies}
+      columns={getCompaniesColumns()}
+      mobileConfig={companiesCardConfig}
+      isLoading={isLoading}
+      isError={isError}
+      onRetry={() => refetch()}
+      errorTitle='Không tải được danh sách công ty'
+      loadingRows={6}
+      showToolbar={false}
+    />
   )
 }

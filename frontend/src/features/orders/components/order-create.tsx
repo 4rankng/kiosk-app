@@ -18,6 +18,7 @@ import { OrderSummary } from './order-summary'
 import { BusinessEntitySelector } from './business-entity-selector'
 import { OrderSuccessDialog } from './order-success-dialog'
 import { OrderReviewSheet } from './order-review-sheet'
+import { OrderSection, OrderSectionCard } from './order-section'
 
 export function OrderCreate() {
   useDocumentTitle('Tạo đơn hàng mới')
@@ -140,36 +141,20 @@ export function OrderCreate() {
         {isMobile ? (
           <div className='flex flex-col gap-4'>
             {/* Section 1: Customer */}
-            <section className='space-y-2'>
-              <div className='flex items-center gap-2'>
-                <span className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'>
-                  1
-                </span>
-                <h3 className='text-sm font-semibold uppercase tracking-wider text-tertiary'>
-                  Thông tin người mua
-                </h3>
-              </div>
-              <div className='rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
+            <OrderSection step={1} title='Thông tin người mua' isComplete={!!selectedCustomer}>
+              <OrderSectionCard>
                 <CustomerSelector
                   selectedCustomer={selectedCustomer}
                   company={company}
                   priceList={priceList}
                   onSelect={setSelectedCustomer}
                 />
-              </div>
-            </section>
+              </OrderSectionCard>
+            </OrderSection>
 
             {/* Section 2: Cart */}
-            <section className='space-y-2'>
-              <div className='flex items-center gap-2'>
-                <span className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'>
-                  2
-                </span>
-                <h3 className='text-sm font-semibold uppercase tracking-wider text-tertiary'>
-                  Giỏ hàng
-                </h3>
-              </div>
-              <div className='space-y-3 rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
+            <OrderSection step={2} title='Giỏ hàng' isComplete={items.length > 0}>
+              <OrderSectionCard spaced>
                 <ProductSearch
                   priceListId={priceListId}
                   onAddProduct={addItem}
@@ -178,28 +163,37 @@ export function OrderCreate() {
                   priceListId={priceListId}
                   onAddProduct={addItem}
                 />
-              </div>
-            </section>
+              </OrderSectionCard>
+            </OrderSection>
           </div>
         ) : (
           <div className='grid grid-cols-12 items-start gap-6'>
-            {/* Left 7-8 cols: Product search & Cart line items */}
+            {/* Step order matches the mobile flow: pick the customer first, then
+                build the cart. The badge numbers describe the order of work, so
+                they must not change with the breakpoint. The cart stays the wide
+                column because it is the main interaction surface. */}
+            <div className='col-span-12 space-y-4 lg:col-span-5 lg:sticky lg:top-20 xl:col-span-4'>
+              <OrderSection step={1} title='Khách hàng & Bảng giá' isComplete={!!selectedCustomer}>
+                <OrderSectionCard>
+                  <CustomerSelector
+                    selectedCustomer={selectedCustomer}
+                    company={company}
+                    priceList={priceList}
+                    onSelect={setSelectedCustomer}
+                  />
+                </OrderSectionCard>
+              </OrderSection>
+            </div>
+
             <div className='col-span-12 space-y-4 lg:col-span-7 xl:col-span-8'>
-              <section className='space-y-2'>
-                <div className='flex items-center justify-between'>
-                  <div className='flex items-center gap-2'>
-                    <span className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'>
-                      1
-                    </span>
-                    <h3 className='text-sm font-semibold uppercase tracking-wider text-tertiary'>
-                      Sản phẩm & Giỏ hàng
-                    </h3>
-                  </div>
-                  <span className='text-xs text-quaternary'>
-                    {items.length} mặt hàng đã chọn
-                  </span>
-                </div>
-                <div className='space-y-4 rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
+              {/* Product search & Cart line items */}
+              <OrderSection
+                step={2}
+                title='Sản phẩm & Giỏ hàng'
+                note={`${items.length} mặt hàng đã chọn`}
+                isComplete={items.length > 0}
+              >
+                <OrderSectionCard spaced>
                   <ProductSearch
                     priceListId={priceListId}
                     onAddProduct={addItem}
@@ -210,43 +204,12 @@ export function OrderCreate() {
                     onUpdatePrice={updateItemPrice}
                     onRemove={removeItem}
                   />
-                </div>
-              </section>
-            </div>
-
-            {/* Right 4-5 cols: Customer & Summary Checkout Panel */}
-            <div className='col-span-12 space-y-4 lg:sticky lg:top-20 lg:col-span-5 xl:col-span-4'>
-              {/* Customer selection */}
-              <section className='space-y-2'>
-                <div className='flex items-center gap-2'>
-                  <span className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'>
-                    2
-                  </span>
-                  <h3 className='text-sm font-semibold uppercase tracking-wider text-tertiary'>
-                    Khách hàng & Bảng giá
-                  </h3>
-                </div>
-                <div className='rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
-                  <CustomerSelector
-                    selectedCustomer={selectedCustomer}
-                    company={company}
-                    priceList={priceList}
-                    onSelect={setSelectedCustomer}
-                  />
-                </div>
-              </section>
+                </OrderSectionCard>
+              </OrderSection>
 
               {/* Order Totals & Business Entity */}
-              <section className='space-y-2'>
-                <div className='flex items-center gap-2'>
-                  <span className='flex size-6 items-center justify-center rounded-full bg-brand-solid text-xs font-semibold text-white'>
-                    3
-                  </span>
-                  <h3 className='text-sm font-semibold uppercase tracking-wider text-tertiary'>
-                    Tổng kết & Thanh toán
-                  </h3>
-                </div>
-                <div className='space-y-4 rounded-xl bg-primary p-4 shadow-xs ring-1 ring-secondary_alt'>
+              <OrderSection step={3} title='Tổng kết & Thanh toán'>
+                <OrderSectionCard spaced>
                   <OrderSummary
                     subtotal={subtotal}
                     discount={discount}
@@ -265,8 +228,8 @@ export function OrderCreate() {
                   >
                     {createMutation.isPending ? 'Đang lưu...' : 'Lưu và tạo hóa đơn'}
                   </Button>
-                </div>
-              </section>
+                </OrderSectionCard>
+              </OrderSection>
             </div>
           </div>
         )}

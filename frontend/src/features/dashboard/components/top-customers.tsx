@@ -44,7 +44,7 @@ export function TopCustomers() {
       <WidgetCard title={TITLE} description={DESCRIPTION}>
         <EmptyState
           variant='empty'
-          icon={<Users01 className='size-10 text-fg-quaternary' />}
+          icon={<Users01 className='size-10 text-quaternary' />}
           title='Chưa có khách hàng'
           description='Dữ liệu sẽ xuất hiện khi có đơn hàng'
           className='my-auto'

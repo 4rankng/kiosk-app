@@ -44,7 +44,7 @@ export function OutstandingDebts() {
       <WidgetCard title={TITLE} description={DESCRIPTION}>
         <EmptyState
           variant='empty'
-          icon={<CoinsHand className='size-10 text-fg-quaternary' />}
+          icon={<CoinsHand className='size-10 text-quaternary' />}
           title='Không có công nợ'
           description='Tất cả hóa đơn đã thanh toán'
           className='my-auto'

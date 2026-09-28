@@ -96,7 +96,7 @@ export function POSCategoryGrid({ priceListId, onAddProduct }: POSCategoryGridPr
                 {formatCurrency(getPrice(p.id, p.defaultSalePrice))}
                 {p.unitName ? ` · ${p.unitName}` : ''}
               </span>
-              <Plus className='size-4 shrink-0 text-fg-quaternary' />
+              <Plus className='size-4 shrink-0 text-quaternary' />
             </span>
           </button>
         ))}

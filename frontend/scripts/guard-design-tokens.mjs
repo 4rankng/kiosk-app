@@ -2,12 +2,15 @@
 /**
  * Design-token guard for the Fresh Market system.
  *
- * Bans, in app code (shadcn primitives in src/components/ui are exempt):
+ * Bans, in app code (UntitledUI vendor components in src/components/{ui,base,
+ * application,foundations} are exempt):
  *   1. palette-numbered Tailwind color utilities (text-emerald-600-style) —
  *      semantic tokens (text-success, bg-warning/10, ...) only;
  *   2. `dark:` variants — the app is light-only;
  *   3. display-size text utilities (text-xl and up) — the type contract is
- *      11px/12px via theme.css tokens.
+ *      11px/12px via theme.css tokens;
+ *   4. Heroicons CSS classes (hi-micro/hi-outline/hi-solid) — not installed
+ *      here, so they render nothing; use @untitledui/icons.
  *
  * Exit 1 lists every violation with file:line. Run via `pnpm lint:tokens`.
  */
@@ -48,6 +51,14 @@ const RULES = [
   {
     name: 'display-size text utility (11/12px type contract; use text-sm/text-display)',
     re: /\btext-(?:xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)\b/g,
+  },
+  {
+    // Heroicons CSS (hi-micro/hi-outline/hi-solid + modifiers) is what the
+    // Tailkit MCP emits for icons. It is not installed here, so the classes
+    // render nothing at all and the icon silently disappears. Use
+    // @untitledui/icons instead, resolved via the UntitledUI MCP's search_icons.
+    name: 'Heroicons CSS class (not installed; use @untitledui/icons)',
+    re: /\bhi-(?:micro|mini|outline|solid)(?:[\w-]*)\b/g,
   },
 ]
 
