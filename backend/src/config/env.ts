@@ -6,18 +6,36 @@ import './dotenv.js'
 import { z } from 'zod'
 import crypto from 'node:crypto'
 
-const envSchema = z.object({
+// dotenv materialises a blank `KEY=` line in .env as an empty string, so an
+// optional var left blank fails `.url()` / reads as configured rather than
+// unset. The shipped .env leaves the OAuth keys blank, which made the server
+// refuse to boot at all even though Google sign-in is optional. Treat blank
+// as "not configured" for the optional values.
+const optionalUrl = z.preprocess(
+  (v) => (typeof v === 'string' && v.trim() === '' ? undefined : v),
+  z.string().url().optional()
+)
+const optionalString = z.preprocess(
+  (v) => (typeof v === 'string' && v.trim() === '' ? undefined : v),
+  z.string().optional()
+)
+
+// Exported so the blank-vs-unset behaviour can be tested without booting the
+// server (this module calls process.exit on an invalid parse).
+export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().int().positive().default(3000),
   API_BASE_URL: z.string().url().default('http://localhost:3000'),
-  CORS_ORIGIN: z.string().default('http://localhost:5173'),
+  // Must match frontend/vite.config.ts `server.port` (5174, strictPort).
+  // app.ts splits on ',' so an override can carry more than one origin.
+  CORS_ORIGIN: z.string().default('http://localhost:5174'),
 
   POSTGRES_HOST: z.string().default('localhost'),
   POSTGRES_PORT: z.coerce.number().int().positive().default(5432),
   POSTGRES_USER: z.string().min(1, 'POSTGRES_USER is required'),
   POSTGRES_PASSWORD: z.string().default(''),
   POSTGRES_DB: z.string().min(1, 'POSTGRES_DB is required'),
-  DATABASE_URL: z.string().url().optional(),
+  DATABASE_URL: optionalUrl,
 
   REDIS_URL: z.string().default('redis://localhost:6379'),
 
@@ -26,9 +44,9 @@ const envSchema = z.object({
   JWT_REFRESH_TTL: z.string().default('7d'),
   BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(10),
 
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
-  GOOGLE_REDIRECT_URI: z.string().url().optional(),
+  GOOGLE_CLIENT_ID: optionalString,
+  GOOGLE_CLIENT_SECRET: optionalString,
+  GOOGLE_REDIRECT_URI: optionalUrl,
 
   ALLOWED_EMAILS: z
     .string()
