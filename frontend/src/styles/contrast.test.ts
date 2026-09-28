@@ -68,6 +68,16 @@ const PAIRS: Array<[string, string, [number, number, number] | string, number]> 
   ['--color-text-warning-primary', 'paper', '--color-paper', TEXT_MIN],
   ['--color-text-success-primary', 'paper', '--color-paper', TEXT_MIN],
   ['--color-text-error-primary', 'paper', '--color-paper', TEXT_MIN],
+  // Brand text tokens. These resolve from the brand ramp, so any future brand
+  // recolour is gated here — brand-600 in particular is both the primary button
+  // fill and text-brand-tertiary, and it has to hold up as text on paper.
+  ['--color-text-brand-primary', 'white', WHITE, TEXT_MIN],
+  ['--color-text-brand-secondary', 'white', WHITE, TEXT_MIN],
+  ['--color-text-brand-tertiary', 'white', WHITE, TEXT_MIN],
+  ['--color-text-brand-primary', 'paper', '--color-paper', TEXT_MIN],
+  ['--color-text-brand-secondary', 'paper', '--color-paper', TEXT_MIN],
+  ['--color-text-brand-tertiary', 'paper', '--color-paper', TEXT_MIN],
+  ['--color-text-brand-tertiary', 'bg-secondary', '--color-bg-secondary', TEXT_MIN],
   // bg-secondary fills (table headers, chips, muted rows)
   ['--color-text-primary', 'bg-secondary', '--color-bg-secondary', TEXT_MIN],
   ['--color-text-tertiary', 'bg-secondary', '--color-bg-secondary', TEXT_MIN],

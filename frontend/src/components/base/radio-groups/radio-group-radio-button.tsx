@@ -30,7 +30,7 @@ export const RadioGroupRadioButton = ({ items, size = "sm", className, ...props 
                             "relative flex cursor-pointer rounded-xl bg-primary p-4 outline-focus-ring ring-inset",
                             size === "md" ? "gap-3" : "gap-2",
                             isSelected ? "ring-2 ring-brand" : "ring-1 ring-secondary",
-                            isDisabled && "cursor-not-allowed bg-disabled_subtle ring-disabled_subtle",
+                            isDisabled && "cursor-not-allowed opacity-50 ",
                             isFocusVisible && "outline-2 outline-offset-2",
                         )
                     }
@@ -42,7 +42,7 @@ export const RadioGroupRadioButton = ({ items, size = "sm", className, ...props 
                                     "relative mt-0.5 inline-flex shrink-0 items-center justify-center rounded-full ring-inset",
                                     size === "md" ? "size-5" : "size-4",
                                     isSelected ? "bg-brand-solid" : "ring-1 ring-primary",
-                                    isDisabled && "bg-disabled_subtle ring-1 ring-disabled",
+                                    isDisabled && "opacity-50 ring-1 ",
                                     isFocusVisible && "outline-2 outline-offset-2 outline-focus-ring",
                                 )}
                             >
@@ -51,7 +51,6 @@ export const RadioGroupRadioButton = ({ items, size = "sm", className, ...props 
                                         "absolute rounded-full bg-fg-white opacity-0",
                                         size === "md" ? "size-2" : "size-1.5",
                                         isSelected ? "opacity-100" : "opacity-0",
-                                        isDisabled && "bg-fg-disabled_subtle",
                                     )}
                                 />
                             </div>

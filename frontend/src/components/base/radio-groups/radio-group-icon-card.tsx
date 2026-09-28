@@ -34,8 +34,8 @@ export const RadioGroupIconCard = ({ items, size = "sm", className, ...props }: 
                         cx(
                             "relative block cursor-pointer rounded-xl bg-primary outline-focus-ring ring-inset",
                             isSelected ? "ring-2 ring-brand" : "ring-1 ring-secondary",
-                            isDisabled && "cursor-not-allowed bg-disabled_subtle ring-disabled",
-                            isSelected && isDisabled && "ring-disabled_subtle",
+                            isDisabled && "cursor-not-allowed opacity-50 ",
+                            isSelected && isDisabled && "",
                             isFocusVisible && "outline-2 outline-offset-2",
                         )
                     }
@@ -46,8 +46,8 @@ export const RadioGroupIconCard = ({ items, size = "sm", className, ...props }: 
                                 className={cx(
                                     "flex items-center gap-3 rounded-t-xl p-3 pr-5 ring-inset",
                                     isSelected ? "ring-2 ring-brand" : "ring-1 ring-secondary",
-                                    isDisabled && "ring-disabled",
-                                    isSelected && isDisabled && "ring-disabled_subtle",
+                                    isDisabled && "",
+                                    isSelected && isDisabled && "",
                                     isFocusVisible && "outline-hidden",
                                 )}
                             >
@@ -56,7 +56,7 @@ export const RadioGroupIconCard = ({ items, size = "sm", className, ...props }: 
                                     icon={plan.icon}
                                     color="gray"
                                     theme="modern"
-                                    className={cx(isDisabled && "bg-disabled text-fg-disabled")}
+                                    className={cx(isDisabled && "opacity-50 ")}
                                 />
 
                                 <span className={cx("mr-1 text-secondary", size === "md" ? "text-lg font-semibold" : "text-md font-semibold")}>

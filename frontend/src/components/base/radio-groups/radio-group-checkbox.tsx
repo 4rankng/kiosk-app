@@ -31,7 +31,7 @@ export const RadioGroupCheckbox = ({ items, size = "sm", className, ...props }: 
                             "relative flex cursor-pointer items-start gap-1 rounded-xl bg-primary p-4 outline-focus-ring ring-inset",
                             size === "md" ? "gap-3" : "gap-2",
                             isSelected ? "ring-2 ring-brand" : "ring-1 ring-secondary",
-                            isDisabled && "cursor-not-allowed bg-disabled_subtle ring-disabled_subtle",
+                            isDisabled && "cursor-not-allowed opacity-50 ",
                             isFocusVisible && "outline-2 outline-offset-2",
                         )
                     }

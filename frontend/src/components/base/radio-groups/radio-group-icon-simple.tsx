@@ -31,7 +31,7 @@ export const RadioGroupIconSimple = ({ items, size = "sm", className, ...props }
                         cx(
                             "relative flex cursor-pointer items-start gap-1 rounded-xl bg-primary p-4 outline-focus-ring ring-inset",
                             isSelected ? "ring-2 ring-brand" : "ring-1 ring-secondary",
-                            isDisabled && "cursor-not-allowed bg-disabled_subtle ring-disabled",
+                            isDisabled && "cursor-not-allowed opacity-50 ",
                             isFocusVisible && "outline-2 outline-offset-2",
                         )
                     }
@@ -44,7 +44,7 @@ export const RadioGroupIconSimple = ({ items, size = "sm", className, ...props }
                                     size={size === "md" ? "md" : "sm"}
                                     color="gray"
                                     theme="modern"
-                                    className={cx(isDisabled && "bg-disabled text-fg-disabled")}
+                                    className={cx(isDisabled && "opacity-50 ")}
                                 />
 
                                 <div className={cx("flex flex-col", size === "md" ? "gap-0.5" : "")}>
