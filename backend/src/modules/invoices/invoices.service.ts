@@ -16,6 +16,18 @@ import { AppError, NotFound } from '../../lib/errors.js'
 /** Status values allowed on the invoices.status column. */
 type InvoiceStatus = (typeof invoiceStatusEnum.enumValues)[number]
 
+
+/** Coerce `numeric(15,2)` columns (strings from Drizzle) to numbers. */
+function withMoney<T extends { subtotal: unknown; discount: unknown; total: unknown; paidAmount: unknown }>(row: T) {
+  return {
+    ...row,
+    subtotal: Number(row.subtotal),
+    discount: Number(row.discount),
+    total: Number(row.total),
+    paidAmount: Number(row.paidAmount),
+  }
+}
+
 export const invoiceService = {
   /** List invoices with filters and pagination. */
   async list(params: {
@@ -67,7 +79,9 @@ export const invoiceService = {
         .leftJoin(customers, eq(invoices.customerId, customers.id))
         .where(where),
     ])
-    return { items: rows, total: Number(total) }
+    // `numeric(15,2)` columns arrive from Drizzle as strings; coerce so the
+    // API is consistently numeric (the frontend does arithmetic on these).
+    return { items: rows.map(withMoney), total: Number(total) }
   },
 
   /** Get invoice detail (header + items). */
@@ -104,7 +118,7 @@ export const invoiceService = {
       .from(orderItems)
       .where(eq(orderItems.orderId, inv.orderId))
       .orderBy(orderItems.sortOrder)
-    return { ...inv, items }
+    return { ...withMoney(inv), items }
   },
 
   /** Get invoice with full detail for PDF rendering. */

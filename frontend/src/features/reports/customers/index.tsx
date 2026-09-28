@@ -9,7 +9,7 @@ import { ReportScreen } from '@/components/report-screen'
 import { useReportDateRange } from '@/components/use-report-date-range'
 import { CustomerReportTable } from './components/customer-report-table'
 import { ExportActions } from './components/export-actions'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { ReportKpiGrid } from '@/features/reports/components/report-kpi-card'
 
 
@@ -17,8 +17,8 @@ import { ReportKpiGrid } from '@/features/reports/components/report-kpi-card'
 function summarizeCustomerReport(rows: CustomerReportRow[]) {
   return rows.reduce(
     (acc, r) => ({
-      revenue: acc.revenue + r.totalRevenue,
-      unpaid: acc.unpaid + r.unpaidAmount,
+      revenue: acc.revenue + toNumber(r.totalRevenue),
+      unpaid: acc.unpaid + toNumber(r.unpaidAmount),
       customers: acc.customers + 1,
     }),
     { revenue: 0, unpaid: 0, customers: 0 }

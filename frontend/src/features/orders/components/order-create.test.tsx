@@ -210,6 +210,48 @@ describe('OrderCreate', () => {
     ])
   })
 
+  it('totals correctly when the API returns prices as strings', async () => {
+    // Regression: every money column is numeric(15,2) in Postgres, so Drizzle
+    // hands these back as strings. `0 + "120000.00" + "90000.00"` concatenates
+    // to "0120000.0090000.00" and the summary then rendered a literal "NaN đ".
+    const stringPriced = {
+      ...product,
+      defaultSalePrice: '120000.00',
+      purchasePrice: '90000.00',
+    }
+    m.getProducts.mockResolvedValue([stringPriced, { ...product2, defaultSalePrice: '90000.00' }])
+    // Exercise both price paths as strings: p1 resolves through the price
+    // list's customPrice, p2 falls back to the product's defaultSalePrice.
+    m.getPriceListById.mockResolvedValue({
+      priceList,
+      items: [{ ...priceListDetail.items[0], customPrice: '125000.00' }],
+    })
+    m.getPriceListByCompany.mockResolvedValue({
+      priceList,
+      items: [{ ...priceListDetail.items[0], customPrice: '125000.00' }],
+    })
+    const screen = await renderOrderCreate()
+
+    const productInput = screen.getByPlaceholder('Gõ tên hàng để thêm...')
+    await userEvent.fill(productInput, 'Tôm')
+    await userEvent.click(screen.getByRole('button', { name: /Tôm sú/ }))
+    await userEvent.fill(productInput, 'Cá')
+    await userEvent.click(screen.getByRole('button', { name: /Cá basa/ }))
+
+    // The summary is what broke, and both layouts render it.
+    await expect.element(screen.getByText('Tổng tiền hàng:')).toBeInTheDocument()
+
+    // Assert on the figure in the row, not a hard-coded layout.
+    const summaryRow = screen.getByText('Tổng tiền hàng:').element().closest('div')!
+    const subtotalShown = summaryRow.textContent ?? ''
+    expect(subtotalShown).toMatch(/165\.000 đ/)
+    expect(subtotalShown).not.toContain('NaN')
+
+    const dueRow = screen.getByText('Khách cần trả:').element().closest('div')!
+    expect(dueRow.textContent).toMatch(/165\.000 đ/)
+    expect(dueRow.textContent).not.toContain('NaN')
+  })
+
   it('marks a step complete as its condition is met', async () => {
     const screen = await renderOrderCreate()
 

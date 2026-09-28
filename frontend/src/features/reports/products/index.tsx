@@ -5,7 +5,7 @@ import { getProductReport, type ProductReportRow } from '@/services/reports'
 import { ReportScreen } from '@/components/report-screen'
 import { useReportDateRange } from '@/components/use-report-date-range'
 import { ProductReportTable } from './components/product-report-table'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { ReportKpiGrid } from '@/features/reports/components/report-kpi-card'
 
 
@@ -13,7 +13,7 @@ import { ReportKpiGrid } from '@/features/reports/components/report-kpi-card'
 function summarizeProductReport(rows: ProductReportRow[]) {
   return rows.reduce(
     (acc, r) => ({
-      revenue: acc.revenue + r.totalRevenue,
+      revenue: acc.revenue + toNumber(r.totalRevenue),
       quantity: acc.quantity + r.totalQuantity,
       products: acc.products + 1,
     }),

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 import { NumberInput } from '@/components/number-input'
 import type { PriceListItem } from '@/types/api'
 
@@ -76,7 +76,7 @@ export function PriceListMobile({
           <div className='flex items-center gap-2'>
             <span className='shrink-0 text-xs text-tertiary'>Giá bán:</span>
             <NumberInput
-              value={item.customPrice}
+              value={toNumber(item.customPrice)}
               onValueChange={(val) => onUpdatePrice(item.productId, val)}
               className='flex-1'
             />

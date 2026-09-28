@@ -16,11 +16,11 @@ export function OrderSummary({ subtotal, discount, total, onDiscountChange }: Or
         <span className='font-medium text-primary'>{formatCurrency(subtotal)}</span>
       </div>
       <div className='flex items-center justify-between gap-4'>
-        <span className='text-sm text-secondary'>Chiết khấu thêm:</span>
+        <span className='text-sm whitespace-nowrap text-secondary'>Chiết khấu thêm:</span>
         <NumberInput
           value={discount}
           onValueChange={onDiscountChange}
-          className='w-full max-w-[150px]'
+          className='w-full max-w-[150px] shrink-0'
         />
       </div>
       <div className='flex items-center justify-between border-t border-secondary pt-2'>

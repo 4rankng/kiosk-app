@@ -1,5 +1,5 @@
 import type { InvoiceDetail, BusinessEntity } from '@/types/api'
-import { formatCurrency, formatNumber, formatDate } from '@/lib/format'
+import { formatCurrency, formatNumber, formatDate, toNumber } from '@/lib/format'
 import { escapeHtml } from '@/lib/escape'
 
 export function generateInvoiceHTML(invoice: InvoiceDetail, entity: BusinessEntity): string {
@@ -72,7 +72,7 @@ export function generateInvoiceHTML(invoice: InvoiceDetail, entity: BusinessEnti
         <td style="text-align:right;padding:8px 10px;border:1px solid #333">Tổng cộng:</td>
         <td style="text-align:right;padding:8px 10px;border:1px solid #333">${formatCurrency(invoice.subtotal)}</td>
       </tr>
-      ${invoice.discount > 0 ? `<tr class="total-row"><td colspan="4"></td><td style="text-align:right;padding:8px 10px;border:1px solid #333">Chiết khấu:</td><td style="text-align:right;padding:8px 10px;border:1px solid #333">${formatCurrency(invoice.discount)}</td></tr>` : ''}
+      ${toNumber(invoice.discount) > 0 ? `<tr class="total-row"><td colspan="4"></td><td style="text-align:right;padding:8px 10px;border:1px solid #333">Chiết khấu:</td><td style="text-align:right;padding:8px 10px;border:1px solid #333">${formatCurrency(invoice.discount)}</td></tr>` : ''}
       <tr class="total-row">
         <td colspan="4"></td>
         <td style="text-align:right;padding:8px 10px;border:1px solid #333;font-size:14px">Khách cần trả:</td>

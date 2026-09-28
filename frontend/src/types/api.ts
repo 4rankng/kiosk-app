@@ -36,8 +36,8 @@ export interface Product {
   unitId: string | null
   unitName?: string | null
   unit?: string | null
-  purchasePrice: number
-  defaultSalePrice: number
+  purchasePrice: number | string
+  defaultSalePrice: number | string
   stockQuantity: number
   effectivePrice?: number
   isActive: boolean
@@ -87,8 +87,8 @@ export interface PriceListItem {
   name: string
   unit: string
   stockQuantity: number
-  basePrice: number
-  customPrice: number
+  basePrice: number | string
+  customPrice: number | string
   hasOverride: boolean
 }
 
@@ -114,9 +114,9 @@ export interface OrderItem {
   productName: string
   unit: string
   quantity: number
-  unitPrice: number
-  total: number
-  totalPrice?: number
+  unitPrice: number | string
+  total: number | string
+  totalPrice?: number | string
   sortOrder?: number
 }
 
@@ -129,10 +129,10 @@ export interface Order {
   businessEntityId: string
   businessEntityName: string | null
   status: OrderStatus
-  subtotal: number
-  discount: number
-  total: number
-  paidAmount: number
+  subtotal: number | string
+  discount: number | string
+  total: number | string
+  paidAmount: number | string
   notes: string | null
   createdAt: string
 }
@@ -143,7 +143,7 @@ export interface OrderDetail extends Order {
   items: OrderItem[]
   payments: Array<{
     id: string
-    amount: number
+    amount: number | string
     method: string
     paidAt: string
     note: string | null
@@ -164,10 +164,10 @@ export interface Invoice {
   customerName: string | null
   businessEntityId: string
   status: InvoiceStatus
-  subtotal: number
-  discount: number
-  total: number
-  paidAmount: number
+  subtotal: number | string
+  discount: number | string
+  total: number | string
+  paidAmount: number | string
   isPaid: boolean
   issuedAt: string
 }

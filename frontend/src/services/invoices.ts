@@ -3,6 +3,7 @@
  */
 import { apiClient, DEFAULT_PAGE_SIZE } from '@/lib/api-client'
 import type { Invoice, InvoiceDetail } from '@/types/api'
+import { toNumber } from '@/lib/format'
 
 export async function getInvoices(): Promise<Invoice[]> {
   const { data } = await apiClient.get<{ data: Invoice[] }>('/api/invoices', { params: { pageSize: DEFAULT_PAGE_SIZE } })
@@ -17,7 +18,9 @@ export async function getInvoiceById(id: string): Promise<InvoiceDetail> {
 export async function markInvoiceAsPaid(id: string): Promise<InvoiceDetail> {
   // Record full payment for the outstanding balance via the order's payment endpoint
   const detail = await getInvoiceById(id)
-  const outstanding = detail.total - detail.paidAmount
+  // numeric(15,2) arrives as a string. This figure is posted as the payment
+  // amount, so it must be a real number, not a coerced accident.
+  const outstanding = toNumber(detail.total) - toNumber(detail.paidAmount)
   if (outstanding <= 0) return detail
   await apiClient.post(
     `/api/orders/${detail.orderId}/payments`,

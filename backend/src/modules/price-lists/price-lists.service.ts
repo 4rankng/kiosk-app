@@ -67,6 +67,8 @@ export const priceListService = {
         name: products.name,
         unitName: units.name,
         stockQuantity: products.stockQuantity,
+        // Raw columns: values in a .select() map are SQL expressions, so they
+        // must not be computed here. Coerced in the row mapping below.
         defaultSalePrice: products.defaultSalePrice,
         customPrice: priceListItems.customPrice,
         hasOverride: sql<boolean>`${priceListItems.id} IS NOT NULL`,
@@ -95,6 +97,9 @@ export const priceListService = {
         unit: r.unitName ?? '',
         stockQuantity: r.stockQuantity,
         basePrice: Number(r.defaultSalePrice),
+        // numeric(15,2) -> string from Drizzle. Coerce both money fields so
+        // the POS cannot concatenate them into a NaN total.
+        defaultSalePrice: Number(r.defaultSalePrice),
         customPrice:
           r.customPrice !== null
             ? Number(r.customPrice)

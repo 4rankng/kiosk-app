@@ -171,7 +171,26 @@ async function safeInsert(
 // ---------------------------------------------------------------------------
 // Seed
 // ---------------------------------------------------------------------------
-export async function seed() {
+export /**
+ * Move each code sequence past the highest code already stored, so the next
+ * generated code cannot collide with a seeded row.
+ *
+ * Written to survive re-seeding: it reads the current maximum rather than a
+ * hard-coded number, so it is a no-op when the tables are empty.
+ */
+async function syncCodeSequences(): Promise<void> {
+  for (const [seq, table, column] of [
+    ['order_code_seq', 'orders', 'code'],
+    ['invoice_code_seq', 'invoices', 'code'],
+  ] as const) {
+    await pool.query(
+      `SELECT setval($1, GREATEST(COALESCE((SELECT MAX(SUBSTRING(${column} FROM 3)::int) FROM ${table}), 0), 1), true)`,
+      [seq],
+    )
+  }
+}
+
+async function seed() {
   console.log('\n========================================')
   console.log('  TingTing Kiosk - Seed Data')
   console.log('========================================\n')
@@ -594,6 +613,16 @@ export async function seed() {
       issuedAt: new Date('2026-06-09T08:00:00+07:00'),
     },
   ], 'invoices')
+
+  // Advance the code sequences past whatever was just inserted.
+  //
+  // `order_code_seq` and `invoice_code_seq` are created with START 1, but this
+  // seed writes literal codes (DH000001…, HD000001…). Without this, the first
+  // order created through the API calls nextval('order_code_seq') and gets 1,
+  // producing DH000001 — a duplicate, and the insert dies with
+  // "duplicate key value violates unique constraint orders_code_key". That
+  // blocked the primary POS workflow entirely.
+  await syncCodeSequences()
 
   console.log('\n========================================')
   console.log('  Seed complete!')

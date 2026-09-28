@@ -23,8 +23,11 @@ export function BusinessEntitySelector({ selected, onSelect }: BusinessEntitySel
   }, [selected, entities, onSelect])
 
   return (
-    <div className='space-y-2 pt-2'>
-      <p className='text-xs font-semibold uppercase tracking-wider text-tertiary'>
+    <div className='space-y-2'>
+      {/* leading-5: the app's 11px type scale sets a tight line-height, which
+          clips the stacked Vietnamese diacritics in an uppercase label
+          ("CƠ SỞ XUẤT PHIẾU IN"). */}
+      <p className='text-xs leading-5 font-semibold uppercase tracking-wider text-tertiary'>
         Cơ sở xuất phiếu in:
       </p>
       <RadioGroup

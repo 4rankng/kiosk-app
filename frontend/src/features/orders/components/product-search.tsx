@@ -6,11 +6,11 @@ import { InputBase } from '@/components/base/input/input'
 import { ModalOverlay, Modal, Dialog } from '@/components/application/modals/modal'
 import { CloseButton } from '@/components/base/buttons/close-button'
 import { SearchMd, PlusCircle } from '@untitledui/icons'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, toNumber } from '@/lib/format'
 
 interface ProductSearchProps {
   priceListId: string
-  onAddProduct: (product: { id: string; name: string; unit: string }, price: number) => void
+  onAddProduct: (product: { id: string; name: string; unit: string }, price: number | string) => void
 }
 
 export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps) {
@@ -33,13 +33,16 @@ export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps)
 
   // Memoized so `handleAdd` can depend on it directly rather than closing over
   // `priceList`/`results` implicitly.
+  // See pos-category-grid: numeric columns arrive as strings.
   const getPrice = useCallback((productId: string): number => {
     if (priceList) {
       const item = priceList.items.find((i) => i.productId === productId)
-      if (item) return item.customPrice
+      if (item && item.customPrice !== null && item.customPrice !== undefined) {
+        return toNumber(item.customPrice)
+      }
     }
     const product = results.find((p) => p.id === productId)
-    return product?.defaultSalePrice ?? 0
+    return toNumber(product?.defaultSalePrice)
   }, [priceList, results])
 
   const handleAdd = useCallback((product: { id: string; name: string; unit: string }) => {
