@@ -2,26 +2,47 @@
 
 Date: 2026-09-24
 Status: Implemented (foundation + exemplar surfaces)
+Superseded in part — 2026-09-28. See "Corrections" below. The **density contract**,
+**status-colour semantics** and **contrast rationale** in this document still stand.
+The **brand colour** and the **MCP/stack stance** no longer do.
 
 ## Outcome & Decisions
 
 - Goal: polish UI/UX for the B2B wholesale app with an ownable identity and a
   strict data-density contract.
-- Brand direction: **Fresh Market** — warm off-white base, deep green primary,
+- Brand direction: **Fresh Market** — warm off-white base, ~~deep green primary~~,
   amber reserved for debt/outstanding, soft 10px radius. Light-only.
+  *(2026-09-28: brand is now **indigo, oklch hue 265** — see the Token Contract note.)*
 - Density contract (user-mandated): **type 11px / 12px only**; controls
   **30–36px** (h-7.5 / h-8 / h-9).
 - Architecture: token-first. Density and color live in `theme.css` tokens and
-  shadcn primitives; features inherit. No per-page one-offs.
-- MCP comparison: **Tailkit** is the working source (raw JSX, shadcn-adjacent,
-  matches `.claude`-skill conventions). **Untitled UI** is reference-only — its
-  MCP installs React-Aria components that would conflict with the
-  Radix/shadcn + lucide-only rule. Its visual idioms (soft status badges,
-  quiet muted table headers) were borrowed, not its stack.
+  the component primitives; features inherit. No per-page one-offs.
+- MCP stance (CORRECTED 2026-09-28 — the original note below was wrong):
+  **UntitledUI PRO is the component layer.** The frontend is a native UntitledUI
+  project on React Aria; the PRO catalog and page templates install with zero
+  translation. **Tailkit is the layout lens only** — its raw JSX ships `dark:`
+  variants, palette-numbered colours and Heroicons CSS, none of which are legal
+  here, so its markup must be translated onto semantic tokens before it lands.
+  See the "UI/UX work" section in `AGENTS.md` for the workflow and the
+  token-translation table.
+- ~~Original (obsolete) MCP comparison: Tailkit is the working source. Untitled
+  UI is reference-only — its MCP installs React-Aria components that would
+  conflict with the Radix/shadcn + lucide-only rule.~~ This held while the
+  frontend was still on Radix + lucide. It is no longer true: the Radix layer
+  has been fully replaced by React Aria + `@untitledui/icons`, and UntitledUI is
+  now the source of truth for components.
 
 ## Token Contract (frontend/src/styles/theme.css)
 
-Palette (oklch, light-only):
+> **Authoritative source: `frontend/src/styles/theme.css`.** The table below records the
+> original 2026-09-24 proposal. The brand ramp has since moved from green to **indigo
+> (oklch hue 265)** because money state is encoded as colour (paid / due / overdue) and the
+> brand had to vacate the status family — the old green sat 0.068 OKLab ΔE from the success
+> green, so a "paid" badge was indistinguishable from a primary button. The warm off-white
+> page base is now a near-neutral `--color-paper` (chroma 0.005) rather than the tan-tinted
+> value below. Read `theme.css` for current values; it documents the reasoning inline.
+
+Palette (oklch, light-only) — *as originally specified, green brand*:
 
 | Token | Value | Use |
 |---|---|---|

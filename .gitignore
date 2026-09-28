@@ -181,3 +181,6 @@ plans/backups/
 # Vitest browser failure screenshots
 __screenshots__/
 .vitest-attachments/
+
+# macOS Finder metadata (appears in component dirs during UI work)
+.DS_Store
