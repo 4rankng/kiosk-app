@@ -105,7 +105,7 @@ function StatCard({
     <div className='rounded-lg border border-primary bg-primary p-4'>
       <div className='flex items-center justify-between'>
         <span className='text-sm font-medium text-tertiary'>{label}</span>
-        <Icon className='size-4 text-fg-quaternary' />
+        <Icon className='size-4 text-quaternary' />
       </div>
       <div className='mt-2 font-heading text-display-md font-semibold tabular-nums text-primary'>
         {value}

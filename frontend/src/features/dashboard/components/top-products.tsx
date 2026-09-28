@@ -46,7 +46,7 @@ export function TopProducts() {
       <WidgetCard title={TITLE} description={DESCRIPTION}>
         <EmptyState
           variant='empty'
-          icon={<Package className='size-10 text-fg-quaternary' />}
+          icon={<Package className='size-10 text-quaternary' />}
           title='Chưa có sản phẩm'
           description='Dữ liệu sẽ xuất hiện khi có đơn hàng'
           className='my-auto'

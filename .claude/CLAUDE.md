@@ -104,7 +104,7 @@ list below, **this repo wins**:
 |---|---|
 | `npx shadcn@latest` to install components | **Do not.** That installs Radix primitives, which conflict with the React Aria stack. Use `npx untitledui@latest` (below). |
 | lucide icons | **`@untitledui/icons` only.** Resolve names via the MCP's `search_icons`. |
-| CSS-var / shadcn colour vars | Semantic tokens from `src/styles/theme.css` (`text-fg-primary`, `bg-success-primary`, …) |
+| CSS-var / shadcn colour vars | Semantic tokens from `src/styles/theme.css` (`text-primary`, `bg-success-primary`, `border-primary`, …) |
 | 44px mobile touch targets | **30/32/36px** (`h-7.5`/`h-8`/`h-9`) — the dense 11/12px contract |
 | tailwind default type scale | Everything ≥ `text-xl` is banned; scale is 11px/12px only |
 | dark mode variants | Light-only. No `dark:` anywhere. |
@@ -162,21 +162,27 @@ pagination, slideout-menu.
 
 Tailkit emits raw mockup JSX. It **cannot** be pasted in. Translate it:
 
-*Colour* — the app exposes 361 `--color-*` tokens (`fg` / `bg` / `text` / `border`, each
-`primary`/`secondary`/`tertiary`, plus brand/success/warning/error):
+*Colour* — the app uses the **shim vocabulary** (`text-primary`, `border-primary`, `bg-primary`),
+which resolves through `untitledui.css`'s alias layer to the `--color-*` tokens. `fg-*` classes
+are direct theme keys and are valid, but they are **not** the house convention — the exception is
+the status family (`text-fg-success`, `text-fg-warning`, `text-fg-error`, `text-fg-brand`), which
+belongs to a different scale and is correct as written.
 
 | Tailkit emits | Use |
 |---|---|
 | `bg-white`, `bg-primary` | `bg-primary` |
 | `bg-gray-50/100`, `bg-secondary-50` | `bg-secondary` |
-| `border-gray-200`, `border-secondary-100` | `border-border-primary` / `-secondary` / `-tertiary` |
-| `text-gray-900/800` | `text-fg-primary` |
-| `text-gray-600/700`, `text-secondary-700` | `text-fg-secondary` |
-| `text-gray-500` (muted) | `text-fg-tertiary` |
-| primary action | `bg-brand-primary`, `text-text-brand-primary` |
-| success / paid | `bg-success-primary` (soft `/10`), `text-text-success-primary` |
-| warning / debt outstanding | `bg-warning-primary` (soft `/10`), `text-text-warning-primary` |
-| error / unpaid | `bg-error-primary` (soft `/10`), `text-text-error-primary` |
+| `border-gray-200`, `border-secondary-100` | `border-primary` (default edge) / `border-secondary` (row dividers) |
+| `text-gray-900/800` | `text-primary` |
+| `text-gray-600/700`, `text-secondary-700` | `text-secondary` |
+| `text-gray-500` (muted) | `text-tertiary` body-muted · `text-quaternary` faintest tier |
+| primary action | `bg-brand-primary`, `text-brand-primary` |
+| success / paid | `bg-success-primary` (soft `/10`), `text-success-primary` |
+| warning / debt outstanding | `bg-warning-primary` (soft `/10`), `text-warning-primary` |
+| error / unpaid | `bg-error-primary` (soft `/10`), `text-error-primary` |
+
+> Note the two scales: `--color-text-quaternary` is neutral-500 but `--color-fg-quaternary` is
+> neutral-400. Prefer the `text-*` form for the faintest tier so it matches the other muted text.
 
 *Dark mode* — delete every `dark:*`. The app is light-only by contract.
 *Type* — `text-xl` and up are banned; the scale is `text-xs` (11px) and `text-sm`/`md`/`lg` (12px).

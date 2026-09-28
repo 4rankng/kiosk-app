@@ -61,7 +61,7 @@ export function OrderReviewSheet({
               variant='empty'
               title='Chưa có sản phẩm nào'
               description='Chọn hàng hóa từ danh sách phía dưới'
-              icon={<ShoppingCart01 className='size-6 text-fg-quaternary' />}
+              icon={<ShoppingCart01 className='size-6 text-quaternary' />}
             />
           ) : (
             <>

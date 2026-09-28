@@ -22,7 +22,7 @@ export function OrderLineItems({
         variant='empty'
         title='Chưa có sản phẩm nào'
         description='Tìm kiếm và thêm hàng hóa ở trên'
-        icon={<ShoppingCart01 className='size-6 text-fg-quaternary' />}
+        icon={<ShoppingCart01 className='size-6 text-quaternary' />}
       />
     )
   }

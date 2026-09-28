@@ -19,7 +19,7 @@ export function NotificationBell() {
             <h4 className='text-sm font-semibold text-secondary'>Thông báo</h4>
           </div>
           <div className='flex flex-col items-center justify-center gap-2 p-8 text-center'>
-            <Bell03 aria-hidden='true' className='size-8 text-fg-quaternary' />
+            <Bell03 aria-hidden='true' className='size-8 text-quaternary' />
             <p className='text-sm text-tertiary'>Không có thông báo mới</p>
           </div>
         </Dialog>

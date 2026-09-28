@@ -104,7 +104,7 @@ function DetailTable({ details }: { details: ProductReportRow['details'] }) {
   return (
     <div className='mx-4 mb-2'>
       <p className='flex items-center gap-1.5 py-2 text-sm font-semibold'>
-        <SearchMd className='size-4 text-fg-quaternary' />
+        <SearchMd className='size-4 text-quaternary' />
         Chi tiết lịch sử tiêu thụ
       </p>
       <Table>

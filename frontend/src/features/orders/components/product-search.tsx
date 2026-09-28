@@ -90,7 +90,7 @@ export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps)
                 </div>
                 <div className='flex shrink-0 items-center gap-2'>
                   <span className='text-xs text-tertiary tabular-nums'>{formatCurrency(getPrice(p.id))}</span>
-                  <PlusCircle className='size-4 text-fg-quaternary' />
+                  <PlusCircle className='size-4 text-quaternary' />
                 </div>
               </button>
             ))}
@@ -137,7 +137,7 @@ export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps)
                         <div className='text-sm font-medium text-primary'>{p.name}</div>
                         <div className='text-xs text-tertiary'>{p.code} · {p.unitName ?? ''}</div>
                       </div>
-                      <PlusCircle className='size-5 shrink-0 text-fg-quaternary' />
+                      <PlusCircle className='size-5 shrink-0 text-quaternary' />
                     </button>
                   ))}
                   {query.length >= 1 && results.length === 0 && (

@@ -21,7 +21,7 @@ export function ReportKpiCard({
   hint,
   labelClassName = 'text-tertiary',
   valueClassName = 'text-primary',
-  iconClassName = 'text-fg-quaternary',
+  iconClassName = 'text-quaternary',
 }: ReportKpiCardProps) {
   return (
     <div className='rounded-lg border border-primary bg-primary p-4'>

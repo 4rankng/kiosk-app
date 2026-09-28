@@ -51,7 +51,7 @@ export function MobileCard({
               )}
             </div>
           </div>
-          <span className='mt-0.5 shrink-0 text-fg-quaternary'>
+          <span className='mt-0.5 shrink-0 text-quaternary'>
             {expanded ? (
               <ChevronDown className='size-4' />
             ) : (
