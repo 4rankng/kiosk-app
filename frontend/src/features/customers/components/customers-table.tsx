@@ -21,10 +21,11 @@ export function CustomersTable() {
   const { data: customersData, isLoading: isCustomersLoading, isError: isCustomersError, refetch: refetchCustomers } = useQuery({ queryKey: ['customers'], queryFn: () => getCustomers() })
   const customers = customersData?.data ?? []
   const { data: companiesData } = useQuery({ queryKey: ['companies'], queryFn: () => getCompanies() })
-  const companies = companiesData?.data ?? []
+  // Derived inside the memo on purpose: `companiesData?.data ?? []` allocates a
+  // fresh array every render, which would invalidate this memo each time.
   const companyOptions = useMemo(
-    () => companies.map((c: { id: string; name: string }) => ({ label: c.name, value: c.id })),
-    [companies]
+    () => (companiesData?.data ?? []).map((c: { id: string; name: string }) => ({ label: c.name, value: c.id })),
+    [companiesData]
   )
   const columns = useMemo(() => getCustomersColumns(), [])
   const isMobile = useIsMobile()

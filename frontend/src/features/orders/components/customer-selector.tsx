@@ -219,9 +219,10 @@ export function CustomerSelector({
     queryKey: ['customers'],
     queryFn: () => getCustomers(),
   })
-  const customers = customersData?.data ?? []
-
+  // Derived inside the memo on purpose: `customersData?.data ?? []` allocates a
+  // fresh array every render, which would invalidate this memo each time.
   const filtered = useMemo(() => {
+    const customers = customersData?.data ?? []
     if (!query) return customers
     const q = query.toLowerCase()
     return customers.filter(
@@ -230,7 +231,7 @@ export function CustomerSelector({
         c.code.toLowerCase().includes(q) ||
         (c.phone ?? '').includes(q)
     )
-  }, [customers, query])
+  }, [customersData, query])
 
   function handleSelect(customer: Customer) {
     setQuery('')

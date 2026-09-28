@@ -31,19 +31,21 @@ export function ProductSearch({ priceListId, onAddProduct }: ProductSearchProps)
     enabled: !!priceListId,
   })
 
-  function getPrice(productId: string): number {
+  // Memoized so `handleAdd` can depend on it directly rather than closing over
+  // `priceList`/`results` implicitly.
+  const getPrice = useCallback((productId: string): number => {
     if (priceList) {
       const item = priceList.items.find((i) => i.productId === productId)
       if (item) return item.customPrice
     }
     const product = results.find((p) => p.id === productId)
     return product?.defaultSalePrice ?? 0
-  }
+  }, [priceList, results])
 
   const handleAdd = useCallback((product: { id: string; name: string; unit: string }) => {
     onAddProduct(product, getPrice(product.id))
     setQuery('')
-  }, [onAddProduct, priceList, results])
+  }, [onAddProduct, getPrice])
 
   const handleFocus = () => {
     if (blurTimeout.current) clearTimeout(blurTimeout.current)

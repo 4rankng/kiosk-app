@@ -69,18 +69,22 @@ export function CompanyMutateDialog() {
       : { name: '', taxCode: '', priceListId: '' },
   })
 
+  // `reset` is a stable reference across renders, unlike the `form` object
+  // itself — depending on it keeps this effect from firing on every render.
+  const { reset } = form
+
   // Reset form when dialog opens with new company data
   useEffect(() => {
     if (open === 'edit' && selectedCompany) {
-      form.reset({
+      reset({
         name: selectedCompany.name ?? '',
         taxCode: selectedCompany.taxCode ?? '',
         priceListId: selectedCompany.priceListId ?? '',
       })
     } else if (open === 'add') {
-      form.reset({ name: '', taxCode: '', priceListId: '' })
+      reset({ name: '', taxCode: '', priceListId: '' })
     }
-  }, [open, selectedCompany])
+  }, [open, selectedCompany, reset])
 
   const mutation = useMutation({
     mutationFn: (values: CompanySchema) =>

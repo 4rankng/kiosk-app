@@ -99,10 +99,14 @@ export function CustomerMutateDialog() {
       : { code: '', name: '', companyId: '', phone: '', email: '', address: '', taxId: '' },
   })
 
+  // `reset` is a stable reference across renders, unlike the `form` object
+  // itself — depending on it keeps this effect from firing on every render.
+  const { reset } = form
+
   // Reset form when dialog opens with new customer data
   useEffect(() => {
     if (open === 'edit' && selectedCustomer) {
-      form.reset({
+      reset({
         code: selectedCustomer.code ?? '',
         name: selectedCustomer.name ?? '',
         companyId: selectedCustomer.companyId ?? '',
@@ -112,9 +116,9 @@ export function CustomerMutateDialog() {
         taxId: selectedCustomer.taxId ?? '',
       })
     } else if (open === 'add') {
-      form.reset({ code: '', name: '', companyId: '', phone: '', email: '', address: '', taxId: '' })
+      reset({ code: '', name: '', companyId: '', phone: '', email: '', address: '', taxId: '' })
     }
-  }, [open, selectedCustomer])
+  }, [open, selectedCustomer, reset])
 
   const mutation = useMutation({
     mutationFn: (values: CustomerSchema) =>
