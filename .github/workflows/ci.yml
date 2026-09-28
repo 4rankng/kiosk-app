@@ -44,6 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Reads the pinned version from packageManager in package.json.
       - uses: pnpm/action-setup@v4
 
       - uses: actions/setup-node@v4
