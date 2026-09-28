@@ -54,6 +54,12 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # `@kiosk/shared` resolves through its `dist/`, which is gitignored, so a
+      # fresh checkout has no types until it is built. Everything downstream
+      # (backend typecheck, build, both test suites) depends on it.
+      - name: Build shared contracts
+        run: pnpm --filter @kiosk/shared build
+
       # The backend suite opens a real Redis client on import and asserts
       # read-only or in-memory behaviour against the local kiosk_dev database.
       - name: Apply migrations
