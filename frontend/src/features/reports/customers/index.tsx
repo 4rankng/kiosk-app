@@ -10,7 +10,7 @@ import { useReportDateRange } from '@/components/use-report-date-range'
 import { CustomerReportTable } from './components/customer-report-table'
 import { ExportActions } from './components/export-actions'
 import { formatCurrency } from '@/lib/format'
-import { ReportKpiCard } from '@/features/reports/components/report-kpi-card'
+import { ReportKpiGrid } from '@/features/reports/components/report-kpi-card'
 
 
 /** Roll the report rows up into the three summary KPI values. */
@@ -22,39 +22,6 @@ function summarizeCustomerReport(rows: CustomerReportRow[]) {
       customers: acc.customers + 1,
     }),
     { revenue: 0, unpaid: 0, customers: 0 }
-  )
-}
-
-/** The three summary KPI cards above the report table. */
-function CustomerReportKpis({
-  summary,
-}: {
-  summary: ReturnType<typeof summarizeCustomerReport>
-}) {
-  return (
-    <div className='grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4'>
-      <ReportKpiCard
-        icon={Users01}
-        label='Khách hàng giao dịch'
-        value={summary.customers}
-        hint='đối tác trong kỳ'
-      />
-      <ReportKpiCard
-        icon={CurrencyDollar}
-        label='Tổng tiền hàng'
-        value={formatCurrency(summary.revenue)}
-        hint='tổng doanh thu phát sinh'
-      />
-      <ReportKpiCard
-        icon={AlertCircle}
-        label='Tiền chưa thu (Công nợ)'
-        value={formatCurrency(summary.unpaid)}
-        hint='cần đối chiếu thu nợ'
-        labelClassName='text-brand-tertiary'
-        valueClassName='text-brand-tertiary'
-        iconClassName='text-brand-tertiary'
-      />
-    </div>
   )
 }
 
@@ -109,7 +76,16 @@ export function CustomerReport() {
         description: 'Không tìm thấy đơn hàng hoặc hóa đơn trong khoảng thời gian đã chọn. Hãy thử nới rộng khoảng thời gian lọc.',
       }}
     >
-      <CustomerReportKpis summary={summary} />
+      <ReportKpiGrid
+        kpis={[
+          { icon: Users01, label: 'Khách hàng giao dịch', value: summary.customers, hint: 'đối tác trong kỳ' },
+          { icon: CurrencyDollar, label: 'Tổng tiền hàng', value: formatCurrency(summary.revenue), hint: 'tổng doanh thu phát sinh' },
+          {
+            icon: AlertCircle, label: 'Tiền chưa thu (Công nợ)', value: formatCurrency(summary.unpaid), hint: 'cần đối chiếu thu nợ',
+            labelClassName: 'text-brand-tertiary', valueClassName: 'text-brand-tertiary', iconClassName: 'text-brand-tertiary',
+          },
+        ]}
+      />
 
       <ExportActions data={reportData} companyName={activeCompanyName} />
       <CustomerReportTable data={reportData} />

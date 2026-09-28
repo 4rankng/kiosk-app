@@ -6,7 +6,7 @@ import { ReportScreen } from '@/components/report-screen'
 import { useReportDateRange } from '@/components/use-report-date-range'
 import { ProductReportTable } from './components/product-report-table'
 import { formatCurrency } from '@/lib/format'
-import { ReportKpiCard } from '@/features/reports/components/report-kpi-card'
+import { ReportKpiGrid } from '@/features/reports/components/report-kpi-card'
 
 
 /** Roll the report rows up into the three summary KPI values. */
@@ -18,39 +18,6 @@ function summarizeProductReport(rows: ProductReportRow[]) {
       products: acc.products + 1,
     }),
     { revenue: 0, quantity: 0, products: 0 }
-  )
-}
-
-/** The three summary KPI cards above the report table. */
-function ProductReportKpis({
-  summary,
-}: {
-  summary: ReturnType<typeof summarizeProductReport>
-}) {
-  return (
-    <div className='grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4'>
-      <ReportKpiCard
-        icon={Package}
-        label='Số mặt hàng bán ra'
-        value={summary.products}
-        hint='mặt hàng phát sinh đơn'
-      />
-      <ReportKpiCard
-        icon={ShoppingBag02}
-        label='Tổng số lượng đã bán'
-        value={summary.quantity.toLocaleString('vi-VN')}
-        hint='sản phẩm / đơn vị'
-      />
-      <ReportKpiCard
-        icon={TrendUp01}
-        label='Tổng doanh thu'
-        value={formatCurrency(summary.revenue)}
-        hint='doanh thu tích lũy'
-        labelClassName='text-primary'
-        valueClassName='text-primary'
-        iconClassName='text-fg-secondary'
-      />
-    </div>
   )
 }
 
@@ -84,7 +51,16 @@ export function ProductReport() {
         description: 'Không tìm thấy đơn hàng nào có sản phẩm bán ra trong khoảng thời gian đã chọn.',
       }}
     >
-      <ProductReportKpis summary={summary} />
+      <ReportKpiGrid
+        kpis={[
+          { icon: Package, label: 'Số mặt hàng bán ra', value: summary.products, hint: 'mặt hàng phát sinh đơn' },
+          { icon: ShoppingBag02, label: 'Tổng số lượng đã bán', value: summary.quantity.toLocaleString('vi-VN'), hint: 'sản phẩm / đơn vị' },
+          {
+            icon: TrendUp01, label: 'Tổng doanh thu', value: formatCurrency(summary.revenue), hint: 'doanh thu tích lũy',
+            labelClassName: 'text-primary', valueClassName: 'text-primary', iconClassName: 'text-fg-secondary',
+          },
+        ]}
+      />
       <ProductReportTable data={reportData} />
     </ReportScreen>
   )
